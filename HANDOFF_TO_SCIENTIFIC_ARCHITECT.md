@@ -46,11 +46,11 @@ PASS. The product matches the reference interaction density and spacing while us
 
 ## 9. Accessibility and Test Results
 
-Lint, TypeScript, 10 Vitest tests, 14 publisher integration tests, schema/content validation, 31-page export, route scan, project-site export, asset budget, and 7 Playwright tests pass. axe found 0 critical violations. Two consecutive Lighthouse runs scored Performance 92, Accessibility 96, Best Practices 96, FCP 1.2 s, LCP 3.1 s, TBT 150-160 ms, CLS 0.
+Lint, TypeScript, 11 Vitest tests, 14 publisher integration tests, schema/content validation, 31-page export, route scan, project-site export, asset budget, and 7 Playwright tests pass. axe found 0 critical violations. Two consecutive Lighthouse runs scored Performance 92, Accessibility 96, Best Practices 96, FCP 1.2 s, LCP 3.1 s, TBT 150-160 ms, CLS 0.
 
 ## 10. Static-Site Size
 
-The final project-path export is 5,926,946 bytes (5.65 MiB), well below the 750 MB warning and 900 MB block thresholds. No PDF exceeds 25 MB.
+The final project-path export is 5,971,834 bytes (5.70 MiB), well below the 750 MB warning and 900 MB block thresholds. No PDF exceeds 25 MB.
 
 ## 11. GitHub Actions Status
 

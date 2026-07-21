@@ -6,13 +6,13 @@
 |---|---|
 | ESLint | PASS |
 | TypeScript | PASS |
-| Vitest | PASS: 10 tests in 5 files |
+| Vitest | PASS: 11 tests in 5 files |
 | Publication CLI integration | PASS: 14 tests |
 | Content and schema validation | PASS: 3 synthetic runs, 0 errors, 0 warnings |
 | Root static export | PASS: 31 HTML pages |
 | Project-site `basePath` export | PASS: routes, Next assets, PDF worker, and PDF artifact |
 | Static route and local-path scan | PASS: 31 HTML pages |
-| Asset budget | PASS: 5,926,946 bytes (5.65 MiB) |
+| Asset budget | PASS: 5,971,834 bytes (5.70 MiB) |
 | Playwright | PASS: 7 end-to-end tests |
 | axe | PASS: 0 critical violations on primary pages |
 

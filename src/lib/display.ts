@@ -15,6 +15,7 @@ export function formatDate(value: string, locale = "en-US") {
     year: "numeric",
     month: "short",
     day: "numeric",
+    timeZone: "UTC",
   }).format(new Date(value));
 }
 
