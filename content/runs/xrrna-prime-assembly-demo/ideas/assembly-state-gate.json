@@ -1,0 +1,21 @@
+{
+  "schema_version": "ResearchIdeaManifestV1",
+  "idea_id": "demo_xrrna_idea_001",
+  "slug": "assembly-state-gate",
+  "title": "Assembly-state gating for a protected prime-editing intermediate",
+  "short_title": "Assembly-state gate",
+  "abstract": "A synthetic example of a mechanism-focused hypothesis: the protective RNA element is treated as a state-selective gate rather than a generic stability tag. The report separates what would be measured, what remains uncertain, and what result would end the line of investigation.",
+  "category": "Mechanism-focused",
+  "disposition": "Retained for focused evaluation",
+  "recommendation": "Recommended for focused testing",
+  "tags": ["RNA folding", "kinetics", "causal test"],
+  "origin": "Synthetic portal demonstration",
+  "updated_at": "2026-07-21T08:00:00Z",
+  "language_variants": {"en": "English", "ko": "한국어"},
+  "report_pdf": {"en": "/artifacts/xrrna-prime-assembly-demo/idea-report-en.pdf", "ko": "/artifacts/xrrna-prime-assembly-demo/idea-report-ko.pdf"},
+  "report_markdown": {"en": "reports/assembly-state-gate-en.md", "ko": "reports/assembly-state-gate-ko.md"},
+  "knowledge_refs": ["knowledge-background-en"],
+  "reference_count": 4,
+  "figure_count": 1,
+  "publication_status": "DEMO_ONLY"
+}

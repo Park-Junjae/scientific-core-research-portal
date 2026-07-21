@@ -1,0 +1,4 @@
+{
+  "$ref": "./schemas/publication-allowlist-v1.schema.json",
+  "description": "Canonical location retained for publication operators and reviewers."
+}

@@ -1,0 +1,61 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  visibility:
+    runs-on: ubuntu-latest
+    outputs:
+      deployable: ${{ steps.gate.outputs.deployable }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: gate
+        run: node scripts/check-visibility.mjs --github-output >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: visibility
+    if: needs.visibility.outputs.deployable == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.9.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/configure-pages@v5
+      - run: pnpm install --frozen-lockfile
+      - run: python -m pip install -e .
+      - run: python -m coscientist.site validate-content --portal-root . --public-build
+      - run: NEXT_PUBLIC_BASE_PATH=/scientific-core-research-portal pnpm build
+      - run: pnpm test:links && pnpm test:basepath -- /scientific-core-research-portal && pnpm test:budget
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

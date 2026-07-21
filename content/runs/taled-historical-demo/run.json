@@ -1,0 +1,47 @@
+{
+  "schema_version": "ResearchRunManifestV1",
+  "run_id": "demo_taled_historical_001",
+  "slug": "taled-historical-demo",
+  "title": "TALED Editing-Window Study",
+  "short_title": "TALED historical case",
+  "subtitle": "Archived scientific-quality case showing why plausible ideas require stronger grounding",
+  "owner": "Scientific Core",
+  "created_at": "2026-07-05T09:00:00Z",
+  "updated_at": "2026-07-16T16:00:00Z",
+  "status": "ARCHIVED",
+  "terminal_state": "HISTORICAL_QUALITY_CASE",
+  "research_domain": "Mitochondrial genome editing",
+  "research_goal": "Demonstrate an archived run whose early ideas were readable and mechanistic but insufficiently grounded for an active recommendation.",
+  "summary": "The historical demonstration preserves two mechanisms as learning examples. It highlights the difference between a useful causal coordinate and evidence that a complete TALED architecture will work.",
+  "scientific_decision": "Archive as a scientific-quality case. Retain helical phase and exposure-time concepts as testable coordinates, but do not present either as an active recommendation.",
+  "reading_order": ["Why the run was archived", "Helical phase concept", "Exposure-time concept", "Lessons for future runs"],
+  "tags": ["TALED", "mitochondria", "historical case"],
+  "languages": ["en", "ko"],
+  "visibility": "PUBLIC_SANITIZED",
+  "publication_status": "DEMO_ONLY",
+  "idea_count": 2,
+  "reviewed_idea_count": 2,
+  "retained_idea_count": 0,
+  "report_count": 2,
+  "knowledge_document_count": 1,
+  "featured": false,
+  "source_type": "SYNTHETIC_DEMO",
+  "source_commit": "demo-not-linked-to-scientific-runtime",
+  "source_bundle_hash": "sha256:demo-taled-bundle",
+  "current_stage": "Archived",
+  "progress_percent": 100,
+  "timeline": [
+    {"date": "2026-07-05", "label": "Initial exploration", "detail": "Editing-window mechanisms were surveyed."},
+    {"date": "2026-07-10", "label": "Evidence audit", "detail": "Architecture-level support was found to be incomplete."},
+    {"date": "2026-07-16", "label": "Archived", "detail": "The run was retained as a quality-learning case only."}
+  ],
+  "idea_refs": ["helical-phase-coordinate", "exposure-time-distribution"],
+  "report_refs": [
+    {"id": "taled-case-en", "title": "Historical case report", "kind": "PDF", "path": "/artifacts/taled-historical-demo/historical-case-en.pdf", "language": "en"},
+    {"id": "taled-case-ko", "title": "과거 사례 보고서", "kind": "PDF", "path": "/artifacts/taled-historical-demo/historical-case-ko.pdf", "language": "ko"}
+  ],
+  "knowledge_refs": [
+    {"id": "taled-knowledge", "title": "TALED background", "kind": "MARKDOWN", "path": "knowledge/taled-background-en.md", "language": "en"}
+  ],
+  "artifact_refs": []
+}

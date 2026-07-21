@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scientific-core.local/schemas/research-artifact-manifest-v1.schema.json",
+  "title": "ResearchArtifactManifestV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "artifacts"],
+  "properties": {
+    "schema_version": {"const": "ResearchArtifactManifestV1"},
+    "run_id": {"type": "string"},
+    "artifacts": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "title", "kind", "path", "approved"], "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "kind": {"enum": ["PDF", "MARKDOWN", "JSON", "CSV", "IMAGE"]}, "path": {"type": "string"}, "approved": {"type": "boolean"}, "language": {"type": "string"}, "sha256": {"type": "string"}}}}
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scientific-core.local/schemas/publication-allowlist-v1.schema.json",
+  "title": "PublicationAllowlistV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "visibility", "approved_artifacts", "denied_patterns", "approved_by", "approved_at"],
+  "properties": {
+    "schema_version": {"const": "PublicationAllowlistV1"},
+    "run_id": {"type": "string"},
+    "visibility": {"enum": ["PRIVATE", "LAB_INTERNAL", "PUBLIC_SANITIZED"]},
+    "approved_artifacts": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "denied_patterns": {"type": "array", "items": {"type": "string"}},
+    "approved_by": {"type": "string"},
+    "approved_at": {"type": "string", "format": "date-time"}
+  }
+}

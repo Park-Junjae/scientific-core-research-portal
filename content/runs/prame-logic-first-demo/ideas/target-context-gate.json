@@ -1,0 +1,21 @@
+{
+  "schema_version": "ResearchIdeaManifestV1",
+  "idea_id": "demo_prame_idea_001",
+  "slug": "target-context-gate",
+  "title": "Target-context gate before transfer",
+  "short_title": "Target-context gate",
+  "abstract": "A synthetic transfer hypothesis that makes context compatibility an explicit gate. It asks whether the biological state required for the proposed mechanism is present and measurable before importing an intervention from another setting.",
+  "category": "Decision logic",
+  "disposition": "Awaiting context review",
+  "recommendation": "Refine before testing",
+  "tags": ["context", "transfer", "gate"],
+  "origin": "Synthetic portal demonstration",
+  "updated_at": "2026-07-20T11:00:00Z",
+  "language_variants": {"en": "English", "ko": "한국어"},
+  "report_pdf": {"en": "/artifacts/prame-logic-first-demo/logic-first-report-en.pdf", "ko": "/artifacts/prame-logic-first-demo/logic-first-report-ko.pdf"},
+  "report_markdown": {"en": "reports/target-context-gate-en.md", "ko": "reports/target-context-gate-ko.md"},
+  "knowledge_refs": ["transfer-background-en"],
+  "reference_count": 3,
+  "figure_count": 0,
+  "publication_status": "DEMO_ONLY"
+}

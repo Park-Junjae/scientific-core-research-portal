@@ -1,0 +1,1 @@
+{"schema_version":"ResearchArtifactManifestV1","run_id":"demo_xrrna_prime_assembly_001","artifacts":[{"id":"xrrna-method-note","title":"Demo publication note","kind":"MARKDOWN","path":"artifacts/demo-publication-note.md","approved":true,"language":"en"}]}

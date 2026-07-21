@@ -1,0 +1,11 @@
+# Accessibility Report
+
+## Result
+
+PASS. Lighthouse accessibility scored **100**, and Playwright + axe found **0 critical violations** on Runs, Run Overview, and New Run.
+
+## Implemented controls
+
+Semantic landmarks and tables, a skip link, visible focus rings, labelled icon controls, natural status text, 44 px major targets, keyboard-operable links/forms/tabs, a labelled mobile navigation dialog, reduced-motion behavior, Korean-capable font fallbacks, and text labels that do not depend on color alone.
+
+Automated interaction coverage includes status filters, list/grid controls, language selection, report tabs, form validation, downloads, deep links, and mobile navigation. Manual review confirmed heading order, focus visibility, PDF fallback, mobile wrapping, readable contrast, and no incoherent overlap.

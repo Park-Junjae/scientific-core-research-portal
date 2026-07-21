@@ -1,0 +1,21 @@
+{
+  "schema_version": "ResearchIdeaManifestV1",
+  "idea_id": "demo_xrrna_idea_002",
+  "slug": "intermediate-readout",
+  "title": "Molecular-identity readout before causal attribution",
+  "short_title": "Intermediate readout",
+  "abstract": "This synthetic measurement-first concept asks whether the proposed early intermediate can be identified on the same recovered molecule before any mechanistic conclusion is made. It illustrates how the portal represents a useful blocked or measurement-dependent direction without overstating evidence.",
+  "category": "Measurement-method research",
+  "disposition": "Retained as a measurement program",
+  "recommendation": "Measurement-method research",
+  "tags": ["molecular identity", "measurement", "uncertainty"],
+  "origin": "Synthetic portal demonstration",
+  "updated_at": "2026-07-21T07:40:00Z",
+  "language_variants": {"en": "English", "ko": "한국어"},
+  "report_pdf": {"en": "/artifacts/xrrna-prime-assembly-demo/measurement-report-en.pdf", "ko": "/artifacts/xrrna-prime-assembly-demo/measurement-report-ko.pdf"},
+  "report_markdown": {"en": "reports/intermediate-readout-en.md", "ko": "reports/intermediate-readout-ko.md"},
+  "knowledge_refs": ["knowledge-background-en"],
+  "reference_count": 3,
+  "figure_count": 0,
+  "publication_status": "DEMO_ONLY"
+}

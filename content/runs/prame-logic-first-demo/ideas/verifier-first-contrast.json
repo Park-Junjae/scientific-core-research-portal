@@ -1,0 +1,21 @@
+{
+  "schema_version": "ResearchIdeaManifestV1",
+  "idea_id": "demo_prame_idea_002",
+  "slug": "verifier-first-contrast",
+  "title": "Verifier-first contrast for causal transfer",
+  "short_title": "Verifier-first contrast",
+  "abstract": "This measurement-oriented concept defines the positive, negative, and ambiguity patterns that a transfer experiment must resolve. It is retained as background program work rather than presented as a therapeutic hypothesis.",
+  "category": "Measurement-method research",
+  "disposition": "Background program",
+  "recommendation": "Background program",
+  "tags": ["assay validity", "controls", "decision robustness"],
+  "origin": "Synthetic portal demonstration",
+  "updated_at": "2026-07-20T10:00:00Z",
+  "language_variants": {"en": "English", "ko": "한국어"},
+  "report_pdf": {"en": "/artifacts/prame-logic-first-demo/verifier-report-en.pdf", "ko": "/artifacts/prame-logic-first-demo/verifier-report-ko.pdf"},
+  "report_markdown": {"en": "reports/verifier-first-contrast-en.md", "ko": "reports/verifier-first-contrast-ko.md"},
+  "knowledge_refs": ["transfer-background-en"],
+  "reference_count": 2,
+  "figure_count": 0,
+  "publication_status": "DEMO_ONLY"
+}

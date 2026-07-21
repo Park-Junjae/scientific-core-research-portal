@@ -1,0 +1,21 @@
+{
+  "schema_version": "ResearchIdeaManifestV1",
+  "idea_id": "demo_taled_idea_002",
+  "slug": "exposure-time-distribution",
+  "title": "Product purity as an exposure-time distribution",
+  "short_title": "Exposure-time distribution",
+  "abstract": "An archived hypothesis that treats multiple-edit reads as a kinetic exposure problem rather than a static reach problem. It remains a conceptual coordinate because the historical run lacked locus-resolved evidence that time control could narrow the window without proportional activity loss.",
+  "category": "Historical mechanism concept",
+  "disposition": "Archived learning case",
+  "recommendation": "Parked",
+  "tags": ["dwell time", "product purity", "kinetics"],
+  "origin": "Synthetic historical demonstration",
+  "updated_at": "2026-07-16T14:30:00Z",
+  "language_variants": {"en": "English", "ko": "한국어"},
+  "report_pdf": {"en": "/artifacts/taled-historical-demo/exposure-case-en.pdf", "ko": "/artifacts/taled-historical-demo/exposure-case-ko.pdf"},
+  "report_markdown": {"en": "reports/exposure-time-distribution-en.md", "ko": "reports/exposure-time-distribution-ko.md"},
+  "knowledge_refs": ["taled-background-en"],
+  "reference_count": 3,
+  "figure_count": 0,
+  "publication_status": "DEMO_ONLY"
+}
