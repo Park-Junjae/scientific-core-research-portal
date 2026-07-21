@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 type RunRequest = {
   title: string;
+  run_mode: "DISCOVERY_PORTFOLIO_RUN" | "FOCUSED_DECISION_RUN" | "VERIFICATION_RUN" | "MEASUREMENT_DISCOVERY_RUN";
   research_question: string;
   research_goal: string;
   current_bottleneck: string;
@@ -17,10 +18,10 @@ type RunRequest = {
   notes: string;
 };
 
-const initial: RunRequest = { title: "", research_question: "", research_goal: "", current_bottleneck: "", experimental_constraints: "", success_criteria: "", failure_criteria: "", non_goals: "", preferred_output_language: "Bilingual", visibility: "PRIVATE", notes: "" };
+const initial: RunRequest = { title: "", run_mode: "FOCUSED_DECISION_RUN", research_question: "", research_goal: "", current_bottleneck: "", experimental_constraints: "", success_criteria: "", failure_criteria: "", non_goals: "", preferred_output_language: "Bilingual", visibility: "PRIVATE", notes: "" };
 
 function markdownFor(value: RunRequest) {
-  return `# ${value.title || "Untitled research request"}\n\n## Research question\n${value.research_question || "Not provided"}\n\n## Research goal\n${value.research_goal || "Not provided"}\n\n## Current bottleneck\n${value.current_bottleneck || "Not provided"}\n\n## Experimental constraints\n${value.experimental_constraints || "Not provided"}\n\n## Success criteria\n${value.success_criteria || "Not provided"}\n\n## Failure criteria\n${value.failure_criteria || "Not provided"}\n\n## Non-goals\n${value.non_goals || "Not provided"}\n\n## Output\n- Language: ${value.preferred_output_language}\n- Visibility: ${value.visibility}\n\n## Notes\n${value.notes || "None"}\n`;
+  return `# ${value.title || "Untitled research request"}\n\n## Run mode\n${value.run_mode}\n\n## Research question\n${value.research_question || "Not provided"}\n\n## Research goal\n${value.research_goal || "Not provided"}\n\n## Current bottleneck\n${value.current_bottleneck || "Not provided"}\n\n## Experimental constraints\n${value.experimental_constraints || "Not provided"}\n\n## Success criteria\n${value.success_criteria || "Not provided"}\n\n## Failure criteria\n${value.failure_criteria || "Not provided"}\n\n## Non-goals\n${value.non_goals || "Not provided"}\n\n## Output\n- Language: ${value.preferred_output_language}\n- Visibility: ${value.visibility}\n\n## Notes\n${value.notes || "None"}\n`;
 }
 
 function download(name: string, body: string, type: string) {
@@ -51,6 +52,7 @@ export function NewRunBuilder() {
     <div className="intake-layout">
       <form className="intake-form" onSubmit={(event) => event.preventDefault()}>
         <div className="static-notice"><strong>This page creates a run request.</strong><span>It does not execute Scientific Core.</span></div>
+        <label><span>Run mode</span><small>Select the workflow shape that matches the decision.</small><select value={value.run_mode} onChange={(event) => update("run_mode", event.target.value)}><option value="FOCUSED_DECISION_RUN">Focused decision</option><option value="DISCOVERY_PORTFOLIO_RUN">Discovery portfolio</option><option value="VERIFICATION_RUN">Verification</option><option value="MEASUREMENT_DISCOVERY_RUN">Measurement discovery</option></select></label>
         {fields.map((field) => <label key={field.key}><span>{field.label}{field.required && <b aria-hidden="true"> *</b>}</span><small>{field.hint}</small>{field.key === "title" ? <input required={field.required} value={value[field.key]} onChange={(event) => update(field.key, event.target.value)} /> : <textarea required={field.required} rows={field.key === "notes" ? 3 : 4} value={value[field.key]} onChange={(event) => update(field.key, event.target.value)} />}</label>)}
         <div className="two-column-fields"><label><span>Preferred output language</span><select value={value.preferred_output_language} onChange={(event) => update("preferred_output_language", event.target.value)}><option>English</option><option>Korean</option><option>Bilingual</option></select></label><label><span>Visibility</span><select value={value.visibility} onChange={(event) => update("visibility", event.target.value)}><option value="PRIVATE">Private</option><option value="LAB_INTERNAL">Lab internal</option><option value="PUBLIC_SANITIZED">Public sanitized request</option></select></label></div>
       </form>

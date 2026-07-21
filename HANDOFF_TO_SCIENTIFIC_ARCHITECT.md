@@ -4,7 +4,7 @@
 
 The static Scientific Core Research Portal is complete for deployment review. It productizes approved `ResearchRunBundleV1` packages as a persistent reader workspace and needs no Node.js server after export.
 
-Terminal state: `SCIENTIFIC_CORE_STATIC_RESEARCH_PORTAL_READY_FOR_DEPLOYMENT_REVIEW`.
+Terminal state: `SCIENTIFIC_CORE_STATIC_RESEARCH_PORTAL_READY_FOR_PUBLIC_SYNTHETIC_DEPLOYMENT`.
 
 ## 2. Architecture Decision
 
@@ -12,7 +12,7 @@ Phase 1 is a completely static, read-only Next.js App Router application using T
 
 ## 3. Repository and Deployment Mode
 
-The portal is a standalone repository, separate from the scientific runtime. Current visibility is `LOCAL_ONLY`. The GitHub CLI is authenticated, but remote repository creation and Pages publication were intentionally not performed because no artifact-level public approval exists.
+The portal is a standalone repository, separate from the scientific runtime. Current visibility is `PUBLIC_SANITIZED`. Explicit user approval covers only the exact three bundled synthetic run IDs; it does not cover actual scientific artifacts. GitHub Pages publication is the remaining operational step.
 
 ## 4. Implemented Routes
 
@@ -20,7 +20,7 @@ The portal is a standalone repository, separate from the scientific runtime. Cur
 
 ## 5. ResearchRunBundle Contract
 
-Strict JSON Schemas cover run, idea, artifact, and publication-allowlist manifests with `additionalProperties: false`, controlled enums, date/path formats, and public visibility rules. Each run contains independent ideas, reports, knowledge, artifacts, and optional thumbnails. The global index is deterministic.
+Strict JSON Schemas cover run, idea, artifact, and publication-allowlist manifests with `additionalProperties: false`, controlled enums, date/path formats, and public visibility rules. Run modes distinguish discovery portfolios, focused decisions, verification, and measurement discovery. Idea records carry lifecycle, type, causal mechanism, evidence, critiques, disposition, scorecard, pairwise impact, lineage, and optional report artifacts. Idea and report counts remain independent. The global index is deterministic.
 
 The publisher validates an allowlist, normalizes and contains paths, rejects traversal, symlinks, run-ID mismatch, orphaned files, and private-to-public promotion, scans text and PDFs, verifies manifest membership and Markdown/PDF presence, creates PDF thumbnails when requested, replaces output transactionally, removes stale public files, rebuilds the index, records hashes/receipt/diff/audit, and proves the source tree did not change.
 
@@ -38,31 +38,31 @@ The TALED demo is explicitly historical and not an active recommendation. Benchm
 
 ## 7. Publication and Privacy Decisions
 
-Only `PUBLIC_SANITIZED` bundles may enter a public build, and Pages deployment additionally requires `deploy/site_visibility.json` to contain explicit approval plus exact approved run IDs. Current synthetic content passes sanitization, but the deployment workflow skips while mode is `LOCAL_ONLY`. No private laboratory data, private evaluation, provider trace, prompt, registry, or absolute path is emitted.
+Only `PUBLIC_SANITIZED` bundles may enter a public build, and Pages deployment additionally requires `deploy/site_visibility.json` to contain explicit approval plus exact approved run IDs. Those conditions are satisfied for the three synthetic demos. No private laboratory data, private evaluation, provider trace, prompt, registry, or absolute path is emitted.
 
 ## 8. Visual Comparison Result
 
-PASS. The product matches the reference interaction density and spacing while using an original Scientific Core identity. Runs are scannable in list/grid views with grouped static search and a functional overflow menu. Language, theme, density, PDF behavior, and recent-run preferences are applied in the browser. Run, idea, knowledge, report, and PDF pages use continuous readable layouts. Nine reviewed screenshots cover desktop, reference, and mobile viewports.
+PASS. The product matches the reference interaction density and spacing while using an original Scientific Core identity. Runs are scannable in list/grid views with grouped static search and a functional overflow menu. Portfolio pages expose run mode, funnel accounting, lifecycle filters, scorecards, pairwise context, and summary-only ideas without inventing missing reports. Language, theme, density, PDF behavior, and recent-run preferences are applied in the browser. Eleven reviewed screenshots cover desktop, reference, and mobile viewports.
 
 ## 9. Accessibility and Test Results
 
-Lint, TypeScript, 6 Vitest tests, 9 publisher integration tests, schema/content validation, 29-page export, route scan, project-site export, asset budget, and 7 Playwright tests pass. axe found 0 critical violations. Lighthouse: Performance 90, Accessibility 96, Best Practices 96, FCP 1.2 s, LCP 3.6 s, TBT 80 ms, CLS 0.
+Lint, TypeScript, 10 Vitest tests, 14 publisher integration tests, schema/content validation, 31-page export, route scan, project-site export, asset budget, and 7 Playwright tests pass. axe found 0 critical violations. Two consecutive Lighthouse runs scored Performance 92, Accessibility 96, Best Practices 96, FCP 1.2 s, LCP 3.1 s, TBT 150-160 ms, CLS 0.
 
 ## 10. Static-Site Size
 
-The final local export is 5,137,806 bytes (4.90 MiB), well below the 750 MB warning and 900 MB block thresholds. No PDF exceeds 25 MB.
+The final project-path export is 5,926,946 bytes (5.65 MiB), well below the 750 MB warning and 900 MB block thresholds. No PDF exceeds 25 MB.
 
 ## 11. GitHub Actions Status
 
-Prepared workflows cover CI, content validation, and Pages deployment. CI tests the root export with Playwright, then separately rebuilds and validates the project-site `basePath`. Deployment is visibility-gated and uses GitHub Pages artifacts with no frontend secrets. Workflows are prepared locally and have not run on GitHub because no remote was authorized.
+Prepared workflows cover CI, content validation, and Pages deployment. CI tests the root export with Playwright, then separately rebuilds and validates the project-site `basePath`. Deployment is visibility-gated and uses GitHub Pages artifacts with no frontend secrets. User authorization to create the GitHub repository and publish the approved synthetic site has been recorded; workflow execution and live-link verification remain.
 
 ## 12. Exact Remaining Deployment Step
 
-The PI must select and sanitize exact artifacts, review their publication receipts, and approve `deploy/site_visibility.json` with `mode: PUBLIC_SANITIZED`, approver, timestamp, exact run IDs, and `public_release_approved: true`. Only then create the `scientific-core-research-portal` remote, push the feature branch, review/merge to `main`, enable Pages via GitHub Actions, and record `DEPLOYMENT_RECEIPT.json`.
+Create the public `scientific-core-research-portal` remote, push the verified commit to `main`, enable Pages via GitHub Actions, wait for CI and deployment, verify the public URL, and record `DEPLOYMENT_RECEIPT.json`. Any future real scientific run still requires its own sanitization receipt and explicit allowlist approval.
 
 ## 13. Screenshots
 
-The reviewed PNG files are in `test-results/screenshots/`: Runs list at three desktop sizes, Runs grid, Run Overview, Idea Report, PDF View, New Run, and Mobile Runs.
+The reviewed PNG files are in `test-results/screenshots/`: Runs list at three desktop sizes, Runs grid, Run Overview, Ideas Portfolio desktop/mobile, Idea Report, PDF View, New Run, and Mobile Runs.
 
 ## 14. Generated-File Index
 
@@ -78,4 +78,4 @@ The reviewed PNG files are in `test-results/screenshots/`: Runs list at three de
 
 The scientific runtime remains at `de4d15ea3eac9547839a214cb6eadd0cbf10b312`; its pre-existing untracked `runs/` entry was not touched. Provider/scientific calls: 0. Candidate/evidence registries: unchanged. No scientific run, candidate generation, promotion, Stage 9, Arena, Elo, backend, or live-run execution was started.
 
-This handoff authorizes review of a local deployment candidate only. It does not itself approve public release.
+This handoff records authorization for public release of only the three bundled synthetic demonstrations. It does not authorize publication of actual scientific content.

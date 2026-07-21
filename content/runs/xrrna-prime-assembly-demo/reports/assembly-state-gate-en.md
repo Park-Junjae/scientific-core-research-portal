@@ -1,8 +1,8 @@
-# Assembly-state gating
+# Symmetric structured-RNA motif panel
 
 ## Abstract
 
-This demonstration hypothesis treats RNA protection as a **time- and state-dependent gate**. The key question is not whether an RNA element raises total abundance, but whether it selectively preserves a productive molecular state during the interval when the editing complex is assembled.
+This demonstration primary object evaluates a **symmetric structured-RNA motif panel** as a time- and state-dependent gate. The key question is not whether an RNA element raises total abundance, but whether paired protection selectively preserves a productive molecular state during assembly.
 
 ## Causal mechanism
 

@@ -2,12 +2,12 @@
 
 ## Result
 
-`PASS` for the current local build. Content validation found no absolute machine paths, API-key patterns, private artifact signatures, or non-public run manifests in the synthetic demo bundles.
+`PASS` for the approved public synthetic build. Content validation found no absolute machine paths, API-key patterns, private artifact signatures, or non-public run manifests.
 
 ## Included
 
 - Three `SYNTHETIC_DEMO` run manifests.
-- Six synthetic idea manifests and approved Markdown variants.
+- Eight synthetic idea manifests, including two valid summary-only records without dedicated report files.
 - Twelve small, generated demonstration PDFs.
 - Schemas, publication code, test fixtures, and static site source.
 
@@ -21,4 +21,4 @@ Strict JSON Schema, path containment, traversal and symlink rejection, allowlist
 
 ## Residual review
 
-Synthetic labels and disclosures must remain until a PI approves artifact-level public release. A future approved migration requires a new sanitization receipt; this report does not authorize it.
+Synthetic labels and disclosures must remain. The current approval covers only the three exact synthetic run IDs; every future scientific migration requires a separate artifact-level approval and sanitization receipt.

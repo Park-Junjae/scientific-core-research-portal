@@ -9,7 +9,8 @@ Reviewed captures under `test-results/screenshots/` cover:
 - Runs list and grid at 1440 x 900.
 - Runs list at the 1841 x 821 reference viewport.
 - Runs list at 1280 x 800.
-- Run overview, idea report, rendered PDF, and New Run at 1440 x 900.
+- Run overview, ideas portfolio, idea report, rendered PDF, and New Run at 1440 x 900.
 - Mobile Runs at 390 x 844.
+- Mobile Ideas Portfolio at 390 x 844.
 
-No clipped controls, nested cards, decorative gradients, marketing hero, unreadable table text, or mobile horizontal page overflow were observed. Final review also covered the run language selector, grouped search results, overflow menu, list/grid preference, and compact density. The PDF canvas test checks that rendered pixels are nonblank.
+No clipped controls, nested cards, decorative gradients, marketing hero, unreadable table text, or mobile horizontal page overflow were observed across 11 reviewed screenshots. Final review also covered the run language selector, grouped search results, lifecycle filters, funnel metrics, scorecards, overflow menu, list/grid preference, and compact density. The PDF canvas test checks that rendered pixels are nonblank.

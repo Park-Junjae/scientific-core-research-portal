@@ -10,7 +10,7 @@ for (const slug of index.runs) {
   records.push({ type: "run", id: run.run_id, run_slug: slug, slug, title: run.title, summary: run.summary, text: [run.subtitle, run.research_domain, ...run.tags].join(" "), href: `/runs/${slug}/` });
   for (const ideaSlug of run.idea_refs) {
     const idea = JSON.parse(readFileSync(join(runRoot, "ideas", `${ideaSlug}.json`), "utf8"));
-    records.push({ type: "idea", id: idea.idea_id, run_slug: slug, slug: idea.slug, title: idea.title, summary: idea.abstract, text: [idea.category, idea.recommendation, ...idea.tags].join(" "), href: `/runs/${slug}/ideas/${idea.slug}/` });
+    records.push({ type: "idea", id: idea.idea_id, run_slug: slug, slug: idea.slug, title: idea.title, summary: idea.abstract, text: [idea.category, idea.idea_type, idea.lifecycle_status, idea.recommendation, idea.strongest_reason, idea.weakest_causal_edge, ...idea.tags].join(" "), href: `/runs/${slug}/ideas/${idea.slug}/` });
   }
   for (const folder of ["knowledge", "reports"]) {
     const folderPath = join(runRoot, folder);

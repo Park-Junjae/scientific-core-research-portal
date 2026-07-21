@@ -4,7 +4,16 @@
   "title": "ResearchRunManifestV1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "run_id", "slug", "title", "short_title", "subtitle", "owner", "created_at", "updated_at", "status", "terminal_state", "research_domain", "research_goal", "summary", "scientific_decision", "reading_order", "tags", "languages", "visibility", "publication_status", "idea_count", "reviewed_idea_count", "retained_idea_count", "report_count", "knowledge_document_count", "featured", "source_type", "source_commit", "source_bundle_hash", "current_stage", "progress_percent", "timeline", "idea_refs", "report_refs", "knowledge_refs", "artifact_refs"],
+  "required": [
+    "schema_version", "run_id", "slug", "title", "short_title", "subtitle", "owner",
+    "created_at", "updated_at", "status", "terminal_state", "run_mode", "research_domain",
+    "research_goal", "summary", "scientific_decision", "reading_order", "tags", "languages",
+    "visibility", "publication_status", "idea_count", "reviewed_idea_count", "retained_idea_count",
+    "report_count", "knowledge_document_count", "featured", "source_type", "source_commit",
+    "source_bundle_hash", "current_stage", "progress_percent", "timeline", "idea_refs",
+    "report_refs", "knowledge_refs", "artifact_refs", "portfolio_funnel", "pairwise_comparisons",
+    "pairwise_selection_impact"
+  ],
   "properties": {
     "schema_version": {"const": "ResearchRunManifestV1"},
     "run_id": {"type": "string", "minLength": 1},
@@ -17,6 +26,7 @@
     "updated_at": {"type": "string", "format": "date-time"},
     "status": {"enum": ["DRAFT", "RUNNING", "REVIEW_REQUIRED", "DONE", "FAILED", "BLOCKED", "ARCHIVED"]},
     "terminal_state": {"type": "string"},
+    "run_mode": {"enum": ["DISCOVERY_PORTFOLIO_RUN", "FOCUSED_DECISION_RUN", "VERIFICATION_RUN", "MEASUREMENT_DISCOVERY_RUN"]},
     "research_domain": {"type": "string"},
     "research_goal": {"type": "string"},
     "summary": {"type": "string"},
@@ -41,10 +51,86 @@
     "idea_refs": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"}, "uniqueItems": true},
     "report_refs": {"type": "array", "items": {"$ref": "#/$defs/artifact"}},
     "knowledge_refs": {"type": "array", "items": {"$ref": "#/$defs/artifact"}},
-    "artifact_refs": {"type": "array", "items": {"$ref": "#/$defs/artifact"}}
+    "artifact_refs": {"type": "array", "items": {"$ref": "#/$defs/artifact"}},
+    "portfolio_funnel": {"$ref": "#/$defs/portfolio_funnel"},
+    "pairwise_comparisons": {"type": "array", "items": {"$ref": "#/$defs/pairwise_comparison"}},
+    "pairwise_selection_impact": {"type": "string", "minLength": 1},
+    "source_lineage": {"$ref": "#/$defs/source_lineage"}
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"run_mode": {"const": "DISCOVERY_PORTFOLIO_RUN"}, "status": {"const": "DONE"}},
+        "required": ["run_mode", "status"]
+      },
+      "then": {
+        "properties": {
+          "portfolio_funnel": {
+            "properties": {"independent_generation_count": {"minimum": 12}}
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
-    "timeline": {"type": "object", "additionalProperties": false, "required": ["date", "label", "detail"], "properties": {"date": {"type": "string", "format": "date"}, "label": {"type": "string"}, "detail": {"type": "string"}}},
-    "artifact": {"type": "object", "additionalProperties": false, "required": ["id", "title", "kind", "path"], "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "kind": {"enum": ["PDF", "MARKDOWN", "JSON", "CSV", "IMAGE"]}, "path": {"type": "string", "not": {"pattern": "^(?:[A-Za-z]:|/home/|/Users/)"}}, "language": {"type": "string"}, "size_bytes": {"type": "integer", "minimum": 0}}}
+    "timeline": {
+      "type": "object", "additionalProperties": false,
+      "required": ["date", "label", "detail"],
+      "properties": {"date": {"type": "string", "format": "date"}, "label": {"type": "string"}, "detail": {"type": "string"}}
+    },
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "title", "kind", "path"],
+      "properties": {
+        "id": {"type": "string"}, "title": {"type": "string"},
+        "kind": {"enum": ["PDF", "MARKDOWN", "JSON", "CSV", "IMAGE"]},
+        "path": {"type": "string", "not": {"pattern": "^(?:[A-Za-z]:|/home/|/Users/)"}},
+        "language": {"type": "string"}, "size_bytes": {"type": "integer", "minimum": 0}
+      }
+    },
+    "portfolio_funnel": {
+      "type": "object", "additionalProperties": false,
+      "required": ["raw_generation_count", "independent_generation_count", "natural_family_count", "developed_count", "reviewed_count", "arena_entrant_count", "finalist_count", "parked_count", "dropped_count"],
+      "properties": {
+        "raw_generation_count": {"type": "integer", "minimum": 0},
+        "independent_generation_count": {"type": "integer", "minimum": 0},
+        "natural_family_count": {"type": "integer", "minimum": 0},
+        "developed_count": {"type": "integer", "minimum": 0},
+        "reviewed_count": {"type": "integer", "minimum": 0},
+        "arena_entrant_count": {"type": "integer", "minimum": 0},
+        "finalist_count": {"type": "integer", "minimum": 0},
+        "parked_count": {"type": "integer", "minimum": 0},
+        "dropped_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "pairwise_comparison": {
+      "type": "object", "additionalProperties": false,
+      "required": ["comparison_id", "idea_a_id", "idea_b_id", "perspective", "winner", "rationale", "fatal_objection", "confidence", "disagreement", "coverage"],
+      "properties": {
+        "comparison_id": {"type": "string", "minLength": 1},
+        "idea_a_id": {"type": "string", "minLength": 1},
+        "idea_b_id": {"type": "string", "minLength": 1},
+        "perspective": {"enum": ["STRUCTURAL", "EXPERIMENTAL_FALSIFICATION", "SKEPTICAL"]},
+        "winner": {"enum": ["A", "B", "TIE"]},
+        "rationale": {"type": "string", "minLength": 1},
+        "fatal_objection": {"type": ["string", "null"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "disagreement": {"type": "string"},
+        "coverage": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "source_lineage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_run_id", "generated_count", "natural_family_count", "arena_entrant_count", "match_count", "finalist_count", "terminal_state"],
+      "properties": {
+        "source_run_id": {"type": "string", "minLength": 1},
+        "generated_count": {"type": "integer", "minimum": 0},
+        "natural_family_count": {"type": "integer", "minimum": 0},
+        "arena_entrant_count": {"type": "integer", "minimum": 0},
+        "match_count": {"type": "integer", "minimum": 0},
+        "finalist_count": {"type": "integer", "minimum": 0},
+        "terminal_state": {"type": "string", "minLength": 1}
+      }
+    }
   }
 }

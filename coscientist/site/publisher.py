@@ -33,6 +33,20 @@ ARTIFACT_MANIFESTS = {
     "knowledge/knowledge-manifest.json": "knowledge_refs",
     "artifacts/artifact-manifest.json": "artifact_refs",
 }
+DEVELOPED_LIFECYCLES = {
+    "DEVELOPED", "REVIEWED", "REVISION_REQUIRED", "REVISED", "ARENA_ELIGIBLE",
+    "ARENA_COMPARED", "FINALIST", "CONDITIONAL", "MEASUREMENT_PROGRAM", "PARKED",
+    "DROPPED",
+}
+REVIEWED_LIFECYCLES = {
+    "REVIEWED", "REVISION_REQUIRED", "REVISED", "ARENA_ELIGIBLE", "ARENA_COMPARED",
+    "FINALIST", "CONDITIONAL", "MEASUREMENT_PROGRAM", "PARKED", "DROPPED",
+}
+ARENA_LIFECYCLES = {"ARENA_ELIGIBLE", "ARENA_COMPARED", "FINALIST"}
+RETAINED_LIFECYCLES = {
+    "DEVELOPED", "REVIEWED", "REVISION_REQUIRED", "REVISED", "ARENA_ELIGIBLE",
+    "ARENA_COMPARED", "FINALIST", "CONDITIONAL", "MEASUREMENT_PROGRAM",
+}
 
 
 class PublicationError(RuntimeError):
@@ -192,6 +206,100 @@ def _validate_visibility(value: dict[str, Any], errors: list[str]) -> None:
         errors.append("LOCAL_ONLY visibility cannot set public_release_approved=true")
 
 
+def _portfolio_counts(ideas: list[dict[str, Any]]) -> dict[str, int]:
+    lifecycles = [idea.get("lifecycle_status") for idea in ideas]
+    families = {
+        idea.get("family_id")
+        for idea in ideas
+        if isinstance(idea.get("family_id"), str) and idea.get("family_id")
+    }
+    return {
+        "raw_generation_count": len(ideas),
+        "independent_generation_count": sum(
+            lifecycle != "MERGED_INTO_FAMILY" for lifecycle in lifecycles
+        ),
+        "natural_family_count": len(families),
+        "developed_count": sum(lifecycle in DEVELOPED_LIFECYCLES for lifecycle in lifecycles),
+        "reviewed_count": sum(lifecycle in REVIEWED_LIFECYCLES for lifecycle in lifecycles),
+        "arena_entrant_count": sum(lifecycle in ARENA_LIFECYCLES for lifecycle in lifecycles),
+        "finalist_count": lifecycles.count("FINALIST"),
+        "parked_count": lifecycles.count("PARKED"),
+        "dropped_count": sum(
+            lifecycle in {"DROPPED", "ADMISSIBILITY_REJECTED"}
+            for lifecycle in lifecycles
+        ),
+    }
+
+
+def _validate_portfolio(
+    slug: str, run: dict[str, Any], ideas: list[dict[str, Any]], errors: list[str]
+) -> None:
+    computed = _portfolio_counts(ideas)
+    funnel = run.get("portfolio_funnel", {})
+    for field, expected in computed.items():
+        if funnel.get(field) != expected:
+            errors.append(
+                f"{slug}: portfolio_funnel.{field}={funnel.get(field)!r} "
+                f"does not reconcile with idea manifests ({expected})"
+            )
+    if run.get("idea_count") != len(ideas):
+        errors.append(f"{slug}: idea_count does not match idea manifests")
+    if run.get("report_count") != len(run.get("report_refs", [])):
+        errors.append(f"{slug}: report_count does not match PDF report_refs")
+    if run.get("reviewed_idea_count") != computed["reviewed_count"]:
+        errors.append(f"{slug}: reviewed_idea_count does not reconcile with lifecycle records")
+    retained = sum(
+        idea.get("lifecycle_status") in RETAINED_LIFECYCLES for idea in ideas
+    )
+    if run.get("retained_idea_count") != retained:
+        errors.append(f"{slug}: retained_idea_count does not reconcile with lifecycle records")
+
+    idea_ids = {idea.get("idea_id") for idea in ideas}
+    comparisons = run.get("pairwise_comparisons", [])
+    for comparison in comparisons:
+        if comparison.get("idea_a_id") not in idea_ids or comparison.get("idea_b_id") not in idea_ids:
+            errors.append(f"{slug}: pairwise comparison references an unknown idea")
+    if computed["arena_entrant_count"] >= 6 and not comparisons:
+        errors.append(f"{slug}: six or more Arena entrants require pairwise comparison records")
+
+    if run.get("run_mode") == "DISCOVERY_PORTFOLIO_RUN":
+        if run.get("status") == "DONE" and computed["independent_generation_count"] < 12:
+            errors.append(f"{slug}: completed discovery run has fewer than 12 independent attempts")
+        if (
+            computed["natural_family_count"] < 8
+            and run.get("status") in {"BLOCKED", "ARCHIVED"}
+            and run.get("terminal_state") != "INSUFFICIENT_PORTFOLIO_BREADTH"
+        ):
+            errors.append(f"{slug}: low-breadth discovery run must emit INSUFFICIENT_PORTFOLIO_BREADTH")
+    if run.get("run_mode") == "FOCUSED_DECISION_RUN":
+        reader_text = " ".join(
+            str(run.get(field, ""))
+            for field in ("title", "subtitle", "summary", "scientific_decision")
+        )
+        if re.search(r"\b(?:tournament|arena[- ]selected|top-?1)\b", reader_text, re.IGNORECASE):
+            errors.append(f"{slug}: focused run is mislabeled as an Arena tournament")
+
+    for idea in ideas:
+        if idea.get("has_fatal_flaw") and (
+            idea.get("featured") or idea.get("lifecycle_status") == "FINALIST"
+        ):
+            errors.append(f"{slug}/{idea.get('slug')}: fatal flaw blocks featured/finalist status")
+
+    lineage = run.get("source_lineage")
+    if isinstance(lineage, dict):
+        expected = {
+            "generated_count": computed["raw_generation_count"],
+            "natural_family_count": computed["natural_family_count"],
+            "arena_entrant_count": computed["arena_entrant_count"],
+            "match_count": len(comparisons),
+            "finalist_count": computed["finalist_count"],
+            "terminal_state": run.get("terminal_state"),
+        }
+        for field, value in expected.items():
+            if lineage.get(field) != value:
+                errors.append(f"{slug}: source_lineage.{field} does not match this run")
+
+
 def validate_content(portal_root: Path, public_build: bool | None = None) -> dict[str, Any]:
     portal_root = portal_root.resolve()
     schema_root = portal_root / "schemas"
@@ -283,6 +391,7 @@ def validate_content(portal_root: Path, public_build: bool | None = None) -> dic
                     errors.append(f"{slug}: unapproved artifact listed in {manifest_relative}")
 
         idea_pdf_paths: set[str] = set()
+        idea_records: list[dict[str, Any]] = []
         for idea_slug in run.get("idea_refs", []):
             idea_path = run_root / "ideas" / f"{idea_slug}.json"
             allowed_content.add(f"ideas/{idea_slug}.json")
@@ -295,13 +404,14 @@ def validate_content(portal_root: Path, public_build: bool | None = None) -> dic
                 )
             )
             idea = _load_json(idea_path)
+            idea_records.append(idea)
             if idea.get("slug") != idea_slug:
                 errors.append(f"{slug}/{idea_slug}: idea slug mismatch")
             languages = set(idea.get("language_variants", {}))
-            if languages != set(idea.get("report_pdf", {})) or languages != set(
-                idea.get("report_markdown", {})
-            ):
-                errors.append(f"{slug}/{idea_slug}: language variant paths are incomplete")
+            pdf_languages = set(idea.get("report_pdf", {}))
+            markdown_languages = set(idea.get("report_markdown", {}))
+            if not pdf_languages.issubset(languages) or not markdown_languages.issubset(languages):
+                errors.append(f"{slug}/{idea_slug}: report language is absent from language_variants")
             for relative in idea.get("report_markdown", {}).values():
                 try:
                     candidate, _ = _artifact_location(portal_root, run_root, relative)
@@ -329,8 +439,7 @@ def validate_content(portal_root: Path, public_build: bool | None = None) -> dic
         for relative in sorted(missing_manifest_pdfs):
             errors.append(f"{slug}: idea PDF absent from report manifest: {relative}")
 
-        if run.get("idea_count") != len(run.get("idea_refs", [])):
-            errors.append(f"{slug}: idea_count does not match idea_refs")
+        _validate_portfolio(slug, run, idea_records, errors)
         ids: set[str] = set()
         for field in ("report_refs", "knowledge_refs", "artifact_refs"):
             for artifact in run.get(field, []):

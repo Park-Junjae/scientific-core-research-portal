@@ -5,6 +5,7 @@ import { Download, ExternalLink, Languages } from "lucide-react";
 import { useState } from "react";
 import { formatDate } from "@/lib/display";
 import { withBasePath } from "@/lib/paths";
+import { runModeLabels } from "@/lib/portfolio";
 import { usePreferences } from "@/lib/preferences";
 import type { ResearchRunManifest } from "@/lib/types";
 import { StatusBadge } from "./status-badge";
@@ -20,7 +21,7 @@ export function RunHeader({ run }: { run: ResearchRunManifest }) {
       <div className="breadcrumb"><Link href="/runs/">Runs</Link><span>/</span><span>{run.short_title}</span></div>
       <div className="run-header-grid">
         <div>
-          <div className="run-kicker"><StatusBadge status={run.status} /><span>{run.research_domain}</span></div>
+          <div className="run-kicker"><StatusBadge status={run.status} /><span>{runModeLabels[run.run_mode]}</span><span>{run.research_domain}</span></div>
           <h1>{run.title}</h1>
           <p>{run.subtitle}</p>
           <div className="run-byline"><span>{run.owner}</span><span>Updated {formatDate(run.updated_at)}</span></div>

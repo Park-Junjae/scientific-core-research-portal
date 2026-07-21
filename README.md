@@ -4,7 +4,7 @@ A static, read-only research workspace for approved Scientific Core runs. It pub
 
 ## Current mode
 
-`LOCAL_ONLY`. The three bundled runs are synthetic demonstrations. No private scientific report, raw provider output, prompt, registry, or laboratory data is included. Public deployment remains disabled until `deploy/site_visibility.json` carries explicit approval and approved run IDs.
+`PUBLIC_SANITIZED`. Explicit approval covers only the three bundled synthetic demonstrations. No private scientific report, raw provider output, prompt, registry, or laboratory data is included.
 
 ## Local use
 
@@ -49,6 +49,7 @@ Publication is allowlist-only, rejects unsafe paths and secret patterns, generat
 - Next.js App Router + TypeScript
 - static export with trailing-slash routes
 - client-side search, filters, preferences, and intake downloads
+- run-mode-aware portfolio funnels, idea lifecycle filters, score vectors, and summary-only idea pages
 - PDF.js browser renderer with native open/download fallback
 - deterministic Python publication CLI
 - GitHub Pages workflow gated by explicit visibility approval

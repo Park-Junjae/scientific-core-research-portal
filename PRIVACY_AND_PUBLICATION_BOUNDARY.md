@@ -10,7 +10,7 @@ Provider outputs, private prompts, raw receipts, laboratory data, candidate/evid
 
 ## Current decision
 
-`deploy/site_visibility.json` is `LOCAL_ONLY`, with no approved run IDs and `public_release_approved: false`. Therefore the build contains synthetic demonstration content only. The actual xrRNA/Prime Assembly, PRAME, and TALED run assets remain outside this repository pending explicit artifact-level visibility review.
+`deploy/site_visibility.json` is `PUBLIC_SANITIZED` following explicit user approval. The allowlist contains only `demo_xrrna_prime_assembly_001`, `demo_prame_logic_first_001`, and `demo_taled_historical_001`. These are synthetic demonstration bundles. Actual xrRNA/Prime Assembly, PRAME, and TALED run assets remain outside this repository and are not authorized by this approval.
 
 ## Enforcement
 

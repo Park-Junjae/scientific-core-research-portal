@@ -9,6 +9,7 @@ import unittest
 from pathlib import Path
 
 from coscientist.site import PublicationError, publish_run, validate_content
+from coscientist.site.publisher import _portfolio_counts, _validate_portfolio
 
 
 PORTAL = Path(__file__).resolve().parents[1]
@@ -79,6 +80,119 @@ class PublicationCliTests(unittest.TestCase):
         result = validate_content(PORTAL)
         self.assertEqual(result["status"], "PASS", result["errors"])
         self.assertEqual(result["run_count"], 3)
+        run = json.loads(
+            (PORTAL / "content" / "runs" / DEMO_SLUG / "run.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(run["run_mode"], "FOCUSED_DECISION_RUN")
+        self.assertEqual(run["idea_count"], 4)
+        self.assertEqual(run["report_count"], 4)
+        self.assertNotRegex(
+            " ".join([run["title"], run["subtitle"], run["summary"]]),
+            r"(?i)arena[- ]selected|top-?1|tournament",
+        )
+
+    def test_twenty_ideas_and_two_pdfs_remain_independent_counts(self) -> None:
+        ideas = [
+            {
+                "idea_id": f"idea-{index}",
+                "slug": f"idea-{index}",
+                "lifecycle_status": "REVIEWED",
+                "family_id": f"family-{index}",
+                "featured": index == 0,
+                "has_fatal_flaw": False,
+            }
+            for index in range(20)
+        ]
+        run = {
+            "run_mode": "FOCUSED_DECISION_RUN",
+            "status": "DONE",
+            "terminal_state": "DONE",
+            "idea_count": 20,
+            "reviewed_idea_count": 20,
+            "retained_idea_count": 20,
+            "report_count": 2,
+            "report_refs": [{"id": "a"}, {"id": "b"}],
+            "pairwise_comparisons": [],
+            "portfolio_funnel": {
+                "raw_generation_count": 20,
+                "independent_generation_count": 20,
+                "natural_family_count": 20,
+                "developed_count": 20,
+                "reviewed_count": 20,
+                "arena_entrant_count": 0,
+                "finalist_count": 0,
+                "parked_count": 0,
+                "dropped_count": 0,
+            },
+        }
+        errors: list[str] = []
+        _validate_portfolio("twenty-two", run, ideas, errors)
+        self.assertEqual(errors, [])
+
+    def test_merged_ideas_count_as_provenance_not_independent_attempts(self) -> None:
+        ideas = [
+            {"lifecycle_status": "REVIEWED", "family_id": "family-a"},
+            {"lifecycle_status": "MERGED_INTO_FAMILY", "family_id": "family-a"},
+            {"lifecycle_status": "GENERATED", "family_id": "family-b"},
+        ]
+        counts = _portfolio_counts(ideas)
+        self.assertEqual(counts["raw_generation_count"], 3)
+        self.assertEqual(counts["independent_generation_count"], 2)
+        self.assertEqual(counts["natural_family_count"], 2)
+
+    def test_low_breadth_discovery_can_stop_without_filler(self) -> None:
+        ideas = [
+            {
+                "idea_id": f"idea-{index}", "slug": f"idea-{index}",
+                "lifecycle_status": "GENERATED", "family_id": f"family-{index}",
+                "featured": False, "has_fatal_flaw": False,
+            }
+            for index in range(7)
+        ]
+        run = {
+            "run_mode": "DISCOVERY_PORTFOLIO_RUN", "status": "BLOCKED",
+            "terminal_state": "INSUFFICIENT_PORTFOLIO_BREADTH", "idea_count": 7,
+            "reviewed_idea_count": 0, "retained_idea_count": 0, "report_count": 0,
+            "report_refs": [], "pairwise_comparisons": [], "portfolio_funnel": _portfolio_counts(ideas),
+        }
+        errors: list[str] = []
+        _validate_portfolio("low-breadth", run, ideas, errors)
+        self.assertEqual(errors, [])
+        self.assertEqual(run["portfolio_funnel"]["finalist_count"], 0)
+
+    def test_completed_discovery_requires_generation_accounting(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            portal = root / "portal"
+            shutil.copytree(PORTAL / "schemas", portal / "schemas")
+            shutil.copytree(PORTAL / "deploy", portal / "deploy")
+            shutil.copytree(PORTAL / "content", portal / "content")
+            shutil.copytree(PORTAL / "public" / "artifacts", portal / "public" / "artifacts")
+            run_path = portal / "content" / "runs" / DEMO_SLUG / "run.json"
+            run = json.loads(run_path.read_text(encoding="utf-8"))
+            run["run_mode"] = "DISCOVERY_PORTFOLIO_RUN"
+            run.pop("portfolio_funnel")
+            run_path.write_text(json.dumps(run), encoding="utf-8")
+            result = validate_content(portal)
+            self.assertEqual(result["status"], "FAIL")
+            self.assertTrue(any("portfolio_funnel" in item for item in result["errors"]))
+
+    def test_fatal_flaw_cannot_be_rescued_by_finalist_status(self) -> None:
+        idea = {
+            "idea_id": "fatal", "slug": "fatal", "lifecycle_status": "FINALIST",
+            "family_id": "family-fatal", "featured": False, "has_fatal_flaw": True,
+        }
+        run = {
+            "run_mode": "DISCOVERY_PORTFOLIO_RUN", "status": "RUNNING", "terminal_state": "RUNNING",
+            "idea_count": 1, "reviewed_idea_count": 1, "retained_idea_count": 1,
+            "report_count": 0, "report_refs": [], "pairwise_comparisons": [],
+            "portfolio_funnel": _portfolio_counts([idea]),
+        }
+        errors: list[str] = []
+        _validate_portfolio("fatal", run, [idea], errors)
+        self.assertTrue(any("fatal flaw" in item for item in errors))
 
     def test_publish_is_deterministic_and_source_unchanged(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -100,7 +214,7 @@ class PublicationCliTests(unittest.TestCase):
             portal = make_empty_portal(root)
             source = make_source(root)
             publish_run(source, portal, "PUBLIC_SANITIZED")
-            missing = portal / "public" / "artifacts" / DEMO_SLUG / "measurement-report-en.pdf"
+            missing = portal / "public" / "artifacts" / DEMO_SLUG / "idea-report-en.pdf"
             missing.unlink()
             result = validate_content(portal)
             self.assertEqual(result["status"], "FAIL")

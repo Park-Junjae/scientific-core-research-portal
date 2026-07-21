@@ -2,7 +2,7 @@
 
 ## Decision
 
-No actual scientific asset is imported because no publication visibility approval exists. Three synthetic bundles model the intended destinations. All source trees remain unchanged.
+No actual scientific asset is imported. Explicit public approval applies only to three synthetic demonstration bundles. All scientific source trees remain unchanged.
 
 ## Priority inventory
 
@@ -27,6 +27,8 @@ This pattern-level classification covers the current run-root inventory without 
 
 | Demo bundle | Status shown | Purpose |
 |---|---|---|
-| `xrrna-prime-assembly-demo` | Done | Finished bilingual report experience |
-| `prame-logic-first-demo` | Review required | Human decision and evidence-boundary experience |
-| `taled-historical-demo` | Archived | Historical scientific-quality learning case |
+| `xrrna-prime-assembly-demo` | Done | `FOCUSED_DECISION_RUN`: PRIMARY symmetric motif panel, CONDITIONAL arm assignment, MEASUREMENT_PROGRAM E_A architecture, and PARKED QuadPE extension. Only PRIMARY has a dedicated final Idea Report PDF. |
+| `prame-logic-first-demo` | Review required | `FOCUSED_DECISION_RUN`: primary context gate plus conditional verifier contrast; no broad discovery claim. |
+| `taled-historical-demo` | Archived | One synthetic child-run lineage with exactly 2 generated families, 0 Arena entrants, 0 matches, and 0 finalists. |
+
+The xrRNA fixture is not described as Arena-selected top-1. Missing PDFs never imply missing research objects.

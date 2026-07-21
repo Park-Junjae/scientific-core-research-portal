@@ -4,7 +4,14 @@
   "title": "ResearchIdeaManifestV1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "idea_id", "slug", "title", "short_title", "abstract", "category", "disposition", "recommendation", "tags", "origin", "updated_at", "language_variants", "report_pdf", "report_markdown", "knowledge_refs", "reference_count", "figure_count", "publication_status"],
+  "required": [
+    "schema_version", "idea_id", "slug", "title", "short_title", "abstract", "category",
+    "idea_type", "lifecycle_status", "featured", "disposition", "recommendation", "tags",
+    "origin", "updated_at", "language_variants", "knowledge_refs", "reference_count",
+    "figure_count", "publication_status", "parent_idea_ids", "disposition_reason",
+    "strongest_reason", "weakest_causal_edge", "has_fatal_flaw", "scientific_summary",
+    "causal_mechanism", "evidence_basis", "reviewer_critiques", "next_discriminating_experiment"
+  ],
   "properties": {
     "schema_version": {"const": "ResearchIdeaManifestV1"},
     "idea_id": {"type": "string", "minLength": 1},
@@ -13,6 +20,9 @@
     "short_title": {"type": "string", "minLength": 1},
     "abstract": {"type": "string", "minLength": 40},
     "category": {"type": "string"},
+    "idea_type": {"enum": ["PRIMARY", "ALTERNATIVE", "CONDITIONAL", "MEASUREMENT_PROGRAM", "EXTENSION", "SUPPORTING"]},
+    "lifecycle_status": {"enum": ["GENERATED", "MERGED_INTO_FAMILY", "ADMISSIBILITY_REJECTED", "DEVELOPED", "REVIEWED", "REVISION_REQUIRED", "REVISED", "ARENA_ELIGIBLE", "ARENA_COMPARED", "FINALIST", "CONDITIONAL", "MEASUREMENT_PROGRAM", "PARKED", "DROPPED"]},
+    "featured": {"type": "boolean"},
     "disposition": {"type": "string"},
     "recommendation": {"enum": ["Recommended for focused testing", "Refine before testing", "Background program", "Measurement-method research", "Parked", "Not retained"]},
     "tags": {"type": "array", "items": {"type": "string"}},
@@ -24,6 +34,55 @@
     "knowledge_refs": {"type": "array", "items": {"type": "string"}},
     "reference_count": {"type": "integer", "minimum": 0},
     "figure_count": {"type": "integer", "minimum": 0},
-    "publication_status": {"enum": ["APPROVED", "DEMO_ONLY", "WITHHELD"]}
+    "publication_status": {"enum": ["APPROVED", "DEMO_ONLY", "WITHHELD"]},
+    "parent_idea_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "family_id": {"type": ["string", "null"]},
+    "merge_reason": {"type": "string"},
+    "disposition_reason": {"type": "string", "minLength": 1},
+    "nearest_prior_art": {"type": "string"},
+    "strongest_reason": {"type": "string", "minLength": 1},
+    "weakest_causal_edge": {"type": "string", "minLength": 1},
+    "has_fatal_flaw": {"type": "boolean"},
+    "fatal_flaw": {"type": ["string", "null"]},
+    "scorecard": {"$ref": "#/$defs/scorecard"},
+    "pairwise_summary": {"type": "string"},
+    "reviewer_disagreement": {"type": "string"},
+    "reviewer_critiques": {"type": "array", "items": {"type": "string"}},
+    "finalist_reason": {"type": "string"},
+    "reentry_condition": {"type": "string"},
+    "scientific_summary": {"type": "string", "minLength": 1},
+    "causal_mechanism": {"type": "string", "minLength": 1},
+    "evidence_basis": {"type": "string", "minLength": 1},
+    "next_discriminating_experiment": {"type": "string", "minLength": 1}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"lifecycle_status": {"const": "MERGED_INTO_FAMILY"}}, "required": ["lifecycle_status"]},
+      "then": {"required": ["family_id", "merge_reason"]}
+    },
+    {
+      "if": {"properties": {"lifecycle_status": {"enum": ["DEVELOPED", "REVIEWED", "REVISION_REQUIRED", "REVISED", "ARENA_ELIGIBLE", "ARENA_COMPARED", "FINALIST", "CONDITIONAL", "MEASUREMENT_PROGRAM", "PARKED", "DROPPED"]}}, "required": ["lifecycle_status"]},
+      "then": {"required": ["scorecard"]}
+    },
+    {
+      "if": {"properties": {"featured": {"const": true}}, "required": ["featured"]},
+      "then": {"properties": {"has_fatal_flaw": {"const": false}}}
+    }
+  ],
+  "$defs": {
+    "scorecard": {
+      "type": "object", "additionalProperties": false,
+      "required": ["goal_alignment", "evidence_grounding", "causal_novelty", "mechanistic_specificity", "physical_coherence", "decisive_test_quality", "feasibility", "expected_information_value"],
+      "properties": {
+        "goal_alignment": {"type": "integer", "minimum": 1, "maximum": 5},
+        "evidence_grounding": {"type": "integer", "minimum": 1, "maximum": 5},
+        "causal_novelty": {"type": "integer", "minimum": 1, "maximum": 5},
+        "mechanistic_specificity": {"type": "integer", "minimum": 1, "maximum": 5},
+        "physical_coherence": {"type": "integer", "minimum": 1, "maximum": 5},
+        "decisive_test_quality": {"type": "integer", "minimum": 1, "maximum": 5},
+        "feasibility": {"type": "integer", "minimum": 1, "maximum": 5},
+        "expected_information_value": {"type": "integer", "minimum": 1, "maximum": 5}
+      }
+    }
   }
 }

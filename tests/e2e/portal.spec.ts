@@ -31,16 +31,28 @@ test("runs search, filter, sorting, list/grid and navigation", async ({ page }) 
   await expect(page.getByRole("heading", { name: "xrRNA-guided Prime Assembly" })).toBeVisible();
 });
 
-test("run, idea, knowledge and PDF paths are readable", async ({ page, request }) => {
+test("portfolio lifecycle, summary-only ideas, and PDF paths are readable", async ({ page, request }) => {
   await page.goto("/runs/xrrna-prime-assembly-demo/");
+  await expect(page.getByText("Focused decision", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("Idea records", { exact: true })).toBeVisible();
+  await expect(page.getByText("PDF reports", { exact: true })).toBeVisible();
+  await expect(page.getByText(/tournament/i)).toHaveCount(0);
   await page.screenshot({ path: join(screenshotRoot, "run-overview-1440x900.png"), fullPage: true });
+
   await page.getByRole("link", { name: "Ideas", exact: true }).click();
-  await page.getByRole("link", { name: /Assembly-state gating for/ }).click();
+  await page.screenshot({ path: join(screenshotRoot, "ideas-portfolio-1440x900.png"), fullPage: true });
+  await page.getByRole("button", { name: "Conditional" }).click();
+  await expect(page.getByRole("link", { name: "Asymmetric arm assignment" })).toBeVisible();
+  await page.getByRole("button", { name: "Measurement" }).click();
+  await expect(page.getByRole("link", { name: "E_A molecular-identity measurement architecture" })).toBeVisible();
+  await page.getByRole("button", { name: "Parked" }).click();
+  await expect(page.getByRole("link", { name: "QuadPE balancing extension" })).toBeVisible();
+  await page.getByRole("button", { name: "All" }).click();
+  await page.getByRole("link", { name: /Symmetric structured-RNA motif panel/ }).click();
   await expect(page).toHaveURL(/assembly-state-gate\/$/);
-  await expect(page.getByRole("heading", { name: /Assembly-state gating for/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Symmetric structured-RNA motif panel for Prime Assembly", exact: true })).toBeVisible();
   await page.screenshot({ path: join(screenshotRoot, "idea-report-1440x900.png"), fullPage: true });
   await page.getByRole("combobox", { name: "Report language" }).selectOption("ko");
-  await expect(page.getByRole("heading", { name: "조립 상태 선택적 보호" })).toBeVisible();
   const pdfHref = await page.getByRole("link", { name: /Download/ }).getAttribute("href");
   expect(pdfHref).toContain("idea-report-ko.pdf");
   const pdfResponse = await request.get(pdfHref!);
@@ -58,6 +70,13 @@ test("run, idea, knowledge and PDF paths are readable", async ({ page, request }
     return nonWhite;
   })).toBeGreaterThan(20);
   await page.screenshot({ path: join(screenshotRoot, "pdf-view-1440x900.png"), fullPage: false });
+
+  await page.goto("/runs/xrrna-prime-assembly-demo/ideas/asymmetric-arm-assignment/");
+  await expect(page.getByRole("heading", { name: "Asymmetric arm assignment" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Scientific summary" })).toBeVisible();
+  await expect(page.getByText("Summary-only idea record")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Open PDF/ })).toHaveCount(0);
+
   await page.goto("/runs/xrrna-prime-assembly-demo/knowledge/");
   await expect(page.getByRole("heading", { name: "Knowledge background", exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Technical Details" }).click();
@@ -68,9 +87,10 @@ test("run, idea, knowledge and PDF paths are readable", async ({ page, request }
   await expect(page.getByText(/text matches?/)).toBeVisible();
 });
 
-test("new-run creates local downloads without execution claim", async ({ page }) => {
+test("new-run creates a mode-aware local request without execution claim", async ({ page }) => {
   await page.goto("/new-run/");
   await expect(page.getByText("It does not execute Scientific Core.")).toBeVisible();
+  await page.getByRole("combobox", { name: "Run mode" }).selectOption("DISCOVERY_PORTFOLIO_RUN");
   const form = page.locator(".intake-form");
   await form.locator("input").first().fill("Test research request");
   const textareas = form.locator("textarea");
@@ -103,7 +123,7 @@ test("saved settings alter the live workspace", async ({ page }) => {
 });
 
 test("primary pages have no critical accessibility violations", async ({ page }) => {
-  for (const path of ["/runs/", "/runs/xrrna-prime-assembly-demo/", "/new-run/"]) {
+  for (const path of ["/runs/", "/runs/xrrna-prime-assembly-demo/", "/runs/xrrna-prime-assembly-demo/ideas/", "/new-run/"]) {
     await page.goto(path);
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations.filter((violation) => violation.impact === "critical")).toEqual([]);
@@ -121,4 +141,7 @@ test("reference and mobile visual captures", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Open navigation" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   await page.screenshot({ path: join(screenshotRoot, "runs-mobile-390x844.png"), fullPage: true });
+  await page.goto("/runs/xrrna-prime-assembly-demo/ideas/");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  await page.screenshot({ path: join(screenshotRoot, "ideas-portfolio-mobile-390x844.png"), fullPage: true });
 });

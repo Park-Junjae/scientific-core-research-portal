@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-1. Freeze the source run and prepare `run.json`, idea manifests, reports, and knowledge files.
+1. Freeze the source run and prepare `run.json`, one manifest per generated/reviewed idea, optional reports, and knowledge files.
 2. Create `publication-allowlist.json` conforming to `PublicationAllowlistV1`.
 3. Obtain explicit visibility approval. A PDF's existence is not approval.
 
@@ -15,7 +15,9 @@ python -m coscientist.site publish-run \
   --visibility PUBLIC_SANITIZED
 ```
 
-The publisher validates paths, copies only allowlisted files through a staging directory, scans text artifacts, mirrors PDFs to static assets, rebuilds the run index, and checks the source tree hash before and after.
+The publisher validates paths, copies only allowlisted files through a staging directory, scans text and PDFs, mirrors approved PDFs to static assets, rebuilds the run index, and checks the source tree hash before and after. It independently reconciles idea, report, lifecycle, family, funnel, pairwise, and lineage counts.
+
+An idea needs neither `report_pdf` nor `report_markdown` to publish. Its structured scientific summary remains the canonical reader page until an approved report exists.
 
 ## Generated audit artifacts
 

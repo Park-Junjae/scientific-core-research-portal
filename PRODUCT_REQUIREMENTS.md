@@ -14,10 +14,11 @@ Scientific Core outputs need a persistent reading surface, not another runtime c
 
 1. Runs are searchable and filterable without a server.
 2. Every run has overview, ideas, knowledge, reports, files, and optional technical details.
-3. Every idea has readable Markdown, PDF, references, files, and bilingual selection when approved.
+3. Every generated or reviewed idea has a manifest and readable scientific summary. Markdown and PDF are optional publication artifacts, not idea identity.
 4. New Run produces local request files only and never claims to execute work.
 5. Publication is deterministic, allowlist-only, source-preserving, and visibility-gated.
 6. Project-site base paths and direct trailing-slash links survive static hosting.
+7. Run mode, portfolio funnel, lifecycle, score vectors, pairwise coverage, and report availability remain explicit and reconcilable.
 
 ## Non-goals
 
