@@ -38,7 +38,9 @@
   "idea_refs": ["assembly-state-gate", "intermediate-readout"],
   "report_refs": [
     {"id": "xrrna-report-en", "title": "Idea report", "kind": "PDF", "path": "/artifacts/xrrna-prime-assembly-demo/idea-report-en.pdf", "language": "en"},
-    {"id": "xrrna-report-ko", "title": "아이디어 보고서", "kind": "PDF", "path": "/artifacts/xrrna-prime-assembly-demo/idea-report-ko.pdf", "language": "ko"}
+    {"id": "xrrna-report-ko", "title": "아이디어 보고서", "kind": "PDF", "path": "/artifacts/xrrna-prime-assembly-demo/idea-report-ko.pdf", "language": "ko"},
+    {"id": "xrrna-measurement-en", "title": "Measurement report", "kind": "PDF", "path": "/artifacts/xrrna-prime-assembly-demo/measurement-report-en.pdf", "language": "en"},
+    {"id": "xrrna-measurement-ko", "title": "측정 보고서", "kind": "PDF", "path": "/artifacts/xrrna-prime-assembly-demo/measurement-report-ko.pdf", "language": "ko"}
   ],
   "knowledge_refs": [
     {"id": "xrrna-knowledge", "title": "Knowledge background", "kind": "MARKDOWN", "path": "knowledge/knowledge-background-en.md", "language": "en"}

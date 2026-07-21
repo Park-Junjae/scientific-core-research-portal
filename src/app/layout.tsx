@@ -16,7 +16,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const recentRuns = getRuns().slice(0, 5).map(({ run_id, slug, short_title, status }) => ({
+  const recentRuns = getRuns().slice(0, 10).map(({ run_id, slug, short_title, status }) => ({
     run_id,
     slug,
     short_title,

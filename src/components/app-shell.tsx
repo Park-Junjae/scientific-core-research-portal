@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PreferencesProvider } from "@/lib/preferences";
 import { SiteNavigation, type RecentRunLink } from "./site-navigation";
 
 export function AppShell({
@@ -9,14 +10,16 @@ export function AppShell({
   recentRuns: RecentRunLink[];
 }) {
   return (
-    <div className="app-shell">
-      <a className="skip-link" href="#main-content">
-        Skip to content
-      </a>
-      <SiteNavigation recentRuns={recentRuns} />
-      <main id="main-content" className="main-content" tabIndex={-1}>
-        {children}
-      </main>
-    </div>
+    <PreferencesProvider>
+      <div className="app-shell">
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
+        <SiteNavigation recentRuns={recentRuns} />
+        <main id="main-content" className="main-content" tabIndex={-1}>
+          {children}
+        </main>
+      </div>
+    </PreferencesProvider>
   );
 }

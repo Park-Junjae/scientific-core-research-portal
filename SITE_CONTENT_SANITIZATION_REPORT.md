@@ -17,7 +17,7 @@ The actual xrRNA/Prime Assembly, PRAME, and TALED files on the VM; provider trac
 
 ## Controls
 
-Strict JSON Schema, relative-path normalization, traversal rejection, allowlist-only copy, text scanning, public visibility validation, source tree hashing, artifact existence checks, and independent Pages visibility gating.
+Strict JSON Schema, path containment, traversal and symlink rejection, allowlist-only copy, text and PDF scanning, public visibility validation, run-ID consistency, manifest membership checks, orphan detection, source tree hashing, deterministic staging/rollback, stale-output removal, and independent Pages visibility gating.
 
 ## Residual review
 

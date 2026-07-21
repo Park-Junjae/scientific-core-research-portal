@@ -14,7 +14,7 @@ export function RunTabs({ slug, active }: { slug: string; active: string }) {
       {tabs.map(([suffix, label]) => (
         <Link key={label} href={`/runs/${slug}/${suffix}`} className={active === label ? "active" : ""} aria-current={active === label ? "page" : undefined}>{label}</Link>
       ))}
-      <a href="#technical-details" className={active === "Technical Details" ? "active" : ""}>Technical Details</a>
+      <Link href={`/runs/${slug}/#technical-details`} className={active === "Technical Details" ? "active" : ""}>Technical Details</Link>
     </nav>
   );
 }

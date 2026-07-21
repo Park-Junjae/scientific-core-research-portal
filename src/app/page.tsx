@@ -1,6 +1,6 @@
 import { RunsExplorer } from "@/components/runs-explorer";
-import { getRuns } from "@/lib/content";
+import { getRuns, getSearchRecords } from "@/lib/content";
 
 export default function HomePage() {
-  return <RunsExplorer runs={getRuns()} heading="Research runs" />;
+  return <RunsExplorer runs={getRuns()} searchRecords={getSearchRecords()} heading="Research runs" />;
 }

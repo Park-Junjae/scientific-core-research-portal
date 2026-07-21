@@ -88,3 +88,14 @@ export interface ResearchIdeaManifest {
 export interface RunWithIdeas extends ResearchRunManifest {
   ideas: ResearchIdeaManifest[];
 }
+
+export interface SearchRecord {
+  type: "run" | "idea" | "knowledge" | "report";
+  id: string;
+  run_slug: string;
+  slug: string;
+  title: string;
+  summary: string;
+  text: string;
+  href: string;
+}

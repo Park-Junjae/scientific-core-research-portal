@@ -22,7 +22,7 @@ The portal is a standalone repository, separate from the scientific runtime. Cur
 
 Strict JSON Schemas cover run, idea, artifact, and publication-allowlist manifests with `additionalProperties: false`, controlled enums, date/path formats, and public visibility rules. Each run contains independent ideas, reports, knowledge, artifacts, and optional thumbnails. The global index is deterministic.
 
-The publisher validates an allowlist, normalizes paths, rejects traversal and private-to-public promotion, scans text, verifies Markdown/PDF presence, creates PDF thumbnails when requested, rebuilds the index, records hashes/receipt/diff/audit, and proves the source tree did not change.
+The publisher validates an allowlist, normalizes and contains paths, rejects traversal, symlinks, run-ID mismatch, orphaned files, and private-to-public promotion, scans text and PDFs, verifies manifest membership and Markdown/PDF presence, creates PDF thumbnails when requested, replaces output transactionally, removes stale public files, rebuilds the index, records hashes/receipt/diff/audit, and proves the source tree did not change.
 
 ## 6. Imported Run Inventory
 
@@ -42,15 +42,15 @@ Only `PUBLIC_SANITIZED` bundles may enter a public build, and Pages deployment a
 
 ## 8. Visual Comparison Result
 
-PASS. The product matches the reference interaction density and spacing while using an original Scientific Core identity. Runs are scannable in list/grid views; run, idea, knowledge, report, and PDF pages use continuous readable layouts. Nine reviewed screenshots cover desktop, reference, and mobile viewports.
+PASS. The product matches the reference interaction density and spacing while using an original Scientific Core identity. Runs are scannable in list/grid views with grouped static search and a functional overflow menu. Language, theme, density, PDF behavior, and recent-run preferences are applied in the browser. Run, idea, knowledge, report, and PDF pages use continuous readable layouts. Nine reviewed screenshots cover desktop, reference, and mobile viewports.
 
 ## 9. Accessibility and Test Results
 
-Lint, TypeScript, 5 Vitest tests, 4 publisher integration tests, schema/content validation, 29-page export, route scan, project-site export, asset budget, and 6 Playwright tests pass. axe found 0 critical violations. Lighthouse: Performance 100, Accessibility 100, Best Practices 96, LCP 1.4 s, TBT 0 ms, CLS 0.
+Lint, TypeScript, 6 Vitest tests, 9 publisher integration tests, schema/content validation, 29-page export, route scan, project-site export, asset budget, and 7 Playwright tests pass. axe found 0 critical violations. Lighthouse: Performance 90, Accessibility 96, Best Practices 96, FCP 1.2 s, LCP 3.6 s, TBT 80 ms, CLS 0.
 
 ## 10. Static-Site Size
 
-The final local export is 4,724,875 bytes (4.51 MB), well below the 750 MB warning and 900 MB block thresholds. No PDF exceeds 25 MB.
+The final local export is 5,137,806 bytes (4.90 MiB), well below the 750 MB warning and 900 MB block thresholds. No PDF exceeds 25 MB.
 
 ## 11. GitHub Actions Status
 
@@ -76,6 +76,6 @@ The reviewed PNG files are in `test-results/screenshots/`: Runs list at three de
 
 ## 15. State Integrity and Limits
 
-The scientific runtime commit and existing untracked run directory state were not changed. Provider/scientific calls: 0. Candidate/evidence registries: unchanged. No scientific run, candidate generation, promotion, Stage 9, Arena, Elo, backend, or live-run execution was started.
+The scientific runtime remains at `de4d15ea3eac9547839a214cb6eadd0cbf10b312`; its pre-existing untracked `runs/` entry was not touched. Provider/scientific calls: 0. Candidate/evidence registries: unchanged. No scientific run, candidate generation, promotion, Stage 9, Arena, Elo, backend, or live-run execution was started.
 
 This handoff authorizes review of a local deployment candidate only. It does not itself approve public release.

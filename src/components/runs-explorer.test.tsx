@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import type { RunWithIdeas } from "@/lib/types";
+import { PreferencesProvider } from "@/lib/preferences";
+import type { RunWithIdeas, SearchRecord } from "@/lib/types";
 import { RunsExplorer, filterAndSortRuns } from "./runs-explorer";
 
 const base = {
@@ -13,6 +14,7 @@ const base = {
 } satisfies RunWithIdeas;
 
 const runs = [base, { ...base, run_id: "r2", slug: "beta", title: "Beta review", status: "REVIEW_REQUIRED", updated_at: "2026-03-01T00:00:00Z", reviewed_idea_count: 4, ideas: [{ ...base.ideas[0], title: "Assembly state" }] } satisfies RunWithIdeas];
+const searchRecords: SearchRecord[] = [{ type: "knowledge", id: "k1", run_slug: "alpha", slug: "background", title: "Kinetic background", summary: "Residence time", text: "hidden coordinate", href: "/runs/alpha/knowledge/" }];
 
 describe("RunsExplorer", () => {
   it("searches idea text and sorts by updated time", () => {
@@ -22,11 +24,19 @@ describe("RunsExplorer", () => {
 
   it("filters status and toggles grid", async () => {
     const user = userEvent.setup();
-    render(<RunsExplorer runs={runs} heading="Runs" />);
+    render(<PreferencesProvider><RunsExplorer runs={runs} searchRecords={searchRecords} heading="Runs" /></PreferencesProvider>);
     await user.click(screen.getByRole("button", { name: "Done" }));
     expect(screen.getByText("Alpha study")).toBeInTheDocument();
     expect(screen.queryByText("Beta review")).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Grid view" }));
     expect(document.querySelector(".run-grid")).toBeInTheDocument();
+  });
+
+  it("groups static knowledge matches", async () => {
+    const user = userEvent.setup();
+    render(<PreferencesProvider><RunsExplorer runs={runs} searchRecords={searchRecords} heading="Runs" /></PreferencesProvider>);
+    await user.type(screen.getByPlaceholderText("Search runs, ideas, domains, or tags"), "residence");
+    expect(screen.getByRole("heading", { name: "Knowledge" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Kinetic background/ })).toHaveAttribute("href", "/runs/alpha/knowledge");
   });
 });

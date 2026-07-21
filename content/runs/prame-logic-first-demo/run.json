@@ -38,7 +38,9 @@
   "idea_refs": ["target-context-gate", "verifier-first-contrast"],
   "report_refs": [
     {"id": "prame-report-en", "title": "Logic-first report", "kind": "PDF", "path": "/artifacts/prame-logic-first-demo/logic-first-report-en.pdf", "language": "en"},
-    {"id": "prame-report-ko", "title": "로직 우선 보고서", "kind": "PDF", "path": "/artifacts/prame-logic-first-demo/logic-first-report-ko.pdf", "language": "ko"}
+    {"id": "prame-report-ko", "title": "로직 우선 보고서", "kind": "PDF", "path": "/artifacts/prame-logic-first-demo/logic-first-report-ko.pdf", "language": "ko"},
+    {"id": "prame-verifier-en", "title": "Verifier-first report", "kind": "PDF", "path": "/artifacts/prame-logic-first-demo/verifier-report-en.pdf", "language": "en"},
+    {"id": "prame-verifier-ko", "title": "검증기 우선 보고서", "kind": "PDF", "path": "/artifacts/prame-logic-first-demo/verifier-report-ko.pdf", "language": "ko"}
   ],
   "knowledge_refs": [
     {"id": "prame-knowledge", "title": "Transfer background", "kind": "MARKDOWN", "path": "knowledge/transfer-background-en.md", "language": "en"}

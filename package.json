@@ -2,11 +2,12 @@
   "name": "scientific-core-research-portal",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.9.0",
   "scripts": {
     "dev": "next dev",
     "prebuild": "node scripts/copy-pdf-worker.mjs && node scripts/build-search-index.mjs",
     "build": "next build",
-    "preview": "npx serve out",
+    "preview": "python -m coscientist.site preview-site --portal-root .",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

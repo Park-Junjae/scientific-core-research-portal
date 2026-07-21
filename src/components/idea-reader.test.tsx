@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
+import { PreferencesProvider } from "@/lib/preferences";
 import type { ResearchIdeaManifest } from "@/lib/types";
 import { IdeaReader } from "./idea-reader";
 
@@ -29,9 +30,11 @@ const idea: ResearchIdeaManifest = {
 describe("IdeaReader", () => {
   it("selects the Korean approved variant", async () => {
     const user = userEvent.setup();
-    render(<IdeaReader idea={idea} markdownByLanguage={{ en: "# English report", ko: "# 한국어 보고서" }} />);
+    render(<PreferencesProvider><IdeaReader idea={idea} markdownByLanguage={{ en: "# English report", ko: "# 한국어 보고서" }} /></PreferencesProvider>);
     await user.selectOptions(screen.getByRole("combobox"), "ko");
     expect(screen.getByRole("heading", { name: "한국어 보고서" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Open PDF/ })).toHaveAttribute("href", "/ko.pdf");
+    expect(screen.getByRole("link", { name: /Download/ })).toHaveAttribute("href", "/ko.pdf");
+    await user.click(screen.getByRole("button", { name: /Open PDF/ }));
+    expect(screen.getByRole("tab", { name: "PDF" })).toHaveAttribute("data-state", "active");
   });
 });

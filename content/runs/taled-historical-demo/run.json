@@ -38,7 +38,9 @@
   "idea_refs": ["helical-phase-coordinate", "exposure-time-distribution"],
   "report_refs": [
     {"id": "taled-case-en", "title": "Historical case report", "kind": "PDF", "path": "/artifacts/taled-historical-demo/historical-case-en.pdf", "language": "en"},
-    {"id": "taled-case-ko", "title": "과거 사례 보고서", "kind": "PDF", "path": "/artifacts/taled-historical-demo/historical-case-ko.pdf", "language": "ko"}
+    {"id": "taled-case-ko", "title": "과거 사례 보고서", "kind": "PDF", "path": "/artifacts/taled-historical-demo/historical-case-ko.pdf", "language": "ko"},
+    {"id": "taled-exposure-en", "title": "Exposure-time report", "kind": "PDF", "path": "/artifacts/taled-historical-demo/exposure-case-en.pdf", "language": "en"},
+    {"id": "taled-exposure-ko", "title": "노출 시간 보고서", "kind": "PDF", "path": "/artifacts/taled-historical-demo/exposure-case-ko.pdf", "language": "ko"}
   ],
   "knowledge_refs": [
     {"id": "taled-knowledge", "title": "TALED background", "kind": "MARKDOWN", "path": "knowledge/taled-background-en.md", "language": "en"}

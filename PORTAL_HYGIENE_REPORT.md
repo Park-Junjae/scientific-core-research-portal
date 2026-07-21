@@ -9,5 +9,6 @@ PASS for source, content, and generated static HTML.
 - Three bundled runs are explicitly `SYNTHETIC_DEMO`, `DEMO_ONLY`, and `PUBLIC_SANITIZED`.
 - The secret-pattern expression in the publication scanner is implementation code, not a credential fixture or secret value.
 - The visibility gate remains `LOCAL_ONLY`; no remote repository or Pages deployment was created.
+- Local `.venv` dependencies are ignored and excluded from source control and static output.
 - Direct scientific provider calls: 0.
-- Scientific source and run trees were read only.
+- The scientific repository remains at commit `de4d15ea3eac9547839a214cb6eadd0cbf10b312`; its pre-existing untracked `runs/` entry is unchanged.

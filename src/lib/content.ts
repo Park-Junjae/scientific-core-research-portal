@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { ResearchIdeaManifest, ResearchRunManifest, RunWithIdeas } from "./types";
+import type { ResearchIdeaManifest, ResearchRunManifest, RunWithIdeas, SearchRecord } from "./types";
 
 const runsRoot = path.join(process.cwd(), "content", "runs");
 
@@ -41,4 +41,11 @@ export function getAllIdeaParams() {
   return getRuns().flatMap((run) =>
     run.ideas.map((idea) => ({ run_slug: run.slug, idea_slug: idea.slug })),
   );
+}
+
+export function getSearchRecords(): SearchRecord[] {
+  const index = readJson<{ records: SearchRecord[] }>(
+    path.join(process.cwd(), "public", "search-index.json"),
+  );
+  return index.records;
 }

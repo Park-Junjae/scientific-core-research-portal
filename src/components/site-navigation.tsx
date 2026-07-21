@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { usePreferences } from "@/lib/preferences";
 import type { RunStatus } from "@/lib/types";
 
 export type RecentRunLink = {
@@ -110,11 +111,13 @@ function Sidebar({
 export function SiteNavigation({ recentRuns }: { recentRuns: RecentRunLink[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { preferences } = usePreferences();
+  const visibleRecentRuns = recentRuns.slice(0, preferences.recent);
 
   return (
     <>
       <div className="desktop-sidebar">
-        <Sidebar pathname={pathname} recentRuns={recentRuns} />
+        <Sidebar pathname={pathname} recentRuns={visibleRecentRuns} />
       </div>
       <header className="mobile-header">
         <button
@@ -139,7 +142,7 @@ export function SiteNavigation({ recentRuns }: { recentRuns: RecentRunLink[] }) 
           >
             <X size={22} />
           </button>
-          <Sidebar pathname={pathname} recentRuns={recentRuns} onNavigate={() => setOpen(false)} />
+          <Sidebar pathname={pathname} recentRuns={visibleRecentRuns} onNavigate={() => setOpen(false)} />
         </div>
       )}
     </>

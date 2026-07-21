@@ -12,4 +12,4 @@ Reviewed captures under `test-results/screenshots/` cover:
 - Run overview, idea report, rendered PDF, and New Run at 1440 x 900.
 - Mobile Runs at 390 x 844.
 
-No clipped controls, nested cards, decorative gradients, marketing hero, unreadable table text, or mobile horizontal page overflow were observed. The PDF canvas test also checks that rendered pixels are nonblank.
+No clipped controls, nested cards, decorative gradients, marketing hero, unreadable table text, or mobile horizontal page overflow were observed. Final review also covered the run language selector, grouped search results, overflow menu, list/grid preference, and compact density. The PDF canvas test checks that rendered pixels are nonblank.
