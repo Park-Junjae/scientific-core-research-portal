@@ -2,9 +2,9 @@
 
 ## 1. Mission Navigation
 
-The static Scientific Core Research Portal is complete for deployment review. It productizes approved `ResearchRunBundleV1` packages as a persistent reader workspace and needs no Node.js server after export.
+The static Scientific Core Research Portal is publicly deployed for the approved synthetic demonstrations. It productizes approved `ResearchRunBundleV1` packages as a persistent reader workspace and needs no Node.js server after export.
 
-Terminal state: `SCIENTIFIC_CORE_STATIC_RESEARCH_PORTAL_READY_FOR_PUBLIC_SYNTHETIC_DEPLOYMENT`.
+Terminal state: `SCIENTIFIC_CORE_STATIC_RESEARCH_PORTAL_PUBLIC_SYNTHETIC_LIVE_VERIFIED`.
 
 ## 2. Architecture Decision
 
@@ -12,7 +12,7 @@ Phase 1 is a completely static, read-only Next.js App Router application using T
 
 ## 3. Repository and Deployment Mode
 
-The portal is a standalone repository, separate from the scientific runtime. Current visibility is `PUBLIC_SANITIZED`. Explicit user approval covers only the exact three bundled synthetic run IDs; it does not cover actual scientific artifacts. GitHub Pages publication is the remaining operational step.
+The portal is a standalone public repository, separate from the scientific runtime. Current visibility is `PUBLIC_SANITIZED`. Explicit user approval covers only the exact three bundled synthetic run IDs; it does not cover actual scientific artifacts. The live reader is `https://best916116-crypto.github.io/scientific-core-research-portal/`.
 
 ## 4. Implemented Routes
 
@@ -54,11 +54,11 @@ The final project-path export is 5,971,834 bytes (5.70 MiB), well below the 750 
 
 ## 11. GitHub Actions Status
 
-Prepared workflows cover CI, content validation, and Pages deployment. CI tests the root export with Playwright, then separately rebuilds and validates the project-site `basePath`. Deployment is visibility-gated and uses GitHub Pages artifacts with no frontend secrets. User authorization to create the GitHub repository and publish the approved synthetic site has been recorded; workflow execution and live-link verification remain.
+Workflows cover CI, content validation, and Pages deployment. CI tests the root export with Playwright, then separately rebuilds and validates the project-site `basePath`. Deployment is visibility-gated and uses GitHub Pages artifacts with no frontend secrets. For verified release `9aff710`, CI run `29841267323` and Pages run `29841267120` both succeeded. Live Playwright verification found 0 console errors and 0 bad responses across Runs, Ideas Portfolio, and a summary-only idea page.
 
 ## 12. Exact Remaining Deployment Step
 
-Create the public `scientific-core-research-portal` remote, push the verified commit to `main`, enable Pages via GitHub Actions, wait for CI and deployment, verify the public URL, and record `DEPLOYMENT_RECEIPT.json`. Any future real scientific run still requires its own sanitization receipt and explicit allowlist approval.
+No deployment action remains for the current synthetic release. Any future real scientific run requires its own sanitization receipt, exact allowlist approval, publication review, and a new deployment receipt before it can appear on the public site.
 
 ## 13. Screenshots
 

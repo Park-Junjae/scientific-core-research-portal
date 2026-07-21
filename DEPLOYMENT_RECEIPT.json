@@ -1,0 +1,39 @@
+{
+  "schema_version": "ScientificCorePortalDeploymentReceiptV1",
+  "deployment_id": "github-pages-public-synthetic-20260721",
+  "deployment_status": "LIVE_VERIFIED",
+  "repository": "best916116-crypto/scientific-core-research-portal",
+  "repository_url": "https://github.com/best916116-crypto/scientific-core-research-portal",
+  "pages_url": "https://best916116-crypto.github.io/scientific-core-research-portal/",
+  "visibility": "PUBLIC_SANITIZED",
+  "approved_run_ids": [
+    "demo_xrrna_prime_assembly_001",
+    "demo_prame_logic_first_001",
+    "demo_taled_historical_001"
+  ],
+  "verified_release_commit": "9aff71050fdda6d717efe7afc541ea87f8da73c6",
+  "branch": "main",
+  "verification": {
+    "verified_at": "2026-07-21T14:55:30Z",
+    "root_http_status": 200,
+    "runs_page_http_status": 200,
+    "ideas_portfolio_http_status": 200,
+    "summary_only_idea_http_status": 200,
+    "icon_http_status": 200,
+    "browser_console_errors": 0,
+    "bad_browser_responses": 0,
+    "final_screenshot_sha256": "309388e6518863503ee95ddaab572fdcc248eb0d6062f5c417d379c909736f66"
+  },
+  "github_actions": {
+    "ci_run_id": 29841267323,
+    "ci_conclusion": "success",
+    "pages_run_id": 29841267120,
+    "pages_conclusion": "success"
+  },
+  "publication_boundary": {
+    "synthetic_only": true,
+    "actual_scientific_artifacts_included": false,
+    "provider_calls": 0,
+    "scientific_runtime_modified": false
+  }
+}

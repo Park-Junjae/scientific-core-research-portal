@@ -2,6 +2,8 @@
 
 A static, read-only research workspace for approved Scientific Core runs. It publishes a validated `ResearchRunBundleV1` into a readable Next.js site that remains available without the scientific VM.
 
+Public synthetic demonstration: [Scientific Core Research Portal](https://best916116-crypto.github.io/scientific-core-research-portal/)
+
 ## Current mode
 
 `PUBLIC_SANITIZED`. Explicit approval covers only the three bundled synthetic demonstrations. No private scientific report, raw provider output, prompt, registry, or laboratory data is included.
@@ -55,3 +57,5 @@ Publication is allowlist-only, rejects unsafe paths and secret patterns, generat
 - GitHub Pages workflow gated by explicit visibility approval
 
 The scientific runtime is outside this repository and remains unchanged. Source-run locations are supplied to the publication CLI at execution time and are never serialized into published content.
+
+The current deployment receipt is recorded in [`DEPLOYMENT_RECEIPT.json`](DEPLOYMENT_RECEIPT.json).
