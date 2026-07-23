@@ -94,7 +94,8 @@ test("New Run keeps one required field and exposes an optional creativity profil
   await expect(page.getByRole("radio", { name: /Standard research search/ })).toBeChecked();
   await page.getByRole("radio", { name: /Breakthrough idea search/ }).check();
   await expect(page.getByText(/Novelty is not guaranteed/)).toBeVisible();
-  await expect(page.getByRole("button", { name: "Save request file" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Prepare research run" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Save request" })).toBeEnabled();
 });
 
 test("mobile primary pages do not overflow", async ({ page }) => {
