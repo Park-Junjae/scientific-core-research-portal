@@ -34,6 +34,8 @@ jobs:
       - run: pnpm test:links
       - run: pnpm test:budget
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Build credentialed-session E2E variant
+        run: NEXT_PUBLIC_RUN_CONTROL_API_BASE=https://control.example pnpm build
       - run: pnpm test:e2e
       - run: NEXT_PUBLIC_BASE_PATH=/scientific-core-research-portal pnpm build
       - run: pnpm test:basepath -- /scientific-core-research-portal
