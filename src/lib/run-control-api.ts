@@ -28,13 +28,47 @@ export interface CompiledRunContract {
   source_boundary: string;
   contamination_boundary: string;
   budget: {
+    expected_successful_calls: number;
+    hard_cap_successful_calls: number;
     successful_calls: number;
+    expected_attempts: number;
+    hard_cap_attempts: number;
     attempts: number;
+    expected_input_tokens: number;
+    hard_cap_input_tokens: number;
     input_tokens: number;
+    expected_output_tokens: number;
+    hard_cap_output_tokens: number;
     output_tokens: number;
+    expected_cost_usd: number;
+    hard_cap_cost_usd: number;
     cost_usd: number;
+    expected_wall_clock_seconds: number;
+    hard_cap_wall_clock_seconds: number;
     wall_clock_seconds: number;
     transient_retries: number;
+  };
+  generation_plan: {
+    raw_idea_minimum: number;
+    raw_idea_target: number;
+    raw_idea_target_range: [number, number];
+    mechanism_family_target_range: [number, number];
+    finalist_range: [number, number];
+    no_forced_finalist: boolean;
+    natural_family_grouping: boolean;
+  };
+  excluded_generation_context: string[];
+  reporting: {
+    language_priority: string;
+    bilingual_pdf_required: boolean;
+    complete_source_ledger_required: boolean;
+    publication_target: string;
+  };
+  orchestration: {
+    canonical_orchestrator_only: boolean;
+    maximum_scientific_writers: number;
+    explicit_budget_approval_required: boolean;
+    silent_scope_truncation_forbidden: boolean;
   };
   runtime_ref: string;
   target_runner: string;
@@ -66,16 +100,45 @@ export interface RunControlRecord {
 }
 
 export interface RunControlEvent {
+  schema_version: "ScientificCoreRunStatusEventV2";
   run_id: string;
+  event_id: string;
+  sequence: number;
+  nonce: string;
   stage: string;
+  status: string;
   timestamp: string;
   progress: number;
-  calls: number;
-  attempts: number;
-  input_tokens: number;
-  output_tokens: number;
-  cost_usd: number;
+  cumulative_usage: {
+    calls: number;
+    attempts: number;
+    input_tokens: number;
+    output_tokens: number;
+    cost_usd: number;
+  };
   message: string;
+}
+
+export interface PrivateArtifact {
+  artifact_id: string;
+  run_id: string;
+  role: string;
+  filename: string;
+  mime_type: string;
+  size_bytes: number;
+  sha256: string;
+  status: "PENDING" | "AVAILABLE";
+}
+
+export interface PrivateRunBundle {
+  manifest: {
+    schema_version: string;
+    run_id: string;
+    artifacts: PrivateArtifact[];
+  };
+  manifest_sha256: string;
+  created_at: string;
+  artifacts: PrivateArtifact[];
 }
 
 export class RunControlApiError extends Error {
@@ -165,4 +228,22 @@ export function redispatchControlledRun(runId: string, csrfToken: string) {
     `/api/runs/${encodeURIComponent(runId)}/redispatch`,
     { method: "POST", headers: { "X-CSRF-Token": csrfToken } },
   );
+}
+
+export function getPrivateRunBundle(runId: string) {
+  return request<PrivateRunBundle>(`/api/runs/${encodeURIComponent(runId)}/bundle`);
+}
+
+export async function readPrivateArtifact(runId: string, artifactId: string) {
+  if (!runControlApiBase) {
+    throw new RunControlApiError("Run Control API is not configured.", 503);
+  }
+  const response = await fetch(
+    `${runControlApiBase}/api/runs/${encodeURIComponent(runId)}/artifacts/${encodeURIComponent(artifactId)}/download`,
+    { credentials: "include" },
+  );
+  if (!response.ok) {
+    throw new RunControlApiError("Unable to read private artifact.", response.status);
+  }
+  return response.blob();
 }
