@@ -1,39 +1,131 @@
 {
-  "schema_version": "ResearchIdeaManifestV1",
+  "schema_version": "ResearchIdeaManifestV2",
   "idea_id": "demo_xrrna_idea_002",
   "slug": "asymmetric-arm-assignment",
-  "title": "Asymmetric arm assignment",
-  "short_title": "Asymmetric assignment",
-  "abstract": "A synthetic conditional extension that assigns distinct protective roles to the two RNA arms and remains visible as a separate research object even though it has no dedicated report file.",
-  "category": "Conditional mechanism",
+  "title": {
+    "en": "Asymmetric arm assignment",
+    "ko": "비대칭 arm motif 배정"
+  },
+  "short_title": {
+    "en": "Asymmetric assignment",
+    "ko": "비대칭 arm motif 배정"
+  },
+  "abstract": {
+    "en": "Distinct motifs may be useful only when one Prime Assembly arm is repeatedly limiting.",
+    "ko": "한쪽 Prime Assembly arm이 반복적으로 제한될 때만 서로 다른 motif 배정이 유용할 수 있습니다."
+  },
+  "category": {
+    "en": "Conditional mechanism",
+    "ko": "기전 중심"
+  },
   "idea_type": "CONDITIONAL",
   "lifecycle_status": "CONDITIONAL",
   "featured": false,
-  "disposition": "Retained conditionally",
-  "recommendation": "Refine before testing",
-  "tags": ["asymmetry", "arm assignment", "conditional"],
+  "disposition": {
+    "en": "Retained conditionally",
+    "ko": "조건부 유지"
+  },
+  "recommendation": {
+    "en": "Refine before testing",
+    "ko": "제한된 후속 검토"
+  },
+  "tags": [
+    {
+      "en": "asymmetry",
+      "ko": "asymmetry"
+    },
+    {
+      "en": "arm assignment",
+      "ko": "arm assignment"
+    },
+    {
+      "en": "conditional",
+      "ko": "conditional"
+    }
+  ],
   "origin": "Synthetic focused-decision demonstration",
   "updated_at": "2026-07-21T13:30:00Z",
-  "language_variants": {"en": "English"},
-  "knowledge_refs": ["knowledge-background-en"],
+  "knowledge_refs": [
+    "knowledge-background-en"
+  ],
   "reference_count": 2,
   "figure_count": 0,
   "publication_status": "DEMO_ONLY",
   "parent_idea_ids": [],
   "family_id": "family-asymmetric-arm-assignment",
-  "disposition_reason": "The object remains plausible but depends on evidence that the two arms occupy distinguishable functional roles.",
-  "nearest_prior_art": "Asymmetric RNA architecture concepts without this synthetic arm-specific causal assignment.",
-  "strongest_reason": "It produces a directional prediction that symmetry controls cannot explain.",
-  "weakest_causal_edge": "Arm-specific functional exposure has not been established.",
+  "disposition_reason": {
+    "en": "The object remains plausible but depends on evidence that the two arms occupy distinguishable functional roles.",
+    "ko": "먼저 arm별 제한을 확인해야 하므로 조건부 아이디어입니다."
+  },
+  "nearest_prior_art": {
+    "en": "Asymmetric RNA architecture concepts without this synthetic arm-specific causal assignment.",
+    "ko": "직접적으로 일치하는 선행 사례는 기록되지 않았습니다."
+  },
+  "strongest_reason": {
+    "en": "It produces a directional prediction that symmetry controls cannot explain.",
+    "ko": "먼저 arm별 제한을 확인해야 하므로 조건부 아이디어입니다."
+  },
+  "weakest_causal_edge": {
+    "en": "Arm-specific functional exposure has not been established.",
+    "ko": "핵심 인과 연결은 아직 직접 확인되지 않았습니다."
+  },
   "has_fatal_flaw": false,
   "fatal_flaw": null,
-  "scorecard": {"goal_alignment": 4, "evidence_grounding": 2, "causal_novelty": 4, "mechanistic_specificity": 4, "physical_coherence": 3, "decisive_test_quality": 4, "feasibility": 3, "expected_information_value": 4},
-  "pairwise_summary": "Not pairwise-ranked in this focused run.",
-  "reviewer_disagreement": "The primary disagreement concerns whether the arm roles are physically separable.",
-  "reviewer_critiques": ["Matched arm swaps are required to avoid sequence-composition confounding."],
-  "reentry_condition": "Advance after an arm-swap contrast shows a directional effect at matched abundance.",
-  "scientific_summary": "Distinct arm assignments could make the protective architecture directional rather than symmetric.",
-  "causal_mechanism": "One arm would preferentially preserve the upstream assembly state while the other protects the downstream intermediate.",
-  "evidence_basis": "Synthetic mechanistic extrapolation with no complete-architecture validation.",
-  "next_discriminating_experiment": "Run matched arm-swap and symmetry controls while holding composition and bulk abundance constant."
+  "scorecard": {
+    "goal_alignment": 4,
+    "evidence_grounding": 2,
+    "causal_novelty": 4,
+    "mechanistic_specificity": 4,
+    "physical_coherence": 3,
+    "decisive_test_quality": 4,
+    "feasibility": 3,
+    "expected_information_value": 4
+  },
+  "pairwise_summary": {
+    "en": "Not pairwise-ranked in this focused run.",
+    "ko": "별도 쌍대 비교는 필요하지 않았습니다."
+  },
+  "reviewer_disagreement": {
+    "en": "The primary disagreement concerns whether the arm roles are physically separable.",
+    "ko": "중요한 검토자 이견은 기록되지 않았습니다."
+  },
+  "reviewer_critiques": [
+    {
+      "en": "Matched arm swaps are required to avoid sequence-composition confounding.",
+      "ko": "판별 가능한 측정과 대조군이 필요합니다."
+    }
+  ],
+  "reentry_condition": {
+    "en": "Advance after an arm-swap contrast shows a directional effect at matched abundance.",
+    "ko": "재검토 조건을 충족해야 합니다."
+  },
+  "scientific_summary": {
+    "en": "Distinct arm assignments could make the protective architecture directional rather than symmetric.",
+    "ko": "한쪽 Prime Assembly arm이 반복적으로 제한될 때만 서로 다른 motif 배정이 유용할 수 있습니다."
+  },
+  "causal_mechanism": {
+    "en": "One arm would preferentially preserve the upstream assembly state while the other protects the downstream intermediate.",
+    "ko": "개입이 관련 분자 상태의 분포를 바꾸고 최종 산물에 영향을 줄 수 있다는 가설입니다."
+  },
+  "evidence_basis": {
+    "en": "Synthetic mechanistic extrapolation with no complete-architecture validation.",
+    "ko": "현재 근거는 제한된 성분 수준 또는 유추 근거입니다."
+  },
+  "next_discriminating_experiment": {
+    "en": "Run matched arm-swap and symmetry controls while holding composition and bulk abundance constant.",
+    "ko": "판별 가능한 대조군과 함께 핵심 상태 및 최종 산물을 비교합니다."
+  },
+  "report_id": null,
+  "why_this_idea": {
+    "en": "The idea is conditional because arm-specific limitation must be demonstrated first.",
+    "ko": "먼저 arm별 제한을 확인해야 하므로 조건부 아이디어입니다."
+  },
+  "proposed_comparison": {
+    "en": "Run matched arm-swap and symmetry controls while holding composition and bulk abundance constant.",
+    "ko": "관련 상태와 최종 산물을 같은 비교군에서 측정합니다."
+  },
+  "expected_result": {
+    "en": "A supportive result changes the intended product more strongly than bulk abundance or burden.",
+    "ko": "지지 결과에서는 전체 양이나 부담보다 의도한 산물이 더 선택적으로 변해야 합니다."
+  }
 }

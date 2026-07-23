@@ -1,7 +1,8 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const out = join(process.cwd(), "out");
+const requestedOut = process.argv.find((value) => value.startsWith("--out="))?.slice(6) ?? "out";
+const out = join(process.cwd(), requestedOut);
 if (!existsSync(join(out, "index.html"))) throw new Error("Static export missing index.html");
 const html = [];
 function walk(dir) { for (const name of readdirSync(dir, { withFileTypes: true })) { const full = join(dir, name.name); if (name.isDirectory()) walk(full); else if (name.name.endsWith(".html")) html.push(full); } }

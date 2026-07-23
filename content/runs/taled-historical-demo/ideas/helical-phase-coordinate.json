@@ -1,22 +1,131 @@
 {
-  "schema_version": "ResearchIdeaManifestV1", "idea_id": "demo_taled_idea_001", "slug": "helical-phase-coordinate",
-  "title": "Helical phase as a catalytic positioning coordinate", "short_title": "Helical phase coordinate",
-  "abstract": "A synthetic historical object that treats rotational registry as distinct from linear spacer distance while preserving the evidence gap that prevented architecture-level promotion.",
-  "category": "Historical mechanism", "idea_type": "ALTERNATIVE", "lifecycle_status": "PARKED", "featured": false,
-  "disposition": "Archived and parked", "recommendation": "Parked", "tags": ["helical phase", "geometry", "historical"],
-  "origin": "Synthetic archived child run", "updated_at": "2026-07-16T15:40:00Z", "language_variants": {"en": "English", "ko": "Korean"},
-  "report_pdf": {"en": "/artifacts/taled-historical-demo/historical-case-en.pdf", "ko": "/artifacts/taled-historical-demo/historical-case-ko.pdf"},
-  "report_markdown": {"en": "reports/helical-phase-coordinate-en.md", "ko": "reports/helical-phase-coordinate-ko.md"},
-  "knowledge_refs": ["taled-background-en"], "reference_count": 3, "figure_count": 1, "publication_status": "DEMO_ONLY",
-  "parent_idea_ids": [], "family_id": "family-helical-phase", "disposition_reason": "The coordinate is testable but the complete architecture lacked sufficient grounding.",
-  "nearest_prior_art": "General rotational-registry effects in tethered molecular systems.", "strongest_reason": "Rotational registry is physically distinct from linear distance.",
-  "weakest_causal_edge": "A practical mitochondrial architecture that controls this coordinate was not established.", "has_fatal_flaw": false, "fatal_flaw": null,
-  "scorecard": {"goal_alignment": 4, "evidence_grounding": 2, "causal_novelty": 4, "mechanistic_specificity": 4, "physical_coherence": 4, "decisive_test_quality": 3, "feasibility": 2, "expected_information_value": 4},
-  "pairwise_summary": "No pairwise comparison occurred in this child run.", "reviewer_disagreement": "Reviewers differed on practical controllability.",
-  "reviewer_critiques": ["Structural plausibility does not establish a complete mitochondrial implementation."],
-  "reentry_condition": "Re-enter only with an independently supported actuator for rotational registry.",
-  "scientific_summary": "Helical phase may alter catalytic positioning independently of spacer length.",
-  "causal_mechanism": "Rotational registry changes the orientation of a catalytic domain relative to accessible substrate volume.",
-  "evidence_basis": "Synthetic structural plausibility without complete-architecture evidence.",
-  "next_discriminating_experiment": "Use matched geometry controls that vary rotational registry while minimizing changes in linear reach."
+  "schema_version": "ResearchIdeaManifestV2",
+  "idea_id": "demo_taled_idea_001",
+  "slug": "helical-phase-coordinate",
+  "title": {
+    "en": "Helical phase as a catalytic positioning coordinate",
+    "ko": "촉매 위치 좌표로서의 나선 위상"
+  },
+  "short_title": {
+    "en": "Helical phase coordinate",
+    "ko": "촉매 위치 좌표로서의 나선 위상"
+  },
+  "abstract": {
+    "en": "A historical idea treats spacer changes as rotational registry rather than distance alone.",
+    "ko": "spacer 변화를 거리뿐 아니라 회전 정렬로 보는 과거 아이디어입니다."
+  },
+  "category": {
+    "en": "Historical mechanism",
+    "ko": "기전 중심"
+  },
+  "idea_type": "ALTERNATIVE",
+  "lifecycle_status": "PARKED",
+  "featured": false,
+  "disposition": {
+    "en": "Archived and parked",
+    "ko": "보류"
+  },
+  "recommendation": {
+    "en": "Parked",
+    "ko": "현재 보류"
+  },
+  "tags": [
+    {
+      "en": "helical phase",
+      "ko": "helical phase"
+    },
+    {
+      "en": "geometry",
+      "ko": "geometry"
+    },
+    {
+      "en": "historical",
+      "ko": "historical"
+    }
+  ],
+  "origin": "Synthetic archived child run",
+  "updated_at": "2026-07-16T15:40:00Z",
+  "knowledge_refs": [
+    "taled-background-en"
+  ],
+  "reference_count": 3,
+  "figure_count": 1,
+  "publication_status": "DEMO_ONLY",
+  "parent_idea_ids": [],
+  "family_id": "family-helical-phase",
+  "disposition_reason": {
+    "en": "The coordinate is testable but the complete architecture lacked sufficient grounding.",
+    "ko": "위상에 따른 활성 이동이 나타나야 단순 linker 단축과 구분할 수 있습니다."
+  },
+  "nearest_prior_art": {
+    "en": "General rotational-registry effects in tethered molecular systems.",
+    "ko": "직접적으로 일치하는 선행 사례는 기록되지 않았습니다."
+  },
+  "strongest_reason": {
+    "en": "Rotational registry is physically distinct from linear distance.",
+    "ko": "위상에 따른 활성 이동이 나타나야 단순 linker 단축과 구분할 수 있습니다."
+  },
+  "weakest_causal_edge": {
+    "en": "A practical mitochondrial architecture that controls this coordinate was not established.",
+    "ko": "핵심 인과 연결은 아직 직접 확인되지 않았습니다."
+  },
+  "has_fatal_flaw": false,
+  "fatal_flaw": null,
+  "scorecard": {
+    "goal_alignment": 4,
+    "evidence_grounding": 2,
+    "causal_novelty": 4,
+    "mechanistic_specificity": 4,
+    "physical_coherence": 4,
+    "decisive_test_quality": 3,
+    "feasibility": 2,
+    "expected_information_value": 4
+  },
+  "pairwise_summary": {
+    "en": "No pairwise comparison occurred in this child run.",
+    "ko": "별도 쌍대 비교는 필요하지 않았습니다."
+  },
+  "reviewer_disagreement": {
+    "en": "Reviewers differed on practical controllability.",
+    "ko": "중요한 검토자 이견은 기록되지 않았습니다."
+  },
+  "reviewer_critiques": [
+    {
+      "en": "Structural plausibility does not establish a complete mitochondrial implementation.",
+      "ko": "판별 가능한 측정과 대조군이 필요합니다."
+    }
+  ],
+  "reentry_condition": {
+    "en": "Re-enter only with an independently supported actuator for rotational registry.",
+    "ko": "재검토 조건을 충족해야 합니다."
+  },
+  "scientific_summary": {
+    "en": "Helical phase may alter catalytic positioning independently of spacer length.",
+    "ko": "spacer 변화를 거리뿐 아니라 회전 정렬로 보는 과거 아이디어입니다."
+  },
+  "causal_mechanism": {
+    "en": "Rotational registry changes the orientation of a catalytic domain relative to accessible substrate volume.",
+    "ko": "개입이 관련 분자 상태의 분포를 바꾸고 최종 산물에 영향을 줄 수 있다는 가설입니다."
+  },
+  "evidence_basis": {
+    "en": "Synthetic structural plausibility without complete-architecture evidence.",
+    "ko": "현재 근거는 제한된 성분 수준 또는 유추 근거입니다."
+  },
+  "next_discriminating_experiment": {
+    "en": "Use matched geometry controls that vary rotational registry while minimizing changes in linear reach.",
+    "ko": "판별 가능한 대조군과 함께 핵심 상태 및 최종 산물을 비교합니다."
+  },
+  "report_id": null,
+  "why_this_idea": {
+    "en": "Phase-dependent activity shifts would distinguish it from generic linker shortening.",
+    "ko": "위상에 따른 활성 이동이 나타나야 단순 linker 단축과 구분할 수 있습니다."
+  },
+  "proposed_comparison": {
+    "en": "Use matched geometry controls that vary rotational registry while minimizing changes in linear reach.",
+    "ko": "관련 상태와 최종 산물을 같은 비교군에서 측정합니다."
+  },
+  "expected_result": {
+    "en": "A supportive result changes the intended product more strongly than bulk abundance or burden.",
+    "ko": "지지 결과에서는 전체 양이나 부담보다 의도한 산물이 더 선택적으로 변해야 합니다."
+  }
 }

@@ -1,23 +1,77 @@
 {
-  "schema_version": "ResearchRunManifestV1",
+  "schema_version": "ResearchRunManifestV2",
   "run_id": "demo_xrrna_prime_assembly_001",
   "slug": "xrrna-prime-assembly-demo",
-  "title": "xrRNA-guided Prime Assembly",
-  "short_title": "xrRNA / Prime Assembly",
-  "subtitle": "A focused decision portfolio with four separately tracked research objects",
+  "title": {
+    "en": "xrRNA-guided Prime Assembly",
+    "ko": "xrRNA 기반 Prime Assembly motif 비교"
+  },
+  "short_title": {
+    "en": "xrRNA / Prime Assembly",
+    "ko": "xrRNA / Prime Assembly"
+  },
+  "subtitle": {
+    "en": "A focused comparison of structured-RNA motif roles in a multi-step prime-editing architecture",
+    "ko": "구조화 RNA motif가 다단계 Prime Assembly 반응에 미치는 영향을 비교합니다."
+  },
   "owner": "Scientific Core",
   "created_at": "2026-07-18T09:00:00Z",
   "updated_at": "2026-07-21T14:00:00Z",
   "status": "DONE",
   "terminal_state": "DEMO_CONTENT_COMPLETE",
   "run_mode": "FOCUSED_DECISION_RUN",
-  "research_domain": "Genome editing",
-  "research_goal": "Demonstrate how a focused Scientific Core run preserves every reviewed research object without treating report files as idea records.",
-  "summary": "This synthetic bundle contains four typed research objects: a primary symmetric motif panel, a conditional asymmetric-arm assignment, a measurement architecture, and a parked balancing extension. Only the primary object has a dedicated final Idea Report PDF.",
-  "scientific_decision": "Feature the symmetric structured-RNA motif panel, retain asymmetric arm assignment conditionally, keep the E_A readout as a measurement program, and park the QuadPE balancing extension. This is interface sample content, not a scientific endorsement.",
-  "reading_order": ["Knowledge background", "Primary motif-panel idea", "Conditional and measurement objects", "Run-level measurement appendix", "Technical details if needed"],
-  "tags": ["prime editing", "RNA structure", "focused decision"],
-  "languages": ["en", "ko"],
+  "research_domain": {
+    "en": "Genome editing",
+    "ko": "유전체 편집"
+  },
+  "research_goal": {
+    "en": "Compare a primary symmetric motif panel with conditional, measurement, and parked alternatives without conflating research objects with report files.",
+    "ko": "대칭 motif 비교를 중심으로 조건부 대안, 측정 프로그램, 보류 확장을 구분해 평가합니다."
+  },
+  "summary": {
+    "en": "The portfolio prioritizes a symmetric structured-RNA motif comparison, keeps asymmetric arm assignment conditional, treats E_A as a measurement program, and parks the QuadPE extension.",
+    "ko": "이 포트폴리오는 대칭 구조화 RNA motif 비교를 우선하고, 비대칭 arm 배정은 조건부로 유지하며, E_A는 측정 프로그램으로 다루고 QuadPE 확장은 보류합니다."
+  },
+  "scientific_decision": {
+    "en": "Proceed with the symmetric motif comparison; require arm-specific evidence before asymmetry; resolve molecular identity before using E_A; do not expand to QuadPE yet.",
+    "ko": "대칭 motif 비교를 우선합니다. 비대칭 배정에는 arm별 근거가 필요하고, E_A는 분자 정체성 확인이 선행되어야 하며, QuadPE 확장은 현재 진행하지 않습니다."
+  },
+  "reading_order": [
+    {
+      "en": "Scientific summary",
+      "ko": "연구 요약"
+    },
+    {
+      "en": "Knowledge background",
+      "ko": "지식 배경"
+    },
+    {
+      "en": "Primary and conditional ideas",
+      "ko": "주요 및 조건부 아이디어"
+    },
+    {
+      "en": "Run specification",
+      "ko": "연구 명세"
+    }
+  ],
+  "tags": [
+    {
+      "en": "prime editing",
+      "ko": "프라임 에디팅"
+    },
+    {
+      "en": "RNA structure",
+      "ko": "RNA 구조"
+    },
+    {
+      "en": "focused decision",
+      "ko": "집중 의사결정"
+    }
+  ],
+  "languages": [
+    "en",
+    "ko"
+  ],
   "visibility": "PUBLIC_SANITIZED",
   "publication_status": "DEMO_ONLY",
   "idea_count": 4,
@@ -32,22 +86,57 @@
   "current_stage": "Focused decision complete",
   "progress_percent": 100,
   "timeline": [
-    {"date": "2026-07-18", "label": "Framing", "detail": "The focused decision and non-goals were recorded."},
-    {"date": "2026-07-19", "label": "Object review", "detail": "Primary, conditional, measurement, and parked objects were separated."},
-    {"date": "2026-07-21", "label": "Published", "detail": "A synthetic, public-safe portfolio bundle was assembled."}
+    {
+      "date": "2026-07-18",
+      "label": {
+        "en": "Framing",
+        "ko": "문제 정의"
+      },
+      "detail": {
+        "en": "The focused decision and non-goals were recorded.",
+        "ko": "해당 단계의 기록을 보존했습니다."
+      }
+    },
+    {
+      "date": "2026-07-19",
+      "label": {
+        "en": "Object review",
+        "ko": "검토"
+      },
+      "detail": {
+        "en": "Primary, conditional, measurement, and parked objects were separated.",
+        "ko": "해당 단계의 기록을 보존했습니다."
+      }
+    },
+    {
+      "date": "2026-07-21",
+      "label": {
+        "en": "Published",
+        "ko": "공개"
+      },
+      "detail": {
+        "en": "A synthetic, public-safe portfolio bundle was assembled.",
+        "ko": "해당 단계의 기록을 보존했습니다."
+      }
+    }
   ],
-  "idea_refs": ["assembly-state-gate", "asymmetric-arm-assignment", "intermediate-readout", "quadpe-balancing-extension"],
-  "report_refs": [
-    {"id": "xrrna-report-en", "title": "Primary idea report", "kind": "PDF", "path": "/artifacts/xrrna-prime-assembly-demo/idea-report-en.pdf", "language": "en"},
-    {"id": "xrrna-report-ko", "title": "Primary idea report - Korean", "kind": "PDF", "path": "/artifacts/xrrna-prime-assembly-demo/idea-report-ko.pdf", "language": "ko"},
-    {"id": "xrrna-measurement-en", "title": "Run-level measurement appendix", "kind": "PDF", "path": "/artifacts/xrrna-prime-assembly-demo/measurement-report-en.pdf", "language": "en"},
-    {"id": "xrrna-measurement-ko", "title": "Run-level measurement appendix - Korean", "kind": "PDF", "path": "/artifacts/xrrna-prime-assembly-demo/measurement-report-ko.pdf", "language": "ko"}
-  ],
-  "knowledge_refs": [
-    {"id": "xrrna-knowledge", "title": "Knowledge background", "kind": "MARKDOWN", "path": "knowledge/knowledge-background-en.md", "language": "en"}
+  "idea_refs": [
+    "assembly-state-gate",
+    "asymmetric-arm-assignment",
+    "intermediate-readout",
+    "quadpe-balancing-extension"
   ],
   "artifact_refs": [
-    {"id": "xrrna-method-note", "title": "Demo publication note", "kind": "MARKDOWN", "path": "artifacts/demo-publication-note.md", "language": "en"}
+    {
+      "id": "xrrna-method-note",
+      "title": {
+        "en": "Demo publication note",
+        "ko": "기술 자료"
+      },
+      "kind": "MARKDOWN",
+      "path": "artifacts/demo-publication-note.md",
+      "language": "en"
+    }
   ],
   "portfolio_funnel": {
     "raw_generation_count": 4,
@@ -61,5 +150,189 @@
     "dropped_count": 0
   },
   "pairwise_comparisons": [],
-  "pairwise_selection_impact": "No pairwise comparison was required because this was a focused decision run, not a broad discovery portfolio."
+  "pairwise_selection_impact": {
+    "en": "No pairwise comparison was required because this was a focused decision run, not a broad discovery portfolio.",
+    "ko": "비교 신호는 연구 결정의 보조 자료로만 사용했습니다."
+  },
+  "research_question": {
+    "en": "Which structured-RNA motif configuration best preserves productive Prime Assembly while limiting partial products?",
+    "ko": "어떤 구조화 RNA motif 구성이 부분 산물을 늘리지 않으면서 생산적인 Prime Assembly를 가장 잘 유지하는가?"
+  },
+  "current_bottleneck": {
+    "en": "Bulk guide abundance does not establish productive assembly or complete two-junction product formation.",
+    "ko": "전체 guide RNA 양만으로는 생산적인 조립 상태나 양쪽 접합부가 완성된 산물을 확인할 수 없습니다."
+  },
+  "success_criteria": [
+    {
+      "en": "Produce an interpretable comparison tied to the stated decision.",
+      "ko": "명시된 결정과 연결되는 해석 가능한 비교를 제시합니다."
+    }
+  ],
+  "experimental_constraints": [
+    {
+      "en": "Remain within the bounded demonstration scope.",
+      "ko": "제한된 데모 범위를 유지합니다."
+    }
+  ],
+  "non_goals": [
+    {
+      "en": "No scientific validation claim.",
+      "ko": "과학적 검증을 주장하지 않습니다."
+    }
+  ],
+  "requested_outputs": [
+    {
+      "en": "Scientific summary",
+      "ko": "연구 요약"
+    },
+    {
+      "en": "Research-object portfolio",
+      "ko": "연구 대상 포트폴리오"
+    }
+  ],
+  "reports": [
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "xrrna-prime-assembly-demo-summary-en",
+      "translation_group_id": "xrrna-prime-assembly-demo-summary",
+      "role": "RESEARCH_SUMMARY",
+      "localized_title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "localized_description": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "language": "en",
+      "path": null,
+      "markdown_path": "reports/research-summary-en.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": true,
+      "display_order": 1,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "xrrna-prime-assembly-demo-summary-ko",
+      "translation_group_id": "xrrna-prime-assembly-demo-summary",
+      "role": "RESEARCH_SUMMARY",
+      "localized_title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "localized_description": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "language": "ko",
+      "path": null,
+      "markdown_path": "reports/research-summary-ko.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": true,
+      "display_order": 1,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "xrrna-prime-assembly-demo-spec-en",
+      "translation_group_id": "xrrna-prime-assembly-demo-spec",
+      "role": "RUN_SPECIFICATION",
+      "localized_title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "localized_description": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "language": "en",
+      "path": null,
+      "markdown_path": "reports/run-specification-en.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": false,
+      "display_order": 3,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "xrrna-prime-assembly-demo-spec-ko",
+      "translation_group_id": "xrrna-prime-assembly-demo-spec",
+      "role": "RUN_SPECIFICATION",
+      "localized_title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "localized_description": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "language": "ko",
+      "path": null,
+      "markdown_path": "reports/run-specification-ko.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": false,
+      "display_order": 3,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "xrrna-prime-assembly-demo-knowledge-en",
+      "translation_group_id": "xrrna-prime-assembly-demo-knowledge",
+      "role": "KNOWLEDGE_BACKGROUND",
+      "localized_title": {
+        "en": "Knowledge background",
+        "ko": "지식 배경"
+      },
+      "localized_description": {
+        "en": "Background needed to assess this run.",
+        "ko": "이 연구를 평가하는 데 필요한 배경입니다."
+      },
+      "language": "en",
+      "path": null,
+      "markdown_path": "knowledge/knowledge-background-en.md",
+      "page_count": null,
+      "reference_count": 4,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": false,
+      "display_order": 2,
+      "updated_at": "2026-07-22T00:00:00Z"
+    }
+  ],
+  "primary_report_id": "xrrna-prime-assembly-demo-summary-en",
+  "primary_knowledge_id": "xrrna-prime-assembly-demo-knowledge-en",
+  "primary_summary_id": "xrrna-prime-assembly-demo-summary-en",
+  "run_specification_id": "xrrna-prime-assembly-demo-spec-en",
+  "literature_stats": {
+    "analyzed_unique_total": null,
+    "report_reference_count": 4
+  },
+  "literature_index": [
+    {
+      "title": "Search-and-replace genome editing without double-strand breaks or donor DNA",
+      "authors": [
+        "Anzalone AV",
+        "Randolph PB",
+        "Davis JR"
+      ],
+      "doi": "10.1038/s41586-019-1711-4"
+    }
+  ],
+  "historical_fixture_paths": [
+    "reports/assembly-state-gate-en.md",
+    "reports/assembly-state-gate-ko.md"
+  ]
 }

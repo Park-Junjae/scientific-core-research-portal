@@ -1,62 +1,284 @@
 "use client";
 
-import { Check, Clipboard, Download, FileJson, FileText } from "lucide-react";
+import { Check, FileJson, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useLocale } from "@/lib/locale";
+import {
+  buildRunRequest,
+  defaultRequestedOutputs,
+  deriveRequestTitle,
+  initialRunRequest,
+  normalizeImportedRequest,
+  type RunRequestDraft,
+} from "@/lib/run-request";
 
-type RunRequest = {
-  title: string;
-  run_mode: "DISCOVERY_PORTFOLIO_RUN" | "FOCUSED_DECISION_RUN" | "VERIFICATION_RUN" | "MEASUREMENT_DISCOVERY_RUN";
-  research_question: string;
-  research_goal: string;
-  current_bottleneck: string;
-  experimental_constraints: string;
-  success_criteria: string;
-  failure_criteria: string;
-  non_goals: string;
-  preferred_output_language: "English" | "Korean" | "Bilingual";
-  visibility: "PRIVATE" | "LAB_INTERNAL" | "PUBLIC_SANITIZED";
-  notes: string;
-};
-
-const initial: RunRequest = { title: "", run_mode: "FOCUSED_DECISION_RUN", research_question: "", research_goal: "", current_bottleneck: "", experimental_constraints: "", success_criteria: "", failure_criteria: "", non_goals: "", preferred_output_language: "Bilingual", visibility: "PRIVATE", notes: "" };
-
-function markdownFor(value: RunRequest) {
-  return `# ${value.title || "Untitled research request"}\n\n## Run mode\n${value.run_mode}\n\n## Research question\n${value.research_question || "Not provided"}\n\n## Research goal\n${value.research_goal || "Not provided"}\n\n## Current bottleneck\n${value.current_bottleneck || "Not provided"}\n\n## Experimental constraints\n${value.experimental_constraints || "Not provided"}\n\n## Success criteria\n${value.success_criteria || "Not provided"}\n\n## Failure criteria\n${value.failure_criteria || "Not provided"}\n\n## Non-goals\n${value.non_goals || "Not provided"}\n\n## Output\n- Language: ${value.preferred_output_language}\n- Visibility: ${value.visibility}\n\n## Notes\n${value.notes || "None"}\n`;
-}
-
-function download(name: string, body: string, type: string) {
-  const url = URL.createObjectURL(new Blob([body], { type }));
+function downloadRequest(body: unknown) {
+  const blob = new Blob([JSON.stringify(body, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
-  anchor.href = url; anchor.download = name; anchor.click();
+  anchor.href = url;
+  anchor.download = "run-request.json";
+  anchor.click();
   URL.revokeObjectURL(url);
 }
 
+type TextFieldKey =
+  | "research_question"
+  | "research_goal"
+  | "current_bottleneck"
+  | "experimental_constraints"
+  | "success_criteria"
+  | "failure_criteria"
+  | "non_goals"
+  | "custom_requested_outputs"
+  | "notes";
+
 export function NewRunBuilder() {
-  const [value, setValue] = useState(initial);
-  const [copied, setCopied] = useState(false);
-  const requiredReady = Boolean(value.title.trim() && value.research_question.trim() && value.research_goal.trim());
-  const markdown = useMemo(() => markdownFor(value), [value]);
-  const update = (key: keyof RunRequest, next: string) => setValue((current) => ({ ...current, [key]: next }));
-  const fields: Array<{ key: keyof RunRequest; label: string; hint: string; required?: boolean }> = [
-    { key: "title", label: "Title", hint: "A literal, compact name for the research question", required: true },
-    { key: "research_question", label: "Research question", hint: "The uncertainty this run should resolve", required: true },
-    { key: "research_goal", label: "Research goal", hint: "What a useful answer should enable", required: true },
-    { key: "current_bottleneck", label: "Current bottleneck", hint: "What standard approaches fail to explain or solve" },
-    { key: "experimental_constraints", label: "Experimental constraints", hint: "Models, modalities, time, safety, or feasibility boundaries" },
-    { key: "success_criteria", label: "Success criteria", hint: "What outcome would make the run useful" },
-    { key: "failure_criteria", label: "Failure criteria", hint: "What result should stop or redirect the work" },
-    { key: "non_goals", label: "Non-goals", hint: "Directions that are intentionally outside scope" },
-    { key: "notes", label: "Notes", hint: "Context that does not fit above" },
-  ];
+  const { locale } = useLocale();
+  const ko = locale === "ko";
+  const [value, setValue] = useState<RunRequestDraft>(initialRunRequest);
+  const [saved, setSaved] = useState(false);
+  const [importMessage, setImportMessage] = useState("");
+  const request = useMemo(() => buildRunRequest(value, locale), [locale, value]);
+  const ready = Boolean(value.raw_research_request.trim());
+  const showPreview = Boolean(
+    value.raw_research_request.trim()
+    || value.reference_material_or_constraints.trim()
+    || request.structured_fields,
+  );
+
+  const update = <K extends keyof RunRequestDraft>(key: K, next: RunRequestDraft[K]) => {
+    setSaved(false);
+    setValue((current) => ({ ...current, [key]: next }));
+  };
+
+  const labels = ko
+    ? {
+        raw: "무엇을 연구하고 싶나요?",
+        rawHelp: "연구 질문, 현재 고민, 원하는 방향을 자유롭게 작성하세요.",
+        references: "참고 자료나 반드시 지켜야 할 조건",
+        referencesHelp: "논문, DOI, 기존 결과, 실험 조건 또는 제외할 접근을 적어주세요.",
+        create: "연구 요청 만들기",
+        saved: "요청 저장됨",
+        advanced: "고급 설정",
+        title: "제목",
+        mode: "연구 유형",
+        question: "연구 질문",
+        goal: "연구 목표",
+        bottleneck: "현재 병목",
+        constraints: "실험 제약",
+        success: "성공 기준",
+        failure: "실패 기준",
+        nonGoals: "비목표",
+        outputs: "추가 요청 산출물",
+        language: "출력 언어",
+        visibility: "공개 범위",
+        notes: "메모",
+        preview: "연구 요청",
+        imported: "기존 요청서를 불러왔습니다.",
+        importError: "요청서 형식을 확인할 수 없습니다.",
+      }
+    : {
+        raw: "What would you like to research?",
+        rawHelp: "Describe the research question, current concern, and desired direction in your own words.",
+        references: "References or constraints to preserve",
+        referencesHelp: "Add papers, DOIs, prior results, experimental constraints, or approaches to exclude.",
+        create: "Create research request",
+        saved: "Request saved",
+        advanced: "Advanced settings",
+        title: "Title",
+        mode: "Run type",
+        question: "Research question",
+        goal: "Research goal",
+        bottleneck: "Current bottleneck",
+        constraints: "Experimental constraints",
+        success: "Success criteria",
+        failure: "Failure criteria",
+        nonGoals: "Non-goals",
+        outputs: "Additional requested outputs",
+        language: "Output language",
+        visibility: "Visibility",
+        notes: "Notes",
+        preview: "Research Request",
+        imported: "Existing request loaded.",
+        importError: "The request format could not be read.",
+      };
+
+  const modes: Array<[RunRequestDraft["run_type"], string]> = ko
+    ? [
+        ["", "자동 선택"],
+        ["FOCUSED_DECISION_RUN", "집중 의사결정"],
+        ["DISCOVERY_PORTFOLIO_RUN", "탐색 포트폴리오"],
+        ["VERIFICATION_RUN", "검증"],
+        ["MEASUREMENT_DISCOVERY_RUN", "측정 탐색"],
+      ]
+    : [
+        ["", "Choose automatically"],
+        ["FOCUSED_DECISION_RUN", "Focused decision"],
+        ["DISCOVERY_PORTFOLIO_RUN", "Discovery portfolio"],
+        ["VERIFICATION_RUN", "Verification"],
+        ["MEASUREMENT_DISCOVERY_RUN", "Measurement discovery"],
+      ];
+  const modeLabel = modes.find(([id]) => id === value.run_type)?.[1];
+  const title = value.title.trim()
+    || deriveRequestTitle(value.raw_research_request)
+    || (ko ? "연구 요청" : "Research request");
+  const previewSections = [
+    [labels.raw, value.raw_research_request],
+    [labels.references, value.reference_material_or_constraints],
+    [labels.question, value.research_question],
+    [labels.goal, value.research_goal],
+    [labels.bottleneck, value.current_bottleneck],
+    [labels.constraints, value.experimental_constraints],
+    [labels.success, value.success_criteria],
+    [labels.failure, value.failure_criteria],
+    [labels.nonGoals, value.non_goals],
+    [labels.notes, value.notes],
+  ].filter(([, body]) => body.trim());
+
+  const textField = (key: TextFieldKey, label: string, rows = 3) => (
+    <label>
+      <span>{label}</span>
+      <textarea rows={rows} value={value[key]} onChange={(event) => update(key, event.target.value)} />
+    </label>
+  );
+
   return (
-    <div className="intake-layout">
-      <form className="intake-form" onSubmit={(event) => event.preventDefault()}>
-        <div className="static-notice"><strong>This page creates a run request.</strong><span>It does not execute Scientific Core.</span></div>
-        <label><span>Run mode</span><small>Select the workflow shape that matches the decision.</small><select value={value.run_mode} onChange={(event) => update("run_mode", event.target.value)}><option value="FOCUSED_DECISION_RUN">Focused decision</option><option value="DISCOVERY_PORTFOLIO_RUN">Discovery portfolio</option><option value="VERIFICATION_RUN">Verification</option><option value="MEASUREMENT_DISCOVERY_RUN">Measurement discovery</option></select></label>
-        {fields.map((field) => <label key={field.key}><span>{field.label}{field.required && <b aria-hidden="true"> *</b>}</span><small>{field.hint}</small>{field.key === "title" ? <input required={field.required} value={value[field.key]} onChange={(event) => update(field.key, event.target.value)} /> : <textarea required={field.required} rows={field.key === "notes" ? 3 : 4} value={value[field.key]} onChange={(event) => update(field.key, event.target.value)} />}</label>)}
-        <div className="two-column-fields"><label><span>Preferred output language</span><select value={value.preferred_output_language} onChange={(event) => update("preferred_output_language", event.target.value)}><option>English</option><option>Korean</option><option>Bilingual</option></select></label><label><span>Visibility</span><select value={value.visibility} onChange={(event) => update("visibility", event.target.value)}><option value="PRIVATE">Private</option><option value="LAB_INTERNAL">Lab internal</option><option value="PUBLIC_SANITIZED">Public sanitized request</option></select></label></div>
+    <div className={`intake-layout${showPreview ? " has-preview" : ""}`}>
+      <form
+        className="intake-form"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!ready) return;
+          downloadRequest(request);
+          setSaved(true);
+        }}
+      >
+        <p className="intake-scope">
+          {ko
+            ? "먼저 간단히 적어주세요. 실행 전 Scientific Director가 전체 연구 명세로 정리하고 확인을 요청합니다."
+            : "Start with a simple request. Before execution, the Scientific Director compiles it into a full specification for confirmation."}
+        </p>
+
+        <label className="primary-request-field">
+          <span>{labels.raw}<b aria-hidden="true"> *</b></span>
+          <textarea
+            required
+            rows={8}
+            value={value.raw_research_request}
+            onChange={(event) => update("raw_research_request", event.target.value)}
+          />
+          <small>{labels.rawHelp}</small>
+        </label>
+
+        <div className="run-request-actions">
+          <button className="primary-button" type="submit" disabled={!ready}>
+            {saved ? <Check size={18} /> : <FileJson size={18} />}
+            {saved ? labels.saved : labels.create}
+          </button>
+        </div>
+
+        <label className="reference-request-field">
+          <span>{labels.references}</span>
+          <textarea
+            rows={4}
+            value={value.reference_material_or_constraints}
+            onChange={(event) => update("reference_material_or_constraints", event.target.value)}
+          />
+          <small>{labels.referencesHelp}</small>
+        </label>
+
+        <details className="advanced-fields">
+          <summary>{labels.advanced}</summary>
+          <div>
+            <label><span>{labels.title}</span><input value={value.title} onChange={(event) => update("title", event.target.value)} /></label>
+            <label>
+              <span>{labels.mode}</span>
+              <select value={value.run_type} onChange={(event) => update("run_type", event.target.value as RunRequestDraft["run_type"])}>
+                {modes.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+              </select>
+            </label>
+            {textField("research_question", labels.question, 4)}
+            {textField("research_goal", labels.goal)}
+            {textField("current_bottleneck", labels.bottleneck)}
+            {textField("experimental_constraints", labels.constraints)}
+            {textField("success_criteria", labels.success)}
+            {textField("failure_criteria", labels.failure)}
+            {textField("non_goals", labels.nonGoals)}
+            {textField("custom_requested_outputs", labels.outputs)}
+            <div className="two-column-fields">
+              <label>
+                <span>{labels.language}</span>
+                <select value={value.output_language} onChange={(event) => update("output_language", event.target.value as RunRequestDraft["output_language"])}>
+                  <option value="">{ko ? "현재 화면 언어" : "Current portal language"}</option>
+                  <option value="ko">한국어</option>
+                  <option value="en">English</option>
+                  <option value="bilingual">{ko ? "한국어 + English" : "Korean + English"}</option>
+                </select>
+              </label>
+              <label>
+                <span>{labels.visibility}</span>
+                <select value={value.visibility} onChange={(event) => update("visibility", event.target.value as RunRequestDraft["visibility"])}>
+                  <option value="PRIVATE">{ko ? "비공개" : "Private"}</option>
+                  <option value="LAB_INTERNAL">{ko ? "연구실 내부" : "Lab internal"}</option>
+                  <option value="PUBLIC_SANITIZED">{ko ? "검토 후 공개" : "Public after review"}</option>
+                </select>
+              </label>
+            </div>
+            {textField("notes", labels.notes)}
+            <label className="request-import">
+              <span><Upload size={16} />{ko ? "기존 구조화 요청서 불러오기" : "Load an existing structured request"}</span>
+              <input
+                type="file"
+                accept=".json,application/json"
+                onChange={async (event) => {
+                  const file = event.target.files?.[0];
+                  if (!file) return;
+                  try {
+                    setValue(normalizeImportedRequest(JSON.parse(await file.text()), locale));
+                    setImportMessage(labels.imported);
+                  } catch {
+                    setImportMessage(labels.importError);
+                  }
+                }}
+              />
+            </label>
+            {importMessage && <p className="import-status" role="status">{importMessage}</p>}
+          </div>
+        </details>
       </form>
-      <aside className="spec-preview"><div className="spec-preview-head"><div><p className="eyebrow">Live preview</p><h2>Run specification</h2></div><span className={requiredReady ? "ready-indicator ready" : "ready-indicator"}>{requiredReady ? "Ready" : "3 required fields"}</span></div><pre>{markdown}</pre><div className="preview-actions"><button className="primary-button" disabled={!requiredReady} onClick={() => download("run-request.json", JSON.stringify({ schema_version: "RunRequestV1", created_at: new Date().toISOString(), ...value }, null, 2), "application/json")}><FileJson size={17} />Download JSON</button><button className="secondary-button" disabled={!requiredReady} onClick={() => download("run-specification.md", markdown, "text/markdown")}><FileText size={17} />Download Markdown</button><button className="secondary-button" disabled={!requiredReady} onClick={async () => { await navigator.clipboard.writeText(`Launch a bounded Scientific Core workflow using this run specification. Do not infer authorization beyond the specification.\n\n${markdown}`); setCopied(true); setTimeout(() => setCopied(false), 1600); }}>{copied ? <Check size={17} /> : <Clipboard size={17} />}{copied ? "Copied" : "Copy launch prompt"}</button></div><p className="preview-footnote"><Download size={15} />Downloads stay on this device. No request is sent to a server.</p></aside>
+
+      {showPreview && (
+        <aside className="spec-preview">
+          <p className="section-label">{ko ? "미리보기" : "Preview"}</p>
+          <h2>{labels.preview}</h2>
+          <div className="rendered-brief">
+            <h3>{title}</h3>
+            {previewSections.map(([heading, body]) => (
+              <section key={heading}>
+                <h4>{heading}</h4>
+                <p>{body}</p>
+              </section>
+            ))}
+            {value.run_type && <section><h4>{labels.mode}</h4><p>{modeLabel}</p></section>}
+            <section>
+              <h4>{ko ? "기본 산출물" : "Default outputs"}</h4>
+              <ul>{defaultRequestedOutputs(locale).map((output) => <li key={output}>{output}</li>)}</ul>
+            </section>
+            <section>
+              <h4>{ko ? "실행 전 확인" : "Confirmation before execution"}</h4>
+              <p>
+                {ko
+                  ? "Scientific Director가 전체 연구 명세와 불명확한 가정을 정리해 보여준 뒤 멈춥니다. 사용자가 확인하기 전에는 provider 기반 연구를 시작하지 않습니다."
+                  : "The Scientific Director compiles the full specification and ambiguous assumptions, presents them, and stops. Provider-backed research starts only after user confirmation."}
+              </p>
+            </section>
+          </div>
+          <small className="preview-footnote">
+            {ko ? "이 정적 화면은 연구 실행을 시작하지 않습니다." : "This static page does not start a scientific run."}
+          </small>
+        </aside>
+      )}
     </div>
   );
 }

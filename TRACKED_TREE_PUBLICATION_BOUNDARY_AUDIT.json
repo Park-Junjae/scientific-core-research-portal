@@ -1,0 +1,10 @@
+{
+  "schema_version": "TrackedTreePublicationBoundaryAuditV1",
+  "audited_source_commit": "3891f4049822b0c1f2506c7173de5e0f184237ad",
+  "tracked_internal_file_count": 0,
+  "tracked_internal_record_count": 0,
+  "tracked_absolute_path_count": 0,
+  "ignored_internal_file_count": 3571,
+  "public_build_internal_record_count": 0,
+  "decision": "PASS"
+}

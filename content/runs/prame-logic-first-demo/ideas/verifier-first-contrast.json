@@ -1,24 +1,131 @@
 {
-  "schema_version": "ResearchIdeaManifestV1", "idea_id": "demo_prame_idea_002", "slug": "verifier-first-contrast",
-  "title": "Verifier-first contrast", "short_title": "Verifier contrast",
-  "abstract": "A synthetic conditional object that uses state-positive, state-negative, inactive-intervention, and burden-matched contrasts to separate target-state dependence from broad burden.",
-  "category": "Falsification architecture", "idea_type": "CONDITIONAL", "lifecycle_status": "CONDITIONAL", "featured": false,
-  "disposition": "Retained conditionally", "recommendation": "Refine before testing",
-  "tags": ["controls", "falsification", "burden"], "origin": "Synthetic focused-decision demonstration", "updated_at": "2026-07-20T11:20:00Z",
-  "language_variants": {"en": "English", "ko": "Korean"},
-  "report_pdf": {"en": "/artifacts/prame-logic-first-demo/verifier-report-en.pdf", "ko": "/artifacts/prame-logic-first-demo/verifier-report-ko.pdf"},
-  "report_markdown": {"en": "reports/verifier-first-contrast-en.md", "ko": "reports/verifier-first-contrast-ko.md"},
-  "knowledge_refs": ["transfer-background-en"], "reference_count": 3, "figure_count": 0, "publication_status": "DEMO_ONLY",
-  "parent_idea_ids": [], "family_id": "family-verifier-contrast", "disposition_reason": "The contrasts are useful only after the target-context state can be measured.",
-  "nearest_prior_art": "General inactive and burden-matched control architectures.",
-  "strongest_reason": "It can distinguish the intended route from broad burden.", "weakest_causal_edge": "The state-positive and state-negative conditions may differ in uncontrolled ways.",
-  "has_fatal_flaw": false, "fatal_flaw": null,
-  "scorecard": {"goal_alignment": 4, "evidence_grounding": 4, "causal_novelty": 2, "mechanistic_specificity": 4, "physical_coherence": 4, "decisive_test_quality": 5, "feasibility": 3, "expected_information_value": 5},
-  "pairwise_summary": "Not pairwise-ranked; it supports the primary decision rather than competing with it.", "reviewer_disagreement": "Reviewers disagree on whether burden matching is sufficient.",
-  "reviewer_critiques": ["State contrasts must be interpreted independently of broad burden."],
-  "reentry_condition": "Use after the target-context gate has an operational measurement.",
-  "scientific_summary": "A verifier-first contrast defines the controls needed before a route-specific claim can be made.",
-  "causal_mechanism": "Matched controls isolate target-state dependence from inactive intervention and broad burden.",
-  "evidence_basis": "Synthetic falsification logic and control-design principles.",
-  "next_discriminating_experiment": "Compare state-positive, state-negative, inactive-intervention, and burden-matched conditions with a route-specific readout."
+  "schema_version": "ResearchIdeaManifestV2",
+  "idea_id": "demo_prame_idea_002",
+  "slug": "verifier-first-contrast",
+  "title": {
+    "en": "Verifier-first contrast",
+    "ko": "검증 우선 비교"
+  },
+  "short_title": {
+    "en": "Verifier contrast",
+    "ko": "검증 우선 비교"
+  },
+  "abstract": {
+    "en": "A conditional contrast proceeds only when the verifier can distinguish the required molecular classes.",
+    "ko": "검증기가 필요한 분자 부류를 구분할 수 있을 때만 진행하는 조건부 비교입니다."
+  },
+  "category": {
+    "en": "Falsification architecture",
+    "ko": "기전 중심"
+  },
+  "idea_type": "CONDITIONAL",
+  "lifecycle_status": "CONDITIONAL",
+  "featured": false,
+  "disposition": {
+    "en": "Retained conditionally",
+    "ko": "조건부 유지"
+  },
+  "recommendation": {
+    "en": "Refine before testing",
+    "ko": "제한된 후속 검토"
+  },
+  "tags": [
+    {
+      "en": "controls",
+      "ko": "controls"
+    },
+    {
+      "en": "falsification",
+      "ko": "falsification"
+    },
+    {
+      "en": "burden",
+      "ko": "burden"
+    }
+  ],
+  "origin": "Synthetic focused-decision demonstration",
+  "updated_at": "2026-07-20T11:20:00Z",
+  "knowledge_refs": [
+    "transfer-background-en"
+  ],
+  "reference_count": 3,
+  "figure_count": 0,
+  "publication_status": "DEMO_ONLY",
+  "parent_idea_ids": [],
+  "family_id": "family-verifier-contrast",
+  "disposition_reason": {
+    "en": "The contrasts are useful only after the target-context state can be measured.",
+    "ko": "생물학적 해석에 앞서 분석적 식별 가능성이 확보되어야 합니다."
+  },
+  "nearest_prior_art": {
+    "en": "General inactive and burden-matched control architectures.",
+    "ko": "직접적으로 일치하는 선행 사례는 기록되지 않았습니다."
+  },
+  "strongest_reason": {
+    "en": "It can distinguish the intended route from broad burden.",
+    "ko": "생물학적 해석에 앞서 분석적 식별 가능성이 확보되어야 합니다."
+  },
+  "weakest_causal_edge": {
+    "en": "The state-positive and state-negative conditions may differ in uncontrolled ways.",
+    "ko": "핵심 인과 연결은 아직 직접 확인되지 않았습니다."
+  },
+  "has_fatal_flaw": false,
+  "fatal_flaw": null,
+  "scorecard": {
+    "goal_alignment": 4,
+    "evidence_grounding": 4,
+    "causal_novelty": 2,
+    "mechanistic_specificity": 4,
+    "physical_coherence": 4,
+    "decisive_test_quality": 5,
+    "feasibility": 3,
+    "expected_information_value": 5
+  },
+  "pairwise_summary": {
+    "en": "Not pairwise-ranked; it supports the primary decision rather than competing with it.",
+    "ko": "별도 쌍대 비교는 필요하지 않았습니다."
+  },
+  "reviewer_disagreement": {
+    "en": "Reviewers disagree on whether burden matching is sufficient.",
+    "ko": "중요한 검토자 이견은 기록되지 않았습니다."
+  },
+  "reviewer_critiques": [
+    {
+      "en": "State contrasts must be interpreted independently of broad burden.",
+      "ko": "판별 가능한 측정과 대조군이 필요합니다."
+    }
+  ],
+  "reentry_condition": {
+    "en": "Use after the target-context gate has an operational measurement.",
+    "ko": "재검토 조건을 충족해야 합니다."
+  },
+  "scientific_summary": {
+    "en": "A verifier-first contrast defines the controls needed before a route-specific claim can be made.",
+    "ko": "검증기가 필요한 분자 부류를 구분할 수 있을 때만 진행하는 조건부 비교입니다."
+  },
+  "causal_mechanism": {
+    "en": "Matched controls isolate target-state dependence from inactive intervention and broad burden.",
+    "ko": "개입이 관련 분자 상태의 분포를 바꾸고 최종 산물에 영향을 줄 수 있다는 가설입니다."
+  },
+  "evidence_basis": {
+    "en": "Synthetic falsification logic and control-design principles.",
+    "ko": "현재 근거는 제한된 성분 수준 또는 유추 근거입니다."
+  },
+  "next_discriminating_experiment": {
+    "en": "Compare state-positive, state-negative, inactive-intervention, and burden-matched conditions with a route-specific readout.",
+    "ko": "판별 가능한 대조군과 함께 핵심 상태 및 최종 산물을 비교합니다."
+  },
+  "report_id": null,
+  "why_this_idea": {
+    "en": "Analytical identifiability must precede biological interpretation.",
+    "ko": "생물학적 해석에 앞서 분석적 식별 가능성이 확보되어야 합니다."
+  },
+  "proposed_comparison": {
+    "en": "Compare state-positive, state-negative, inactive-intervention, and burden-matched conditions with a route-specific readout.",
+    "ko": "관련 상태와 최종 산물을 같은 비교군에서 측정합니다."
+  },
+  "expected_result": {
+    "en": "A supportive result changes the intended product more strongly than bulk abundance or burden.",
+    "ko": "지지 결과에서는 전체 양이나 부담보다 의도한 산물이 더 선택적으로 변해야 합니다."
+  }
 }

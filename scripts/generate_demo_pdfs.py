@@ -1,3 +1,10 @@
+"""Historical fixture generator only.
+
+This script is not part of the portal build or publication path. Reader-facing
+reports must come from explicit ResearchReportManifestV2 records; a missing
+report remains summary-only instead of receiving a generated placeholder PDF.
+"""
+
 from __future__ import annotations
 
 from pathlib import Path

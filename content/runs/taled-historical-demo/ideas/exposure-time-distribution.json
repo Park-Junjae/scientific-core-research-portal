@@ -1,22 +1,131 @@
 {
-  "schema_version": "ResearchIdeaManifestV1", "idea_id": "demo_taled_idea_002", "slug": "exposure-time-distribution",
-  "title": "Exposure-time distribution as a product-purity coordinate", "short_title": "Exposure-time distribution",
-  "abstract": "A synthetic historical object that interprets target-only and multi-edit products as potentially requiring different exposure times while retaining the absence of a practical control mechanism.",
-  "category": "Historical mechanism", "idea_type": "ALTERNATIVE", "lifecycle_status": "PARKED", "featured": false,
-  "disposition": "Archived and parked", "recommendation": "Parked", "tags": ["kinetics", "exposure time", "historical"],
-  "origin": "Synthetic archived child run", "updated_at": "2026-07-16T15:20:00Z", "language_variants": {"en": "English", "ko": "Korean"},
-  "report_pdf": {"en": "/artifacts/taled-historical-demo/exposure-case-en.pdf", "ko": "/artifacts/taled-historical-demo/exposure-case-ko.pdf"},
-  "report_markdown": {"en": "reports/exposure-time-distribution-en.md", "ko": "reports/exposure-time-distribution-ko.md"},
-  "knowledge_refs": ["taled-background-en"], "reference_count": 2, "figure_count": 0, "publication_status": "DEMO_ONLY",
-  "parent_idea_ids": [], "family_id": "family-exposure-time", "disposition_reason": "The kinetic coordinate remained plausible but lacked a selective mitochondrial actuator.",
-  "nearest_prior_art": "General exposure-time control in catalytic systems.", "strongest_reason": "Different product classes can have separable dwell-time requirements.",
-  "weakest_causal_edge": "No practical intervention was shown to selectively shorten the relevant exposure distribution.", "has_fatal_flaw": false, "fatal_flaw": null,
-  "scorecard": {"goal_alignment": 4, "evidence_grounding": 2, "causal_novelty": 3, "mechanistic_specificity": 3, "physical_coherence": 4, "decisive_test_quality": 3, "feasibility": 2, "expected_information_value": 4},
-  "pairwise_summary": "No pairwise comparison occurred in this child run.", "reviewer_disagreement": "Reviewers differed on whether exposure could be controlled independently of burden.",
-  "reviewer_critiques": ["A global activity reduction would not distinguish the proposed kinetic mechanism."],
-  "reentry_condition": "Re-enter only with an actuator that changes exposure without proportionally changing all products.",
-  "scientific_summary": "Target-only and multi-edit products may occupy different parts of an exposure-time distribution.",
-  "causal_mechanism": "Shorter effective exposure could preserve early desired products before later bystander events accumulate.",
-  "evidence_basis": "Synthetic kinetic interpretation without a validated mitochondrial control mechanism.",
-  "next_discriminating_experiment": "Compare matched interventions that alter exposure timing and test whether all product classes change proportionally."
+  "schema_version": "ResearchIdeaManifestV2",
+  "idea_id": "demo_taled_idea_002",
+  "slug": "exposure-time-distribution",
+  "title": {
+    "en": "Exposure-time distribution as a product-purity coordinate",
+    "ko": "산물 순도를 결정하는 노출 시간 분포"
+  },
+  "short_title": {
+    "en": "Exposure-time distribution",
+    "ko": "산물 순도를 결정하는 노출 시간 분포"
+  },
+  "abstract": {
+    "en": "A historical idea reframes product purity as a distribution of catalytic exposure rather than only static reach.",
+    "ko": "산물 순도를 정적인 도달 거리뿐 아니라 촉매 노출 시간의 분포로 보는 과거 아이디어입니다."
+  },
+  "category": {
+    "en": "Historical mechanism",
+    "ko": "기전 중심"
+  },
+  "idea_type": "ALTERNATIVE",
+  "lifecycle_status": "PARKED",
+  "featured": false,
+  "disposition": {
+    "en": "Archived and parked",
+    "ko": "보류"
+  },
+  "recommendation": {
+    "en": "Parked",
+    "ko": "현재 보류"
+  },
+  "tags": [
+    {
+      "en": "kinetics",
+      "ko": "kinetics"
+    },
+    {
+      "en": "exposure time",
+      "ko": "exposure time"
+    },
+    {
+      "en": "historical",
+      "ko": "historical"
+    }
+  ],
+  "origin": "Synthetic archived child run",
+  "updated_at": "2026-07-16T15:20:00Z",
+  "knowledge_refs": [
+    "taled-background-en"
+  ],
+  "reference_count": 2,
+  "figure_count": 0,
+  "publication_status": "DEMO_ONLY",
+  "parent_idea_ids": [],
+  "family_id": "family-exposure-time",
+  "disposition_reason": {
+    "en": "The kinetic coordinate remained plausible but lacked a selective mitochondrial actuator.",
+    "ko": "다중 편집 read를 설명할 수 있지만 시간 분해 판별 실험이 없어 보류 상태입니다."
+  },
+  "nearest_prior_art": {
+    "en": "General exposure-time control in catalytic systems.",
+    "ko": "직접적으로 일치하는 선행 사례는 기록되지 않았습니다."
+  },
+  "strongest_reason": {
+    "en": "Different product classes can have separable dwell-time requirements.",
+    "ko": "다중 편집 read를 설명할 수 있지만 시간 분해 판별 실험이 없어 보류 상태입니다."
+  },
+  "weakest_causal_edge": {
+    "en": "No practical intervention was shown to selectively shorten the relevant exposure distribution.",
+    "ko": "핵심 인과 연결은 아직 직접 확인되지 않았습니다."
+  },
+  "has_fatal_flaw": false,
+  "fatal_flaw": null,
+  "scorecard": {
+    "goal_alignment": 4,
+    "evidence_grounding": 2,
+    "causal_novelty": 3,
+    "mechanistic_specificity": 3,
+    "physical_coherence": 4,
+    "decisive_test_quality": 3,
+    "feasibility": 2,
+    "expected_information_value": 4
+  },
+  "pairwise_summary": {
+    "en": "No pairwise comparison occurred in this child run.",
+    "ko": "별도 쌍대 비교는 필요하지 않았습니다."
+  },
+  "reviewer_disagreement": {
+    "en": "Reviewers differed on whether exposure could be controlled independently of burden.",
+    "ko": "중요한 검토자 이견은 기록되지 않았습니다."
+  },
+  "reviewer_critiques": [
+    {
+      "en": "A global activity reduction would not distinguish the proposed kinetic mechanism.",
+      "ko": "판별 가능한 측정과 대조군이 필요합니다."
+    }
+  ],
+  "reentry_condition": {
+    "en": "Re-enter only with an actuator that changes exposure without proportionally changing all products.",
+    "ko": "재검토 조건을 충족해야 합니다."
+  },
+  "scientific_summary": {
+    "en": "Target-only and multi-edit products may occupy different parts of an exposure-time distribution.",
+    "ko": "산물 순도를 정적인 도달 거리뿐 아니라 촉매 노출 시간의 분포로 보는 과거 아이디어입니다."
+  },
+  "causal_mechanism": {
+    "en": "Shorter effective exposure could preserve early desired products before later bystander events accumulate.",
+    "ko": "개입이 관련 분자 상태의 분포를 바꾸고 최종 산물에 영향을 줄 수 있다는 가설입니다."
+  },
+  "evidence_basis": {
+    "en": "Synthetic kinetic interpretation without a validated mitochondrial control mechanism.",
+    "ko": "현재 근거는 제한된 성분 수준 또는 유추 근거입니다."
+  },
+  "next_discriminating_experiment": {
+    "en": "Compare matched interventions that alter exposure timing and test whether all product classes change proportionally.",
+    "ko": "판별 가능한 대조군과 함께 핵심 상태 및 최종 산물을 비교합니다."
+  },
+  "report_id": null,
+  "why_this_idea": {
+    "en": "It could explain multi-edit reads but remains parked without a decisive time-resolved test.",
+    "ko": "다중 편집 read를 설명할 수 있지만 시간 분해 판별 실험이 없어 보류 상태입니다."
+  },
+  "proposed_comparison": {
+    "en": "Compare matched interventions that alter exposure timing and test whether all product classes change proportionally.",
+    "ko": "관련 상태와 최종 산물을 같은 비교군에서 측정합니다."
+  },
+  "expected_result": {
+    "en": "A supportive result changes the intended product more strongly than bulk abundance or burden.",
+    "ko": "지지 결과에서는 전체 양이나 부담보다 의도한 산물이 더 선택적으로 변해야 합니다."
+  }
 }

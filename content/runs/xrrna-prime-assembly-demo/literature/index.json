@@ -1,0 +1,47 @@
+{
+  "schema_version": "ResearchSourceIndexV1",
+  "run_id": "demo_xrrna_prime_assembly_001",
+  "sources": [
+    {
+      "schema_version": "ResearchSourceManifestV1",
+      "source_id": "demo-anchor-prime-editing",
+      "localized_title": {
+        "en": "Search-and-replace genome editing without double-strand breaks or donor DNA",
+        "ko": "Search-and-replace genome editing without double-strand breaks or donor DNA"
+      },
+      "authors": ["Anzalone AV", "Randolph PB", "Davis JR"],
+      "journal": "Nature",
+      "year": 2019,
+      "volume": "576",
+      "pages_or_article_number": "149-157",
+      "doi": "10.1038/s41586-019-1711-4",
+      "pmid": null,
+      "url": "https://doi.org/10.1038/s41586-019-1711-4",
+      "source_type": "JOURNAL_ARTICLE",
+      "evidence_role": "ANCHOR",
+      "access_level": "CITATION_ONLY",
+      "full_text_reviewed": null,
+      "deeply_read": null,
+      "load_bearing": true,
+      "localized_relevance": {
+        "en": "Establishes the prime-editing framework used as background for this synthetic decision fixture.",
+        "ko": "이 합성 의사결정 예시의 배경이 되는 Prime Editing 틀을 확립한 논문입니다."
+      },
+      "localized_shows": {
+        "en": "Prime editing can install programmed sequence changes without a donor DNA double-strand-break workflow.",
+        "ko": "Prime Editing이 donor DNA 이중가닥 절단 절차 없이 지정된 서열 변화를 만들 수 있음을 보여줍니다."
+      },
+      "localized_does_not_show": {
+        "en": "It does not test the complete synthetic Prime Assembly motif comparison shown in this portal fixture.",
+        "ko": "이 포털 예시의 전체 Prime Assembly motif 비교를 시험한 것은 아닙니다."
+      },
+      "related_run_ids": ["demo_xrrna_prime_assembly_001"],
+      "related_idea_ids": ["demo_xrrna_idea_001"],
+      "related_report_ids": ["xrrna-prime-assembly-demo-knowledge-en"],
+      "related_report_sections": [{"report_id": "xrrna-prime-assembly-demo-knowledge-en", "section_ids": ["the-scientific-question"]}],
+      "cited_in_reports": [],
+      "publication_status": "DEMO_ONLY",
+      "display_order": 1
+    }
+  ]
+}

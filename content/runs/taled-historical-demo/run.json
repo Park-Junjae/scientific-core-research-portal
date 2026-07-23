@@ -1,31 +1,326 @@
 {
-  "schema_version": "ResearchRunManifestV1",
-  "run_id": "demo_taled_historical_001", "slug": "taled-historical-demo", "title": "TALED Editing-Window Study", "short_title": "TALED historical case",
-  "subtitle": "An archived child-run lineage preserved without cross-run count aggregation", "owner": "Scientific Core",
-  "created_at": "2026-07-05T09:00:00Z", "updated_at": "2026-07-16T16:00:00Z", "status": "ARCHIVED", "terminal_state": "HISTORICAL_QUALITY_CASE",
-  "run_mode": "FOCUSED_DECISION_RUN", "research_domain": "Mitochondrial genome editing",
-  "research_goal": "Demonstrate an archived child run whose two mechanistic coordinates were reviewed but not promoted into an active recommendation.",
-  "summary": "This synthetic historical child run records exactly two generated families, no Arena entrants, no pairwise matches, and no finalists. Its counts are not combined with any other TALED lineage.",
-  "scientific_decision": "Archive both coordinates as learning objects. Neither is an active recommendation or experimentally validated result.",
-  "reading_order": ["Why this child run was archived", "Helical phase coordinate", "Exposure-time coordinate", "Run-specific lineage"],
-  "tags": ["TALED", "historical child run", "lineage"], "languages": ["en", "ko"], "visibility": "PUBLIC_SANITIZED", "publication_status": "DEMO_ONLY",
-  "idea_count": 2, "reviewed_idea_count": 2, "retained_idea_count": 0, "report_count": 4, "knowledge_document_count": 1, "featured": false,
-  "source_type": "SYNTHETIC_DEMO", "source_commit": "demo-not-linked-to-scientific-runtime", "source_bundle_hash": "sha256:demo-taled-child-bundle-v2",
-  "current_stage": "Archived child run", "progress_percent": 100,
+  "schema_version": "ResearchRunManifestV2",
+  "run_id": "demo_taled_historical_001",
+  "slug": "taled-historical-demo",
+  "title": {
+    "en": "TALED Editing-Window Study",
+    "ko": "TALED 편집 범위 연구"
+  },
+  "short_title": {
+    "en": "TALED historical case",
+    "ko": "TALED 과거 사례"
+  },
+  "subtitle": {
+    "en": "An archived child-run lineage preserved without cross-run count aggregation",
+    "ko": "실행 간 수치를 합산하지 않고 보존한 과거 하위 연구입니다."
+  },
+  "owner": "Scientific Core",
+  "created_at": "2026-07-05T09:00:00Z",
+  "updated_at": "2026-07-16T16:00:00Z",
+  "status": "ARCHIVED",
+  "terminal_state": "HISTORICAL_QUALITY_CASE",
+  "run_mode": "FOCUSED_DECISION_RUN",
+  "research_domain": {
+    "en": "Mitochondrial genome editing",
+    "ko": "미토콘드리아 유전체 편집"
+  },
+  "research_goal": {
+    "en": "Preserve two historical mechanism axes for reading without treating archived ideas as current recommendations.",
+    "ko": "두 가지 과거 기전 축을 현재 권고안으로 오해하지 않도록 읽기 자료로 보존합니다."
+  },
+  "summary": {
+    "en": "Helical phase and exposure-time distribution are retained as historical, parked ideas. Neither is presented as a current validated mechanism.",
+    "ko": "나선 위상과 노출 시간 분포를 과거의 보류 아이디어로 유지합니다. 어느 쪽도 현재 검증된 기전으로 제시하지 않습니다."
+  },
+  "scientific_decision": {
+    "en": "Archive both ideas and retain their causal framing for comparison only.",
+    "ko": "두 아이디어를 보관하고 인과적 관점만 비교 자료로 유지합니다."
+  },
+  "reading_order": [
+    {
+      "en": "Scientific summary",
+      "ko": "연구 요약"
+    },
+    {
+      "en": "Historical background",
+      "ko": "과거 배경"
+    },
+    {
+      "en": "Parked ideas",
+      "ko": "보류 아이디어"
+    },
+    {
+      "en": "Run specification",
+      "ko": "연구 명세"
+    }
+  ],
+  "tags": [
+    {
+      "en": "TALED",
+      "ko": "TALED"
+    },
+    {
+      "en": "editing window",
+      "ko": "편집 범위"
+    },
+    {
+      "en": "historical",
+      "ko": "과거 사례"
+    }
+  ],
+  "languages": [
+    "en",
+    "ko"
+  ],
+  "visibility": "PUBLIC_SANITIZED",
+  "publication_status": "DEMO_ONLY",
+  "idea_count": 2,
+  "reviewed_idea_count": 2,
+  "retained_idea_count": 0,
+  "report_count": 4,
+  "knowledge_document_count": 1,
+  "featured": false,
+  "source_type": "SYNTHETIC_DEMO",
+  "source_commit": "demo-not-linked-to-scientific-runtime",
+  "source_bundle_hash": "sha256:demo-taled-child-bundle-v2",
+  "current_stage": "Archived child run",
+  "progress_percent": 100,
   "timeline": [
-    {"date": "2026-07-05", "label": "Initial exploration", "detail": "Two editing-window coordinates were recorded in this child run."},
-    {"date": "2026-07-10", "label": "Evidence audit", "detail": "Architecture-level support remained incomplete."},
-    {"date": "2026-07-16", "label": "Archived", "detail": "This child run ended without Arena comparison or finalists."}
+    {
+      "date": "2026-07-05",
+      "label": {
+        "en": "Initial exploration",
+        "ko": "검토"
+      },
+      "detail": {
+        "en": "Two editing-window coordinates were recorded in this child run.",
+        "ko": "해당 단계의 기록을 보존했습니다."
+      }
+    },
+    {
+      "date": "2026-07-10",
+      "label": {
+        "en": "Evidence audit",
+        "ko": "검토"
+      },
+      "detail": {
+        "en": "Architecture-level support remained incomplete.",
+        "ko": "해당 단계의 기록을 보존했습니다."
+      }
+    },
+    {
+      "date": "2026-07-16",
+      "label": {
+        "en": "Archived",
+        "ko": "검토"
+      },
+      "detail": {
+        "en": "This child run ended without Arena comparison or finalists.",
+        "ko": "해당 단계의 기록을 보존했습니다."
+      }
+    }
   ],
-  "idea_refs": ["helical-phase-coordinate", "exposure-time-distribution"],
-  "report_refs": [
-    {"id": "taled-case-en", "title": "Historical case report", "kind": "PDF", "path": "/artifacts/taled-historical-demo/historical-case-en.pdf", "language": "en"},
-    {"id": "taled-case-ko", "title": "Historical case report - Korean", "kind": "PDF", "path": "/artifacts/taled-historical-demo/historical-case-ko.pdf", "language": "ko"},
-    {"id": "taled-exposure-en", "title": "Exposure-time report", "kind": "PDF", "path": "/artifacts/taled-historical-demo/exposure-case-en.pdf", "language": "en"},
-    {"id": "taled-exposure-ko", "title": "Exposure-time report - Korean", "kind": "PDF", "path": "/artifacts/taled-historical-demo/exposure-case-ko.pdf", "language": "ko"}
+  "idea_refs": [
+    "helical-phase-coordinate",
+    "exposure-time-distribution"
   ],
-  "knowledge_refs": [{"id": "taled-knowledge", "title": "TALED background", "kind": "MARKDOWN", "path": "knowledge/taled-background-en.md", "language": "en"}], "artifact_refs": [],
-  "portfolio_funnel": {"raw_generation_count": 2, "independent_generation_count": 2, "natural_family_count": 2, "developed_count": 2, "reviewed_count": 2, "arena_entrant_count": 0, "finalist_count": 0, "parked_count": 2, "dropped_count": 0},
-  "pairwise_comparisons": [], "pairwise_selection_impact": "No pairwise comparison occurred in this archived child run.",
-  "source_lineage": {"source_run_id": "demo_taled_historical_001", "generated_count": 2, "natural_family_count": 2, "arena_entrant_count": 0, "match_count": 0, "finalist_count": 0, "terminal_state": "HISTORICAL_QUALITY_CASE"}
+  "artifact_refs": [],
+  "portfolio_funnel": {
+    "raw_generation_count": 2,
+    "independent_generation_count": 2,
+    "natural_family_count": 2,
+    "developed_count": 2,
+    "reviewed_count": 2,
+    "arena_entrant_count": 0,
+    "finalist_count": 0,
+    "parked_count": 2,
+    "dropped_count": 0
+  },
+  "pairwise_comparisons": [],
+  "pairwise_selection_impact": {
+    "en": "No pairwise comparison occurred in this archived child run.",
+    "ko": "비교 신호는 연구 결정의 보조 자료로만 사용했습니다."
+  },
+  "source_lineage": {
+    "source_run_id": "demo_taled_historical_001",
+    "generated_count": 2,
+    "natural_family_count": 2,
+    "arena_entrant_count": 0,
+    "match_count": 0,
+    "finalist_count": 0,
+    "terminal_state": "HISTORICAL_QUALITY_CASE"
+  },
+  "research_question": {
+    "en": "Could geometry or exposure time narrow the TALED A-to-G editing window without proportional activity loss?",
+    "ko": "기하학적 배치나 노출 시간이 전체 활성을 비례해 낮추지 않으면서 TALED A-to-G 편집 범위를 좁힐 수 있는가?"
+  },
+  "current_bottleneck": {
+    "en": "Window narrowing and activity preservation were not jointly established in this archived demonstration.",
+    "ko": "이 과거 데모에서는 편집 범위 축소와 활성 유지가 함께 입증되지 않았습니다."
+  },
+  "success_criteria": [
+    {
+      "en": "Produce an interpretable comparison tied to the stated decision.",
+      "ko": "명시된 결정과 연결되는 해석 가능한 비교를 제시합니다."
+    }
+  ],
+  "experimental_constraints": [
+    {
+      "en": "Remain within the bounded demonstration scope.",
+      "ko": "제한된 데모 범위를 유지합니다."
+    }
+  ],
+  "non_goals": [
+    {
+      "en": "No scientific validation claim.",
+      "ko": "과학적 검증을 주장하지 않습니다."
+    }
+  ],
+  "requested_outputs": [
+    {
+      "en": "Scientific summary",
+      "ko": "연구 요약"
+    },
+    {
+      "en": "Research-object portfolio",
+      "ko": "연구 대상 포트폴리오"
+    }
+  ],
+  "reports": [
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "taled-historical-demo-summary-en",
+      "translation_group_id": "taled-historical-demo-summary",
+      "role": "RESEARCH_SUMMARY",
+      "localized_title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "localized_description": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "language": "en",
+      "path": null,
+      "markdown_path": "reports/research-summary-en.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": true,
+      "display_order": 1,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "taled-historical-demo-summary-ko",
+      "translation_group_id": "taled-historical-demo-summary",
+      "role": "RESEARCH_SUMMARY",
+      "localized_title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "localized_description": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "language": "ko",
+      "path": null,
+      "markdown_path": "reports/research-summary-ko.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": true,
+      "display_order": 1,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "taled-historical-demo-spec-en",
+      "translation_group_id": "taled-historical-demo-spec",
+      "role": "RUN_SPECIFICATION",
+      "localized_title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "localized_description": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "language": "en",
+      "path": null,
+      "markdown_path": "reports/run-specification-en.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": false,
+      "display_order": 3,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "taled-historical-demo-spec-ko",
+      "translation_group_id": "taled-historical-demo-spec",
+      "role": "RUN_SPECIFICATION",
+      "localized_title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "localized_description": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "language": "ko",
+      "path": null,
+      "markdown_path": "reports/run-specification-ko.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": false,
+      "display_order": 3,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "taled-historical-demo-knowledge-en",
+      "translation_group_id": "taled-historical-demo-knowledge",
+      "role": "KNOWLEDGE_BACKGROUND",
+      "localized_title": {
+        "en": "Knowledge background",
+        "ko": "지식 배경"
+      },
+      "localized_description": {
+        "en": "Background needed to assess this run.",
+        "ko": "이 연구를 평가하는 데 필요한 배경입니다."
+      },
+      "language": "en",
+      "path": null,
+      "markdown_path": "knowledge/taled-background-en.md",
+      "page_count": null,
+      "reference_count": 4,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": false,
+      "display_order": 2,
+      "updated_at": "2026-07-22T00:00:00Z"
+    }
+  ],
+  "primary_report_id": "taled-historical-demo-summary-en",
+  "primary_knowledge_id": "taled-historical-demo-knowledge-en",
+  "primary_summary_id": "taled-historical-demo-summary-en",
+  "run_specification_id": "taled-historical-demo-spec-en",
+  "literature_stats": {
+    "analyzed_unique_total": null,
+    "report_reference_count": 4
+  },
+  "literature_index": [],
+  "historical_fixture_paths": [
+    "reports/exposure-time-distribution-en.md",
+    "reports/exposure-time-distribution-ko.md",
+    "reports/helical-phase-coordinate-en.md",
+    "reports/helical-phase-coordinate-ko.md"
+  ]
 }

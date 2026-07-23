@@ -9,7 +9,12 @@ import unittest
 from pathlib import Path
 
 from coscientist.site import PublicationError, publish_run, validate_content
-from coscientist.site.publisher import _portfolio_counts, _validate_portfolio
+from coscientist.site.publisher import (
+    _portfolio_counts,
+    _validate_portfolio,
+    derive_analyzed_unique_total,
+    derive_analyzed_unique_total_from_ledger,
+)
 
 
 PORTAL = Path(__file__).resolve().parents[1]
@@ -76,6 +81,101 @@ def make_source(root: Path) -> Path:
 
 
 class PublicationCliTests(unittest.TestCase):
+    def test_analyzed_literature_counts_a_paper_cited_by_two_reports_once(self) -> None:
+        source = {
+            "doi": "10.1000/example",
+            "analysis_stage": "TITLE_ABSTRACT_SCREENED",
+            "cited_in_reports": [{"report_id": "one"}, {"report_id": "two"}],
+        }
+        self.assertEqual(derive_analyzed_unique_total([source]), 1)
+
+    def test_analyzed_literature_deduplicates_doi(self) -> None:
+        sources = [
+            {"doi": "https://doi.org/10.1000/EXAMPLE", "analysis_stage": "FULL_TEXT_REVIEWED"},
+            {"doi": "10.1000/example", "analysis_stage": "DEEPLY_READ"},
+        ]
+        self.assertEqual(derive_analyzed_unique_total(sources), 1)
+
+    def test_analyzed_literature_deduplicates_pmid(self) -> None:
+        sources = [
+            {"pmid": "PMID: 12345", "analysis_stage": "TITLE_ABSTRACT_SCREENED"},
+            {"pmid": 12345, "analysis_stage": "LOAD_BEARING"},
+        ]
+        self.assertEqual(derive_analyzed_unique_total(sources), 1)
+
+    def test_analyzed_literature_uses_normalized_title_and_year_last(self) -> None:
+        sources = [
+            {"title": "A  Mechanistic Study", "year": 2026, "analysis_stage": "TITLE_ABSTRACT_SCREENED"},
+            {"localized_title": {"en": "A mechanistic study"}, "year": 2026, "analysis_stage": "FULL_TEXT_REVIEWED"},
+        ]
+        self.assertEqual(derive_analyzed_unique_total(sources), 1)
+
+    def test_discovered_only_does_not_count_but_title_abstract_screened_does(self) -> None:
+        sources = [
+            {"doi": "10.1000/discovered", "analysis_stage": "DISCOVERED_ONLY"},
+            {"doi": "10.1000/screened", "analysis_stage": "TITLE_ABSTRACT_SCREENED"},
+        ]
+        self.assertEqual(derive_analyzed_unique_total(sources), 1)
+
+    def test_triaged_and_cited_stages_count_as_substantive_analysis(self) -> None:
+        sources = [
+            {"doi": "10.1000/triaged", "analysis_stage": "FULL_TEXT_TRIAGED"},
+            {"doi": "10.1000/cited", "analysis_stage": "CITED"},
+        ]
+        self.assertEqual(derive_analyzed_unique_total(sources), 2)
+
+    def test_missing_analysis_stages_do_not_fall_back_to_other_counts(self) -> None:
+        sources = [{"doi": "10.1000/cited", "cited_in_reports": [{"report_id": "one"}], "load_bearing": True}]
+        self.assertIsNone(derive_analyzed_unique_total(sources))
+
+    def test_run_source_ledger_counts_documented_events_and_deduplicates(self) -> None:
+        sources = [
+            {
+                "doi": "10.1000/example",
+                "normalized_title": "first",
+                "year": 2026,
+                "analysis_events": [
+                    {"event_type": "SOURCE_ATLAS_CURATED", "stage_id": "atlas"}
+                ],
+            },
+            {
+                "doi": "https://doi.org/10.1000/EXAMPLE",
+                "normalized_title": "duplicate",
+                "year": 2026,
+                "analysis_events": [
+                    {"event_type": "REPORT_ARGUMENT_USED", "stage_id": "report"}
+                ],
+            },
+            {
+                "doi": "10.1000/no-event",
+                "normalized_title": "unqualified",
+                "year": 2026,
+                "analysis_events": [],
+            },
+        ]
+        self.assertEqual(derive_analyzed_unique_total_from_ledger(sources), 1)
+
+    def test_publish_derives_analyzed_total_from_staged_source_registry(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            portal = make_empty_portal(root)
+            source = make_source(root)
+            run_path = source / "run.json"
+            run = json.loads(run_path.read_text(encoding="utf-8"))
+            run["literature_stats"]["analyzed_unique_total"] = None
+            run["literature_stats"]["load_bearing_sources"] = 1
+            run["literature_stats"]["report_reference_count"] = 0
+            run_path.write_text(json.dumps(run), encoding="utf-8")
+            source_path = source / "literature" / "index.json"
+            source_index = json.loads(source_path.read_text(encoding="utf-8"))
+            source_index["sources"][0]["analysis_stage"] = "TITLE_ABSTRACT_SCREENED"
+            source_path.write_text(json.dumps(source_index), encoding="utf-8")
+            publish_run(source, portal, "PUBLIC_SANITIZED")
+            published = json.loads(
+                (portal / "content" / "runs" / DEMO_SLUG / "run.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(published["literature_stats"]["analyzed_unique_total"], 1)
+
     def test_current_content_validates(self) -> None:
         result = validate_content(PORTAL)
         self.assertEqual(result["status"], "PASS", result["errors"])
@@ -89,7 +189,9 @@ class PublicationCliTests(unittest.TestCase):
         self.assertEqual(run["idea_count"], 4)
         self.assertEqual(run["report_count"], 4)
         self.assertNotRegex(
-            " ".join([run["title"], run["subtitle"], run["summary"]]),
+            " ".join(
+                [run["title"]["en"], run["subtitle"]["en"], run["summary"]["en"]]
+            ),
             r"(?i)arena[- ]selected|top-?1|tournament",
         )
 
@@ -179,6 +281,23 @@ class PublicationCliTests(unittest.TestCase):
             self.assertEqual(result["status"], "FAIL")
             self.assertTrue(any("portfolio_funnel" in item for item in result["errors"]))
 
+    def test_duplicate_doi_is_rejected_at_run_level(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            portal = Path(temporary) / "portal"
+            shutil.copytree(PORTAL / "schemas", portal / "schemas")
+            shutil.copytree(PORTAL / "deploy", portal / "deploy")
+            shutil.copytree(PORTAL / "content", portal / "content")
+            shutil.copytree(PORTAL / "public" / "artifacts", portal / "public" / "artifacts")
+            source_path = portal / "content" / "runs" / DEMO_SLUG / "literature" / "index.json"
+            index = json.loads(source_path.read_text(encoding="utf-8"))
+            duplicate = dict(index["sources"][0])
+            duplicate["source_id"] = "duplicate-doi-record"
+            index["sources"].append(duplicate)
+            source_path.write_text(json.dumps(index), encoding="utf-8")
+            result = validate_content(portal)
+            self.assertEqual(result["status"], "FAIL")
+            self.assertTrue(any("duplicate DOI" in item for item in result["errors"]))
+
     def test_fatal_flaw_cannot_be_rescued_by_finalist_status(self) -> None:
         idea = {
             "idea_id": "fatal", "slug": "fatal", "lifecycle_status": "FINALIST",
@@ -244,7 +363,12 @@ class PublicationCliTests(unittest.TestCase):
             outside.write_text("external file", encoding="utf-8")
             target = source / "artifacts" / "demo-publication-note.md"
             target.unlink()
-            target.symlink_to(outside)
+            try:
+                target.symlink_to(outside)
+            except OSError as exc:
+                if getattr(exc, "winerror", None) == 1314:
+                    self.skipTest("Windows symlink privilege is unavailable")
+                raise
             with self.assertRaises(PublicationError):
                 publish_run(source, portal, "PUBLIC_SANITIZED")
 

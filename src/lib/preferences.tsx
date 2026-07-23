@@ -3,8 +3,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 export type Preferences = {
-  language: "English" | "Korean";
-  view: "List" | "Grid";
   density: "Comfortable" | "Compact";
   pdf: "Inline viewer" | "New tab";
   theme: "System" | "Light" | "Dark";
@@ -12,8 +10,6 @@ export type Preferences = {
 };
 
 export const defaultPreferences: Preferences = {
-  language: "English",
-  view: "List",
   density: "Comfortable",
   pdf: "Inline viewer",
   theme: "System",
@@ -32,8 +28,6 @@ function normalizePreferences(value: unknown): Preferences {
   if (!value || typeof value !== "object") return defaultPreferences;
   const candidate = value as Partial<Preferences>;
   return {
-    language: candidate.language === "Korean" ? "Korean" : "English",
-    view: candidate.view === "Grid" ? "Grid" : "List",
     density: candidate.density === "Compact" ? "Compact" : "Comfortable",
     pdf: candidate.pdf === "New tab" ? "New tab" : "Inline viewer",
     theme: candidate.theme === "Light" || candidate.theme === "Dark" ? candidate.theme : "System",

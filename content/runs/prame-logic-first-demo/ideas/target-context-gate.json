@@ -1,24 +1,139 @@
 {
-  "schema_version": "ResearchIdeaManifestV1", "idea_id": "demo_prame_idea_001", "slug": "target-context-gate",
-  "title": "Target-context gate before transfer", "short_title": "Target-context gate",
-  "abstract": "A synthetic primary decision object that requires the receiving context to contain and expose the state required by the proposed mechanism before any transfer recommendation is considered.",
-  "category": "Decision gate", "idea_type": "PRIMARY", "lifecycle_status": "REVIEWED", "featured": true,
-  "disposition": "Retained for human review", "recommendation": "Refine before testing",
-  "tags": ["target context", "transfer", "evidence boundary"], "origin": "Synthetic focused-decision demonstration", "updated_at": "2026-07-20T11:40:00Z",
-  "language_variants": {"en": "English", "ko": "Korean"},
-  "report_pdf": {"en": "/artifacts/prame-logic-first-demo/logic-first-report-en.pdf", "ko": "/artifacts/prame-logic-first-demo/logic-first-report-ko.pdf"},
-  "report_markdown": {"en": "reports/target-context-gate-en.md", "ko": "reports/target-context-gate-ko.md"},
-  "knowledge_refs": ["transfer-background-en"], "reference_count": 4, "figure_count": 1, "publication_status": "DEMO_ONLY",
-  "parent_idea_ids": [], "family_id": "family-target-context", "disposition_reason": "The gate prevents source-system precedent from being treated as direct support in a mismatched receiving context.",
-  "nearest_prior_art": "Context-dependent transfer rules described at component level.",
-  "strongest_reason": "It turns an implicit transfer assumption into a falsifiable prerequisite.", "weakest_causal_edge": "The relevant receiving-context state may not be measurable with sufficient specificity.",
-  "has_fatal_flaw": false, "fatal_flaw": null,
-  "scorecard": {"goal_alignment": 5, "evidence_grounding": 3, "causal_novelty": 3, "mechanistic_specificity": 4, "physical_coherence": 4, "decisive_test_quality": 4, "feasibility": 3, "expected_information_value": 5},
-  "pairwise_summary": "Not pairwise-ranked in this focused decision run.", "reviewer_disagreement": "Reviewers disagree on assay specificity.",
-  "reviewer_critiques": ["Analogical evidence must remain labeled as analogical.", "The gate must be measured before outcome interpretation."],
-  "finalist_reason": "Featured as the primary decision object without finalist or validation status.", "reentry_condition": "Resolve the open context measurement before testing.",
-  "scientific_summary": "Transfer should proceed only when the receiving context exposes the state required by the mechanism.",
-  "causal_mechanism": "A context gate determines whether the proposed route is physically and biologically available in the receiving system.",
-  "evidence_basis": "Synthetic direct-versus-analogical evidence boundary.",
-  "next_discriminating_experiment": "Measure the required context state and compare state-positive, state-negative, and burden-matched conditions."
+  "schema_version": "ResearchIdeaManifestV2",
+  "idea_id": "demo_prame_idea_001",
+  "slug": "target-context-gate",
+  "title": {
+    "en": "Target-context gate before transfer",
+    "ko": "전이에 앞선 표적 맥락 관문"
+  },
+  "short_title": {
+    "en": "Target-context gate",
+    "ko": "전이에 앞선 표적 맥락 관문"
+  },
+  "abstract": {
+    "en": "The primary object tests whether the target context supports an interpretable transfer claim before downstream optimization.",
+    "ko": "하류 최적화 전에 표적 맥락이 해석 가능한 전이 주장을 뒷받침하는지 확인합니다."
+  },
+  "category": {
+    "en": "Decision gate",
+    "ko": "기전 중심"
+  },
+  "idea_type": "PRIMARY",
+  "lifecycle_status": "REVIEWED",
+  "featured": true,
+  "disposition": {
+    "en": "Retained for human review",
+    "ko": "우선 검토"
+  },
+  "recommendation": {
+    "en": "Refine before testing",
+    "ko": "제한된 후속 검토"
+  },
+  "tags": [
+    {
+      "en": "target context",
+      "ko": "target context"
+    },
+    {
+      "en": "transfer",
+      "ko": "transfer"
+    },
+    {
+      "en": "evidence boundary",
+      "ko": "evidence boundary"
+    }
+  ],
+  "origin": "Synthetic focused-decision demonstration",
+  "updated_at": "2026-07-20T11:40:00Z",
+  "knowledge_refs": [
+    "transfer-background-en"
+  ],
+  "reference_count": 4,
+  "figure_count": 1,
+  "publication_status": "DEMO_ONLY",
+  "parent_idea_ids": [],
+  "family_id": "family-target-context",
+  "disposition_reason": {
+    "en": "The gate prevents source-system precedent from being treated as direct support in a mismatched receiving context.",
+    "ko": "하류 신호를 표적 특이적 전이로 잘못 해석하는 일을 막습니다."
+  },
+  "nearest_prior_art": {
+    "en": "Context-dependent transfer rules described at component level.",
+    "ko": "직접적으로 일치하는 선행 사례는 기록되지 않았습니다."
+  },
+  "strongest_reason": {
+    "en": "It turns an implicit transfer assumption into a falsifiable prerequisite.",
+    "ko": "하류 신호를 표적 특이적 전이로 잘못 해석하는 일을 막습니다."
+  },
+  "weakest_causal_edge": {
+    "en": "The relevant receiving-context state may not be measurable with sufficient specificity.",
+    "ko": "핵심 인과 연결은 아직 직접 확인되지 않았습니다."
+  },
+  "has_fatal_flaw": false,
+  "fatal_flaw": null,
+  "scorecard": {
+    "goal_alignment": 5,
+    "evidence_grounding": 3,
+    "causal_novelty": 3,
+    "mechanistic_specificity": 4,
+    "physical_coherence": 4,
+    "decisive_test_quality": 4,
+    "feasibility": 3,
+    "expected_information_value": 5
+  },
+  "pairwise_summary": {
+    "en": "Not pairwise-ranked in this focused decision run.",
+    "ko": "별도 쌍대 비교는 필요하지 않았습니다."
+  },
+  "reviewer_disagreement": {
+    "en": "Reviewers disagree on assay specificity.",
+    "ko": "중요한 검토자 이견은 기록되지 않았습니다."
+  },
+  "reviewer_critiques": [
+    {
+      "en": "Analogical evidence must remain labeled as analogical.",
+      "ko": "판별 가능한 측정과 대조군이 필요합니다."
+    },
+    {
+      "en": "The gate must be measured before outcome interpretation.",
+      "ko": "판별 가능한 측정과 대조군이 필요합니다."
+    }
+  ],
+  "finalist_reason": {
+    "en": "Featured as the primary decision object without finalist or validation status.",
+    "ko": "제한된 평가 대상으로 유지했습니다."
+  },
+  "reentry_condition": {
+    "en": "Resolve the open context measurement before testing.",
+    "ko": "재검토 조건을 충족해야 합니다."
+  },
+  "scientific_summary": {
+    "en": "Transfer should proceed only when the receiving context exposes the state required by the mechanism.",
+    "ko": "하류 최적화 전에 표적 맥락이 해석 가능한 전이 주장을 뒷받침하는지 확인합니다."
+  },
+  "causal_mechanism": {
+    "en": "A context gate determines whether the proposed route is physically and biologically available in the receiving system.",
+    "ko": "개입이 관련 분자 상태의 분포를 바꾸고 최종 산물에 영향을 줄 수 있다는 가설입니다."
+  },
+  "evidence_basis": {
+    "en": "Synthetic direct-versus-analogical evidence boundary.",
+    "ko": "현재 근거는 제한된 성분 수준 또는 유추 근거입니다."
+  },
+  "next_discriminating_experiment": {
+    "en": "Measure the required context state and compare state-positive, state-negative, and burden-matched conditions.",
+    "ko": "판별 가능한 대조군과 함께 핵심 상태 및 최종 산물을 비교합니다."
+  },
+  "report_id": null,
+  "why_this_idea": {
+    "en": "It prevents downstream signal from being mistaken for target-specific transfer.",
+    "ko": "하류 신호를 표적 특이적 전이로 잘못 해석하는 일을 막습니다."
+  },
+  "proposed_comparison": {
+    "en": "Measure the required context state and compare state-positive, state-negative, and burden-matched conditions.",
+    "ko": "관련 상태와 최종 산물을 같은 비교군에서 측정합니다."
+  },
+  "expected_result": {
+    "en": "A supportive result changes the intended product more strongly than bulk abundance or burden.",
+    "ko": "지지 결과에서는 전체 양이나 부담보다 의도한 산물이 더 선택적으로 변해야 합니다."
+  }
 }

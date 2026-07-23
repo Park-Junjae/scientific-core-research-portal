@@ -1,4 +1,12 @@
 import type { Metadata } from "next";
+import "@fontsource/noto-sans-kr/korean-400.css";
+import "@fontsource/noto-sans-kr/korean-500.css";
+import "@fontsource/noto-sans-kr/korean-600.css";
+import "@fontsource/noto-sans-kr/korean-700.css";
+import "@fontsource/noto-sans-kr/latin-400.css";
+import "@fontsource/noto-sans-kr/latin-500.css";
+import "@fontsource/noto-sans-kr/latin-600.css";
+import "@fontsource/noto-sans-kr/latin-700.css";
 import { AppShell } from "@/components/app-shell";
 import { getRuns } from "@/lib/content";
 import "./globals.css";
@@ -24,7 +32,7 @@ export default function RootLayout({
   }));
 
   return (
-    <html lang="en">
+    <html lang="en" data-font-family="Noto Sans KR">
       <body>
         <AppShell recentRuns={recentRuns}>{children}</AppShell>
       </body>
