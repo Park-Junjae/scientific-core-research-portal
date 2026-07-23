@@ -47,4 +47,24 @@ describe("run control browser client", () => {
       budget_profile: "standard",
     }));
   });
+
+  it("reads private artifacts through the authenticated session without a browser token", async () => {
+    vi.stubEnv("NEXT_PUBLIC_RUN_CONTROL_API_BASE", "https://control.example");
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      blob: async () => new Blob(["private"]),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { readPrivateArtifact } = await import("./run-control-api");
+    await readPrivateArtifact("run-owner", "artifact-summary");
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://control.example/api/runs/run-owner/artifacts/artifact-summary/download",
+      { credentials: "include" },
+    );
+    expect(JSON.stringify(fetchMock.mock.calls[0][1])).not.toMatch(
+      /authorization|api[_-]?key|github[_-]?token/i,
+    );
+  });
 });

@@ -283,6 +283,11 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
 .budget-strip > div { padding: 14px 16px; border-right: 1px solid var(--line); }
 .budget-strip > div:last-child { border-right: 0; }
 .budget-strip strong { display: block; margin-top: 3px; font-size: 18px; }
+.budget-comparison { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); border-block: 1px solid var(--line-strong); }
+.budget-comparison > div { min-width: 0; padding: 14px 16px; border-right: 1px solid var(--line); }
+.budget-comparison > div:last-child { border-right: 0; }
+.budget-comparison span, .budget-comparison small { display: block; color: var(--ink-faint); font-size: 11px; }
+.budget-comparison strong { display: block; margin: 4px 0 2px; font-size: 18px; }
 .stop-rules h3 { margin: 0 0 8px; font-size: 15px; }
 .stop-rules ul { margin: 0; padding-left: 20px; color: var(--ink-soft); }
 .event-timeline { display: grid; gap: 0; }
@@ -299,6 +304,14 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
 .danger-action { color: #923b3b; }
 .control-error { color: #923b3b; font-weight: 700; }
 .control-loading { display: flex; align-items: center; gap: 8px; color: var(--ink-soft); }
+.private-result-reader { display: grid; gap: 18px; border-top: 1px solid var(--line-strong); padding-top: 28px; }
+.private-result-tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--line); }
+.private-result-tabs button { display: inline-flex; min-height: 42px; align-items: center; gap: 7px; flex: 0 0 auto; border: 0; border-bottom: 2px solid transparent; background: transparent; padding: 0 12px; color: var(--ink-soft); white-space: nowrap; }
+.private-result-tabs button.active { border-bottom-color: var(--accent); color: var(--ink); font-weight: 700; }
+.private-result-tabs button:disabled { cursor: not-allowed; opacity: .38; }
+.private-result-content { min-height: 360px; }
+.private-json-view { max-height: 640px; margin: 0; overflow: auto; border: 1px solid var(--line); background: #f7f8f7; padding: 18px; font: 13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; white-space: pre-wrap; }
+.private-pdf-frame { width: 100%; min-height: 720px; border: 1px solid var(--line); background: white; }
 .spin { animation: control-spin 1s linear infinite; }
 @keyframes control-spin { to { transform: rotate(360deg); } }
 
@@ -363,6 +376,9 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
   .budget-strip { grid-template-columns: repeat(3,minmax(0,1fr)); }
   .budget-strip > div:nth-child(3) { border-right: 0; }
   .budget-strip > div:nth-child(-n+3) { border-bottom: 1px solid var(--line); }
+  .budget-comparison { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .budget-comparison > div { border-bottom: 1px solid var(--line); }
+  .private-pdf-frame { min-height: 560px; }
 }
 
 @media (max-width: 520px) {
@@ -393,9 +409,9 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
   .two-column-fields { grid-template-columns: 1fr; }
   .preview-actions { display: grid; }
   .pdf-toolbar { align-items: flex-start; flex-direction: column; }
-  .run-state-band, .contract-grid, .inference-list, .budget-strip { grid-template-columns: 1fr; }
-  .run-state-band > div, .budget-strip > div { border-right: 0; border-bottom: 1px solid var(--line); }
-  .run-state-band > div:last-child, .budget-strip > div:last-child { border-bottom: 0; }
+  .run-state-band, .contract-grid, .inference-list, .budget-strip, .budget-comparison { grid-template-columns: 1fr; }
+  .run-state-band > div, .budget-strip > div, .budget-comparison > div { border-right: 0; border-bottom: 1px solid var(--line); }
+  .run-state-band > div:last-child, .budget-strip > div:last-child, .budget-comparison > div:last-child { border-bottom: 0; }
   .run-request-actions, .run-control-actions { display: grid; }
   .run-control-header h1 { font-size: 31px; }
   .run-control-layout .section-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
