@@ -1,5 +1,5 @@
 {
-  "schema_version": "SearchIndexV1",
+  "schema_version": "SearchIndexV2",
   "generated_at": "1970-01-01T00:00:00.000Z",
   "records": [
     {
@@ -7,9 +7,15 @@
       "id": "demo_xrrna_prime_assembly_001",
       "run_slug": "xrrna-prime-assembly-demo",
       "slug": "xrrna-prime-assembly-demo",
-      "title": "xrRNA-guided Prime Assembly",
-      "summary": "This synthetic bundle contains four typed research objects: a primary symmetric motif panel, a conditional asymmetric-arm assignment, a measurement architecture, and a parked balancing extension. Only the primary object has a dedicated final Idea Report PDF.",
-      "text": "A focused decision portfolio with four separately tracked research objects Genome editing prime editing RNA structure focused decision",
+      "title": {
+        "en": "xrRNA-guided Prime Assembly",
+        "ko": "xrRNA 기반 Prime Assembly motif 비교"
+      },
+      "summary": {
+        "en": "The portfolio prioritizes a symmetric structured-RNA motif comparison, keeps asymmetric arm assignment conditional, treats E_A as a measurement program, and parks the QuadPE extension.",
+        "ko": "이 포트폴리오는 대칭 구조화 RNA motif 비교를 우선하고, 비대칭 arm 배정은 조건부로 유지하며, E_A는 측정 프로그램으로 다루고 QuadPE 확장은 보류합니다."
+      },
+      "text": "A focused comparison of structured-RNA motif roles in a multi-step prime-editing architecture 구조화 RNA motif가 다단계 Prime Assembly 반응에 미치는 영향을 비교합니다. Which structured-RNA motif configuration best preserves productive Prime Assembly while limiting partial products? 어떤 구조화 RNA motif 구성이 부분 산물을 늘리지 않으면서 생산적인 Prime Assembly를 가장 잘 유지하는가? Genome editing 유전체 편집 prime editing 프라임 에디팅 RNA structure RNA 구조 focused decision 집중 의사결정 Search-and-replace genome editing without double-strand breaks or donor DNA 10.1038/s41586-019-1711-4 Anzalone AV Randolph PB Davis JR",
       "href": "/runs/xrrna-prime-assembly-demo/"
     },
     {
@@ -17,9 +23,15 @@
       "id": "demo_xrrna_idea_001",
       "run_slug": "xrrna-prime-assembly-demo",
       "slug": "assembly-state-gate",
-      "title": "Symmetric structured-RNA motif panel for Prime Assembly",
-      "summary": "A synthetic primary research object that treats paired structured-RNA protection as a state-selective panel rather than a generic stability tag, with explicit measurements and a stopping rule.",
-      "text": "Mechanism-focused PRIMARY REVIEWED Recommended for focused testing The intervention and readout can separate assembly-state protection from bulk abundance. The link between motif symmetry and productive complex residence remains unverified. RNA folding symmetry causal test",
+      "title": {
+        "en": "Symmetric structured-RNA motif panel for Prime Assembly",
+        "ko": "Prime Assembly 대칭 구조화 RNA motif 비교"
+      },
+      "summary": {
+        "en": "A paired motif panel asks whether structured-RNA protection preserves productive assembly rather than merely increasing mature RNA abundance.",
+        "ko": "대칭 motif 비교는 구조화 RNA 보호가 성숙 RNA 양만 늘리는 것이 아니라 생산적인 조립 상태를 보존하는지 묻습니다."
+      },
+      "text": "Mechanism-focused 기전 중심 PRIMARY REVIEWED The intervention and readout can separate assembly-state protection from bulk abundance. 제한된 직접 비교로 완전 산물 형성과 일반적인 RNA 안정화를 구분할 수 있습니다. RNA folding RNA folding symmetry symmetry causal test causal test",
       "href": "/runs/xrrna-prime-assembly-demo/ideas/assembly-state-gate/"
     },
     {
@@ -27,9 +39,15 @@
       "id": "demo_xrrna_idea_002",
       "run_slug": "xrrna-prime-assembly-demo",
       "slug": "asymmetric-arm-assignment",
-      "title": "Asymmetric arm assignment",
-      "summary": "A synthetic conditional extension that assigns distinct protective roles to the two RNA arms and remains visible as a separate research object even though it has no dedicated report file.",
-      "text": "Conditional mechanism CONDITIONAL CONDITIONAL Refine before testing It produces a directional prediction that symmetry controls cannot explain. Arm-specific functional exposure has not been established. asymmetry arm assignment conditional",
+      "title": {
+        "en": "Asymmetric arm assignment",
+        "ko": "비대칭 arm motif 배정"
+      },
+      "summary": {
+        "en": "Distinct motifs may be useful only when one Prime Assembly arm is repeatedly limiting.",
+        "ko": "한쪽 Prime Assembly arm이 반복적으로 제한될 때만 서로 다른 motif 배정이 유용할 수 있습니다."
+      },
+      "text": "Conditional mechanism 기전 중심 CONDITIONAL CONDITIONAL It produces a directional prediction that symmetry controls cannot explain. 먼저 arm별 제한을 확인해야 하므로 조건부 아이디어입니다. asymmetry asymmetry arm assignment arm assignment conditional conditional",
       "href": "/runs/xrrna-prime-assembly-demo/ideas/asymmetric-arm-assignment/"
     },
     {
@@ -37,9 +55,15 @@
       "id": "demo_xrrna_idea_003",
       "run_slug": "xrrna-prime-assembly-demo",
       "slug": "intermediate-readout",
-      "title": "E_A molecular-identity measurement architecture",
-      "summary": "This synthetic measurement program asks whether the proposed early intermediate can be identified on the same recovered molecule before any mechanistic conclusion is made, without treating the measurement object as a competing biological hypothesis.",
-      "text": "Measurement architecture MEASUREMENT_PROGRAM MEASUREMENT_PROGRAM Measurement-method research It can prevent causal interpretation when the required molecular object is not identifiable. Recovery bias may still decouple the observed molecule from the productive intermediate. molecular identity measurement uncertainty",
+      "title": {
+        "en": "E_A molecular-identity measurement architecture",
+        "ko": "E_A 분자 정체성 측정 체계"
+      },
+      "summary": {
+        "en": "A measurement program asks whether the relevant early intermediate can be identified on the same recovered molecule.",
+        "ko": "관련 초기 중간체의 정체성을 같은 회수 분자에서 확인할 수 있는지 검토하는 측정 프로그램입니다."
+      },
+      "text": "Measurement architecture 기전 중심 MEASUREMENT_PROGRAM MEASUREMENT_PROGRAM It can prevent causal interpretation when the required molecular object is not identifiable. 출처가 보장된 분자 정체성 없이는 인과 관계를 해석할 수 없습니다. molecular identity molecular identity measurement measurement uncertainty uncertainty",
       "href": "/runs/xrrna-prime-assembly-demo/ideas/intermediate-readout/"
     },
     {
@@ -47,49 +71,127 @@
       "id": "demo_xrrna_idea_004",
       "run_slug": "xrrna-prime-assembly-demo",
       "slug": "quadpe-balancing-extension",
-      "title": "QuadPE balancing extension",
-      "summary": "A synthetic parked extension that would balance multiple protected components but is retained only for provenance because it adds complexity before the primary causal gate is resolved.",
-      "text": "System extension EXTENSION PARKED Parked It anticipates stoichiometric imbalance if multiple protected components are later combined. There is no evidence that balancing, rather than the primary gate, is currently limiting. balancing system extension parked",
+      "title": {
+        "en": "QuadPE balancing extension",
+        "ko": "QuadPE 균형 확장"
+      },
+      "summary": {
+        "en": "A parked extension considers whether four-arm balancing could rescue asymmetric losses after simpler contrasts are resolved.",
+        "ko": "더 단순한 비교가 끝난 뒤 네 arm의 균형 조절이 비대칭 손실을 보완할 수 있는지 검토하는 보류 확장입니다."
+      },
+      "text": "System extension 기전 중심 EXTENSION PARKED It anticipates stoichiometric imbalance if multiple protected components are later combined. 주요 두 arm 비교를 해석하기 전에는 추가 복잡성을 정당화할 수 없습니다. balancing balancing system extension system extension parked parked",
       "href": "/runs/xrrna-prime-assembly-demo/ideas/quadpe-balancing-extension/"
     },
     {
+      "type": "report",
+      "id": "xrrna-prime-assembly-demo-summary-en",
+      "run_slug": "xrrna-prime-assembly-demo",
+      "slug": "xrrna-prime-assembly-demo-summary-en",
+      "title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "summary": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "text": "RESEARCH_SUMMARY en",
+      "href": "/runs/xrrna-prime-assembly-demo/reports/xrrna-prime-assembly-demo-summary-en/"
+    },
+    {
+      "type": "report",
+      "id": "xrrna-prime-assembly-demo-summary-ko",
+      "run_slug": "xrrna-prime-assembly-demo",
+      "slug": "xrrna-prime-assembly-demo-summary-ko",
+      "title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "summary": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "text": "RESEARCH_SUMMARY ko",
+      "href": "/runs/xrrna-prime-assembly-demo/reports/xrrna-prime-assembly-demo-summary-ko/"
+    },
+    {
+      "type": "report",
+      "id": "xrrna-prime-assembly-demo-spec-en",
+      "run_slug": "xrrna-prime-assembly-demo",
+      "slug": "xrrna-prime-assembly-demo-spec-en",
+      "title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "summary": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "text": "RUN_SPECIFICATION en",
+      "href": "/runs/xrrna-prime-assembly-demo/reports/xrrna-prime-assembly-demo-spec-en/"
+    },
+    {
+      "type": "report",
+      "id": "xrrna-prime-assembly-demo-spec-ko",
+      "run_slug": "xrrna-prime-assembly-demo",
+      "slug": "xrrna-prime-assembly-demo-spec-ko",
+      "title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "summary": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "text": "RUN_SPECIFICATION ko",
+      "href": "/runs/xrrna-prime-assembly-demo/reports/xrrna-prime-assembly-demo-spec-ko/"
+    },
+    {
       "type": "knowledge",
-      "id": "xrrna-prime-assembly-demo:knowledge-background-en.md",
+      "id": "xrrna-prime-assembly-demo-knowledge-en",
       "run_slug": "xrrna-prime-assembly-demo",
-      "slug": "knowledge-background-en",
-      "title": "Knowledge background",
-      "summary": "The scientific question / Why state separation matters / Reading the evidence",
-      "text": "Knowledge background The scientific question Why state separation matters Reading the evidence Practical decision rule References",
-      "href": "/runs/xrrna-prime-assembly-demo/knowledge/"
+      "slug": "xrrna-prime-assembly-demo-knowledge-en",
+      "title": {
+        "en": "Knowledge background",
+        "ko": "지식 배경"
+      },
+      "summary": {
+        "en": "Background needed to assess this run.",
+        "ko": "이 연구를 평가하는 데 필요한 배경입니다."
+      },
+      "text": "KNOWLEDGE_BACKGROUND en",
+      "href": "/runs/xrrna-prime-assembly-demo/reports/xrrna-prime-assembly-demo-knowledge-en/"
     },
     {
-      "type": "report",
-      "id": "xrrna-prime-assembly-demo:assembly-state-gate-en.md",
+      "type": "source",
+      "id": "demo-anchor-prime-editing",
       "run_slug": "xrrna-prime-assembly-demo",
-      "slug": "assembly-state-gate-en",
-      "title": "Symmetric structured-RNA motif panel",
-      "summary": "Abstract / Causal mechanism / Evidence boundary",
-      "text": "Symmetric structured-RNA motif panel Abstract Causal mechanism Evidence boundary Decisive experiment Result patterns Kill criterion References",
-      "href": "/runs/xrrna-prime-assembly-demo/reports/"
-    },
-    {
-      "type": "report",
-      "id": "xrrna-prime-assembly-demo:assembly-state-gate-ko.md",
-      "run_slug": "xrrna-prime-assembly-demo",
-      "slug": "assembly-state-gate-ko",
-      "title": "조립 상태 선택적 보호",
-      "summary": "요약 / 인과 기전 / 근거의 경계",
-      "text": "조립 상태 선택적 보호 요약 인과 기전 근거의 경계 결정적 실험 판정과 중단 기준",
-      "href": "/runs/xrrna-prime-assembly-demo/reports/"
+      "slug": "demo-anchor-prime-editing",
+      "title": {
+        "en": "Search-and-replace genome editing without double-strand breaks or donor DNA",
+        "ko": "Search-and-replace genome editing without double-strand breaks or donor DNA"
+      },
+      "summary": {
+        "en": "Establishes the prime-editing framework used as background for this synthetic decision fixture.",
+        "ko": "이 합성 의사결정 예시의 배경이 되는 Prime Editing 틀을 확립한 논문입니다."
+      },
+      "text": "Anzalone AV Randolph PB Davis JR Nature 2019 10.1038/s41586-019-1711-4  ANCHOR demo_xrrna_idea_001 xrrna-prime-assembly-demo-knowledge-en",
+      "href": "/runs/xrrna-prime-assembly-demo/literature/demo-anchor-prime-editing/"
     },
     {
       "type": "run",
       "id": "demo_prame_logic_first_001",
       "run_slug": "prame-logic-first-demo",
       "slug": "prame-logic-first-demo",
-      "title": "PRAME Logic-First Transfer",
-      "summary": "The synthetic run preserves a primary target-context gate and a conditional verifier-first contrast as separate reviewed objects. It does not claim that a broad discovery process occurred.",
-      "text": "A focused decision run centered on decision logic and evidence boundaries Cancer immunology PRAME logic gate focused decision",
+      "title": {
+        "en": "PRAME Logic-First Transfer",
+        "ko": "PRAME 논리 우선 전이"
+      },
+      "summary": {
+        "en": "The primary object is a target-context gate. A verifier-first contrast remains conditional on analytical identifiability.",
+        "ko": "주요 연구 대상은 표적 맥락 관문입니다. 검증 우선 비교는 분석적 식별 가능성이 확보될 때만 조건부로 진행합니다."
+      },
+      "text": "A focused decision run centered on transfer logic and evidence boundaries 전이 논리와 근거 경계를 먼저 확인하는 집중 의사결정 연구입니다. Which target-context and verifier conditions must hold before a PRAME transfer claim is interpretable? PRAME 전이 주장을 해석하려면 어떤 표적 맥락과 검증 조건이 먼저 충족되어야 하는가? Immuno-oncology 면역항암 PRAME PRAME transfer 전이 evidence boundary 근거 경계",
       "href": "/runs/prame-logic-first-demo/"
     },
     {
@@ -97,9 +199,15 @@
       "id": "demo_prame_idea_001",
       "run_slug": "prame-logic-first-demo",
       "slug": "target-context-gate",
-      "title": "Target-context gate before transfer",
-      "summary": "A synthetic primary decision object that requires the receiving context to contain and expose the state required by the proposed mechanism before any transfer recommendation is considered.",
-      "text": "Decision gate PRIMARY REVIEWED Refine before testing It turns an implicit transfer assumption into a falsifiable prerequisite. The relevant receiving-context state may not be measurable with sufficient specificity. target context transfer evidence boundary",
+      "title": {
+        "en": "Target-context gate before transfer",
+        "ko": "전이에 앞선 표적 맥락 관문"
+      },
+      "summary": {
+        "en": "The primary object tests whether the target context supports an interpretable transfer claim before downstream optimization.",
+        "ko": "하류 최적화 전에 표적 맥락이 해석 가능한 전이 주장을 뒷받침하는지 확인합니다."
+      },
+      "text": "Decision gate 기전 중심 PRIMARY REVIEWED It turns an implicit transfer assumption into a falsifiable prerequisite. 하류 신호를 표적 특이적 전이로 잘못 해석하는 일을 막습니다. target context target context transfer transfer evidence boundary evidence boundary",
       "href": "/runs/prame-logic-first-demo/ideas/target-context-gate/"
     },
     {
@@ -107,69 +215,111 @@
       "id": "demo_prame_idea_002",
       "run_slug": "prame-logic-first-demo",
       "slug": "verifier-first-contrast",
-      "title": "Verifier-first contrast",
-      "summary": "A synthetic conditional object that uses state-positive, state-negative, inactive-intervention, and burden-matched contrasts to separate target-state dependence from broad burden.",
-      "text": "Falsification architecture CONDITIONAL CONDITIONAL Refine before testing It can distinguish the intended route from broad burden. The state-positive and state-negative conditions may differ in uncontrolled ways. controls falsification burden",
+      "title": {
+        "en": "Verifier-first contrast",
+        "ko": "검증 우선 비교"
+      },
+      "summary": {
+        "en": "A conditional contrast proceeds only when the verifier can distinguish the required molecular classes.",
+        "ko": "검증기가 필요한 분자 부류를 구분할 수 있을 때만 진행하는 조건부 비교입니다."
+      },
+      "text": "Falsification architecture 기전 중심 CONDITIONAL CONDITIONAL It can distinguish the intended route from broad burden. 생물학적 해석에 앞서 분석적 식별 가능성이 확보되어야 합니다. controls controls falsification falsification burden burden",
       "href": "/runs/prame-logic-first-demo/ideas/verifier-first-contrast/"
     },
     {
+      "type": "report",
+      "id": "prame-logic-first-demo-summary-en",
+      "run_slug": "prame-logic-first-demo",
+      "slug": "prame-logic-first-demo-summary-en",
+      "title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "summary": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "text": "RESEARCH_SUMMARY en",
+      "href": "/runs/prame-logic-first-demo/reports/prame-logic-first-demo-summary-en/"
+    },
+    {
+      "type": "report",
+      "id": "prame-logic-first-demo-summary-ko",
+      "run_slug": "prame-logic-first-demo",
+      "slug": "prame-logic-first-demo-summary-ko",
+      "title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "summary": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "text": "RESEARCH_SUMMARY ko",
+      "href": "/runs/prame-logic-first-demo/reports/prame-logic-first-demo-summary-ko/"
+    },
+    {
+      "type": "report",
+      "id": "prame-logic-first-demo-spec-en",
+      "run_slug": "prame-logic-first-demo",
+      "slug": "prame-logic-first-demo-spec-en",
+      "title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "summary": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "text": "RUN_SPECIFICATION en",
+      "href": "/runs/prame-logic-first-demo/reports/prame-logic-first-demo-spec-en/"
+    },
+    {
+      "type": "report",
+      "id": "prame-logic-first-demo-spec-ko",
+      "run_slug": "prame-logic-first-demo",
+      "slug": "prame-logic-first-demo-spec-ko",
+      "title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "summary": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "text": "RUN_SPECIFICATION ko",
+      "href": "/runs/prame-logic-first-demo/reports/prame-logic-first-demo-spec-ko/"
+    },
+    {
       "type": "knowledge",
-      "id": "prame-logic-first-demo:transfer-background-en.md",
+      "id": "prame-logic-first-demo-knowledge-en",
       "run_slug": "prame-logic-first-demo",
-      "slug": "transfer-background-en",
-      "title": "Transfer background",
-      "summary": "Why transfer is difficult / Source boundary / Decision-oriented evidence",
-      "text": "Transfer background Why transfer is difficult Source boundary Decision-oriented evidence",
-      "href": "/runs/prame-logic-first-demo/knowledge/"
-    },
-    {
-      "type": "report",
-      "id": "prame-logic-first-demo:target-context-gate-en.md",
-      "run_slug": "prame-logic-first-demo",
-      "slug": "target-context-gate-en",
-      "title": "Target-context gate before transfer",
-      "summary": "Question / Logic / Weakest assumption",
-      "text": "Target-context gate before transfer Question Logic Weakest assumption Decisive pattern Review decision",
-      "href": "/runs/prame-logic-first-demo/reports/"
-    },
-    {
-      "type": "report",
-      "id": "prame-logic-first-demo:target-context-gate-ko.md",
-      "run_slug": "prame-logic-first-demo",
-      "slug": "target-context-gate-ko",
-      "title": "전이 전 표적 맥락 게이트",
-      "summary": "질문 / 판단 논리 / 가장 약한 가정",
-      "text": "전이 전 표적 맥락 게이트 질문 판단 논리 가장 약한 가정",
-      "href": "/runs/prame-logic-first-demo/reports/"
-    },
-    {
-      "type": "report",
-      "id": "prame-logic-first-demo:verifier-first-contrast-en.md",
-      "run_slug": "prame-logic-first-demo",
-      "slug": "verifier-first-contrast-en",
-      "title": "Verifier-first contrast",
-      "summary": "Purpose / Required contrasts / Stop rule",
-      "text": "Verifier-first contrast Purpose Required contrasts Stop rule",
-      "href": "/runs/prame-logic-first-demo/reports/"
-    },
-    {
-      "type": "report",
-      "id": "prame-logic-first-demo:verifier-first-contrast-ko.md",
-      "run_slug": "prame-logic-first-demo",
-      "slug": "verifier-first-contrast-ko",
-      "title": "검증기 우선 대조 설계",
-      "summary": "목적 / 중단 규칙",
-      "text": "검증기 우선 대조 설계 목적 중단 규칙",
-      "href": "/runs/prame-logic-first-demo/reports/"
+      "slug": "prame-logic-first-demo-knowledge-en",
+      "title": {
+        "en": "Knowledge background",
+        "ko": "지식 배경"
+      },
+      "summary": {
+        "en": "Background needed to assess this run.",
+        "ko": "이 연구를 평가하는 데 필요한 배경입니다."
+      },
+      "text": "KNOWLEDGE_BACKGROUND en",
+      "href": "/runs/prame-logic-first-demo/reports/prame-logic-first-demo-knowledge-en/"
     },
     {
       "type": "run",
       "id": "demo_taled_historical_001",
       "run_slug": "taled-historical-demo",
       "slug": "taled-historical-demo",
-      "title": "TALED Editing-Window Study",
-      "summary": "This synthetic historical child run records exactly two generated families, no Arena entrants, no pairwise matches, and no finalists. Its counts are not combined with any other TALED lineage.",
-      "text": "An archived child-run lineage preserved without cross-run count aggregation Mitochondrial genome editing TALED historical child run lineage",
+      "title": {
+        "en": "TALED Editing-Window Study",
+        "ko": "TALED 편집 범위 연구"
+      },
+      "summary": {
+        "en": "Helical phase and exposure-time distribution are retained as historical, parked ideas. Neither is presented as a current validated mechanism.",
+        "ko": "나선 위상과 노출 시간 분포를 과거의 보류 아이디어로 유지합니다. 어느 쪽도 현재 검증된 기전으로 제시하지 않습니다."
+      },
+      "text": "An archived child-run lineage preserved without cross-run count aggregation 실행 간 수치를 합산하지 않고 보존한 과거 하위 연구입니다. Could geometry or exposure time narrow the TALED A-to-G editing window without proportional activity loss? 기하학적 배치나 노출 시간이 전체 활성을 비례해 낮추지 않으면서 TALED A-to-G 편집 범위를 좁힐 수 있는가? Mitochondrial genome editing 미토콘드리아 유전체 편집 TALED TALED editing window 편집 범위 historical 과거 사례",
       "href": "/runs/taled-historical-demo/"
     },
     {
@@ -177,9 +327,15 @@
       "id": "demo_taled_idea_001",
       "run_slug": "taled-historical-demo",
       "slug": "helical-phase-coordinate",
-      "title": "Helical phase as a catalytic positioning coordinate",
-      "summary": "A synthetic historical object that treats rotational registry as distinct from linear spacer distance while preserving the evidence gap that prevented architecture-level promotion.",
-      "text": "Historical mechanism ALTERNATIVE PARKED Parked Rotational registry is physically distinct from linear distance. A practical mitochondrial architecture that controls this coordinate was not established. helical phase geometry historical",
+      "title": {
+        "en": "Helical phase as a catalytic positioning coordinate",
+        "ko": "촉매 위치 좌표로서의 나선 위상"
+      },
+      "summary": {
+        "en": "A historical idea treats spacer changes as rotational registry rather than distance alone.",
+        "ko": "spacer 변화를 거리뿐 아니라 회전 정렬로 보는 과거 아이디어입니다."
+      },
+      "text": "Historical mechanism 기전 중심 ALTERNATIVE PARKED Rotational registry is physically distinct from linear distance. 위상에 따른 활성 이동이 나타나야 단순 linker 단축과 구분할 수 있습니다. helical phase helical phase geometry geometry historical historical",
       "href": "/runs/taled-historical-demo/ideas/helical-phase-coordinate/"
     },
     {
@@ -187,60 +343,96 @@
       "id": "demo_taled_idea_002",
       "run_slug": "taled-historical-demo",
       "slug": "exposure-time-distribution",
-      "title": "Exposure-time distribution as a product-purity coordinate",
-      "summary": "A synthetic historical object that interprets target-only and multi-edit products as potentially requiring different exposure times while retaining the absence of a practical control mechanism.",
-      "text": "Historical mechanism ALTERNATIVE PARKED Parked Different product classes can have separable dwell-time requirements. No practical intervention was shown to selectively shorten the relevant exposure distribution. kinetics exposure time historical",
+      "title": {
+        "en": "Exposure-time distribution as a product-purity coordinate",
+        "ko": "산물 순도를 결정하는 노출 시간 분포"
+      },
+      "summary": {
+        "en": "A historical idea reframes product purity as a distribution of catalytic exposure rather than only static reach.",
+        "ko": "산물 순도를 정적인 도달 거리뿐 아니라 촉매 노출 시간의 분포로 보는 과거 아이디어입니다."
+      },
+      "text": "Historical mechanism 기전 중심 ALTERNATIVE PARKED Different product classes can have separable dwell-time requirements. 다중 편집 read를 설명할 수 있지만 시간 분해 판별 실험이 없어 보류 상태입니다. kinetics kinetics exposure time exposure time historical historical",
       "href": "/runs/taled-historical-demo/ideas/exposure-time-distribution/"
     },
     {
+      "type": "report",
+      "id": "taled-historical-demo-summary-en",
+      "run_slug": "taled-historical-demo",
+      "slug": "taled-historical-demo-summary-en",
+      "title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "summary": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "text": "RESEARCH_SUMMARY en",
+      "href": "/runs/taled-historical-demo/reports/taled-historical-demo-summary-en/"
+    },
+    {
+      "type": "report",
+      "id": "taled-historical-demo-summary-ko",
+      "run_slug": "taled-historical-demo",
+      "slug": "taled-historical-demo-summary-ko",
+      "title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "summary": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "text": "RESEARCH_SUMMARY ko",
+      "href": "/runs/taled-historical-demo/reports/taled-historical-demo-summary-ko/"
+    },
+    {
+      "type": "report",
+      "id": "taled-historical-demo-spec-en",
+      "run_slug": "taled-historical-demo",
+      "slug": "taled-historical-demo-spec-en",
+      "title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "summary": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "text": "RUN_SPECIFICATION en",
+      "href": "/runs/taled-historical-demo/reports/taled-historical-demo-spec-en/"
+    },
+    {
+      "type": "report",
+      "id": "taled-historical-demo-spec-ko",
+      "run_slug": "taled-historical-demo",
+      "slug": "taled-historical-demo-spec-ko",
+      "title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "summary": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "text": "RUN_SPECIFICATION ko",
+      "href": "/runs/taled-historical-demo/reports/taled-historical-demo-spec-ko/"
+    },
+    {
       "type": "knowledge",
-      "id": "taled-historical-demo:taled-background-en.md",
+      "id": "taled-historical-demo-knowledge-en",
       "run_slug": "taled-historical-demo",
-      "slug": "taled-background-en",
-      "title": "TALED historical background",
-      "summary": "Editing-window problem / Lessons from the archived case / Publication boundary",
-      "text": "TALED historical background Editing-window problem Lessons from the archived case Publication boundary",
-      "href": "/runs/taled-historical-demo/knowledge/"
-    },
-    {
-      "type": "report",
-      "id": "taled-historical-demo:exposure-time-distribution-en.md",
-      "run_slug": "taled-historical-demo",
-      "slug": "exposure-time-distribution-en",
-      "title": "Product purity as an exposure-time distribution",
-      "summary": "Historical hypothesis / Evidence boundary / Kill criterion",
-      "text": "Product purity as an exposure-time distribution Historical hypothesis Evidence boundary Kill criterion",
-      "href": "/runs/taled-historical-demo/reports/"
-    },
-    {
-      "type": "report",
-      "id": "taled-historical-demo:exposure-time-distribution-ko.md",
-      "run_slug": "taled-historical-demo",
-      "slug": "exposure-time-distribution-ko",
-      "title": "노출 시간 분포로서의 산물 순도",
-      "summary": "과거 가설 / 근거의 경계",
-      "text": "노출 시간 분포로서의 산물 순도 과거 가설 근거의 경계",
-      "href": "/runs/taled-historical-demo/reports/"
-    },
-    {
-      "type": "report",
-      "id": "taled-historical-demo:helical-phase-coordinate-en.md",
-      "run_slug": "taled-historical-demo",
-      "slug": "helical-phase-coordinate-en",
-      "title": "Helical phase as a positioning coordinate",
-      "summary": "Historical hypothesis / Why it was interesting / Why it was archived",
-      "text": "Helical phase as a positioning coordinate Historical hypothesis Why it was interesting Why it was archived Decisive pattern Kill criterion",
-      "href": "/runs/taled-historical-demo/reports/"
-    },
-    {
-      "type": "report",
-      "id": "taled-historical-demo:helical-phase-coordinate-ko.md",
-      "run_slug": "taled-historical-demo",
-      "slug": "helical-phase-coordinate-ko",
-      "title": "촉매 위치 좌표로서의 나선 위상",
-      "summary": "과거 가설 / 보관된 이유",
-      "text": "촉매 위치 좌표로서의 나선 위상 과거 가설 보관된 이유",
-      "href": "/runs/taled-historical-demo/reports/"
+      "slug": "taled-historical-demo-knowledge-en",
+      "title": {
+        "en": "Knowledge background",
+        "ko": "지식 배경"
+      },
+      "summary": {
+        "en": "Background needed to assess this run.",
+        "ko": "이 연구를 평가하는 데 필요한 배경입니다."
+      },
+      "text": "KNOWLEDGE_BACKGROUND en",
+      "href": "/runs/taled-historical-demo/reports/taled-historical-demo-knowledge-en/"
     }
   ]
 }

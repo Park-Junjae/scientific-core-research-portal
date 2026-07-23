@@ -1,20 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useLocale } from "@/lib/locale";
 
-const tabs = [
-  ["", "Overview"],
-  ["ideas/", "Ideas"],
-  ["knowledge/", "Knowledge"],
-  ["reports/", "Reports"],
-  ["files/", "Files"],
-] as const;
+export type RunTab = "Ideas" | "Literature" | "Knowledge" | "Summary" | "Specification" | "Reports" | "Files" | "Technical";
 
-export function RunTabs({ slug, active }: { slug: string; active: string }) {
-  return (
-    <nav className="run-tabs" aria-label="Run sections">
-      {tabs.map(([suffix, label]) => (
-        <Link key={label} href={`/runs/${slug}/${suffix}`} className={active === label ? "active" : ""} aria-current={active === label ? "page" : undefined}>{label}</Link>
-      ))}
-      <Link href={`/runs/${slug}/#technical-details`} className={active === "Technical Details" ? "active" : ""}>Technical Details</Link>
-    </nav>
-  );
+export function RunTabs({ slug, active }: { slug: string; active: RunTab }) {
+  const { t } = useLocale();
+  const tabs = [["summary/", t("summary"), "Summary"], ["ideas/", t("ideas"), "Ideas"], ["literature/", t("literature"), "Literature"], ["knowledge/", t("knowledge"), "Knowledge"], ["specification/", t("specification"), "Specification"]] as const;
+  return <nav className="run-tabs" aria-label="Run sections">{tabs.map(([suffix, label, key]) => <Link key={key} href={`/runs/${slug}/${suffix}`} className={active === key ? "active" : ""} aria-current={active === key ? "page" : undefined}>{label}</Link>)}<details className="more-menu"><summary>{t("more")}</summary><div><Link href={`/runs/${slug}/reports/`}>{t("reportsDownloads")}</Link><Link href={`/runs/${slug}/files/`}>{t("files")}</Link><Link href={`/runs/${slug}/#technical-details`}>{t("technical")}</Link></div></details></nav>;
 }

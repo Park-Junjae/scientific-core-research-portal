@@ -1,39 +1,10 @@
+"use client";
+
+import { localized, useLocale } from "@/lib/locale";
+import { lifecycleLabels } from "@/lib/portfolio";
 import type { RunWithIdeas } from "@/lib/types";
-import { runModeLabels } from "@/lib/portfolio";
 
 export function RunPortfolioSummary({ run }: { run: RunWithIdeas }) {
-  const funnel = run.portfolio_funnel;
-  const discovery = run.run_mode === "DISCOVERY_PORTFOLIO_RUN";
-  const steps = discovery
-    ? [
-        ["Generated", funnel.raw_generation_count],
-        ["Unique families", funnel.natural_family_count],
-        ["Developed", funnel.developed_count],
-        ["Compared", funnel.arena_entrant_count],
-        ["Finalists", funnel.finalist_count],
-      ]
-    : [
-        ["Research objects", funnel.raw_generation_count],
-        ["Unique families", funnel.natural_family_count],
-        ["Developed", funnel.developed_count],
-        ["Reviewed", funnel.reviewed_count],
-        ["Featured", run.ideas.filter((idea) => idea.featured).length],
-      ];
-
-  return (
-    <section className="portfolio-funnel" aria-labelledby="portfolio-funnel-title">
-      <div className="portfolio-funnel-head">
-        <div>
-          <p className="eyebrow">{runModeLabels[run.run_mode]}</p>
-          <h2 id="portfolio-funnel-title">Research portfolio</h2>
-        </div>
-        <p>{run.pairwise_selection_impact}</p>
-      </div>
-      <ol>
-        {steps.map(([label, value]) => (
-          <li key={label}><strong>{value}</strong><span>{label}</span></li>
-        ))}
-      </ol>
-    </section>
-  );
+  const { locale, t } = useLocale();
+  return <table className="portfolio-table"><thead><tr><th>{t("idea")}</th><th>{t("portfolioRole")}</th><th>{t("currentDecision")}</th></tr></thead><tbody>{run.ideas.map((idea) => <tr key={idea.idea_id}><td>{localized(idea.title, locale) ?? t("noTranslation")}</td><td>{idea.idea_type.replaceAll("_", " ")}</td><td>{lifecycleLabels[locale][idea.lifecycle_status]}</td></tr>)}</tbody></table>;
 }

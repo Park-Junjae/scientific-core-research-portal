@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scientific-core.local/schemas/research-idea-manifest-v2.schema.json",
+  "title": "ResearchIdeaManifestV2",
+  "type": "object",
+  "required": ["schema_version", "idea_id", "slug", "title", "short_title", "abstract", "category", "idea_type", "lifecycle_status", "featured", "disposition", "recommendation", "tags", "origin", "updated_at", "report_id", "knowledge_refs", "reference_count", "figure_count", "publication_status", "parent_idea_ids", "disposition_reason", "strongest_reason", "weakest_causal_edge", "has_fatal_flaw", "reviewer_critiques", "scientific_summary", "why_this_idea", "causal_mechanism", "evidence_basis", "proposed_comparison", "expected_result", "next_discriminating_experiment"],
+  "properties": {
+    "schema_version": {"const": "ResearchIdeaManifestV2"}, "idea_id": {"type": "string"}, "slug": {"type": "string"},
+    "title": {"$ref": "#/$defs/localized"}, "short_title": {"$ref": "#/$defs/localized"}, "abstract": {"$ref": "#/$defs/localized"}, "category": {"$ref": "#/$defs/localized"},
+    "idea_type": {"enum": ["PRIMARY", "ALTERNATIVE", "CONDITIONAL", "MEASUREMENT_PROGRAM", "EXTENSION", "SUPPORTING"]}, "lifecycle_status": {"type": "string"}, "featured": {"type": "boolean"},
+    "disposition": {"$ref": "#/$defs/localized"}, "recommendation": {"$ref": "#/$defs/localized"}, "tags": {"type": "array", "items": {"$ref": "#/$defs/localized"}}, "origin": {"type": "string"}, "updated_at": {"type": "string", "format": "date-time"}, "report_id": {"type": ["string", "null"]},
+    "knowledge_refs": {"type": "array"}, "reference_count": {"type": "integer"}, "figure_count": {"type": "integer"}, "publication_status": {"enum": ["APPROVED", "DEMO_ONLY", "WITHHELD"]}, "parent_idea_ids": {"type": "array"}, "family_id": {"type": ["string", "null"]}, "merge_reason": {"type": "string"},
+    "disposition_reason": {"$ref": "#/$defs/localized"}, "nearest_prior_art": {"$ref": "#/$defs/localized"}, "strongest_reason": {"$ref": "#/$defs/localized"}, "weakest_causal_edge": {"$ref": "#/$defs/localized"}, "has_fatal_flaw": {"type": "boolean"}, "fatal_flaw": {"oneOf": [{"$ref": "#/$defs/localized"}, {"type": "null"}]},
+    "scorecard": {"type": "object"}, "pairwise_summary": {"$ref": "#/$defs/localized"}, "reviewer_disagreement": {"$ref": "#/$defs/localized"}, "reviewer_critiques": {"type": "array", "items": {"$ref": "#/$defs/localized"}}, "finalist_reason": {"$ref": "#/$defs/localized"}, "reentry_condition": {"$ref": "#/$defs/localized"},
+    "scientific_summary": {"$ref": "#/$defs/localized"}, "why_this_idea": {"$ref": "#/$defs/localized"}, "causal_mechanism": {"$ref": "#/$defs/localized"}, "evidence_basis": {"$ref": "#/$defs/localized"}, "proposed_comparison": {"$ref": "#/$defs/localized"}, "expected_result": {"$ref": "#/$defs/localized"}, "next_discriminating_experiment": {"$ref": "#/$defs/localized"}
+  },
+  "$defs": {"localized": {"type": "object", "minProperties": 1, "additionalProperties": false, "properties": {"ko": {"type": "string", "minLength": 1}, "en": {"type": "string", "minLength": 1}}}}
+}

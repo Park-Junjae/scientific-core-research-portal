@@ -1,23 +1,77 @@
 {
-  "schema_version": "ResearchRunManifestV1",
+  "schema_version": "ResearchRunManifestV2",
   "run_id": "demo_prame_logic_first_001",
   "slug": "prame-logic-first-demo",
-  "title": "PRAME Logic-First Transfer",
-  "short_title": "PRAME Logic-First",
-  "subtitle": "A focused decision run centered on decision logic and evidence boundaries",
+  "title": {
+    "en": "PRAME Logic-First Transfer",
+    "ko": "PRAME 논리 우선 전이"
+  },
+  "short_title": {
+    "en": "PRAME Logic-First",
+    "ko": "PRAME 논리 우선"
+  },
+  "subtitle": {
+    "en": "A focused decision run centered on transfer logic and evidence boundaries",
+    "ko": "전이 논리와 근거 경계를 먼저 확인하는 집중 의사결정 연구입니다."
+  },
   "owner": "Scientific Core",
   "created_at": "2026-07-17T09:00:00Z",
   "updated_at": "2026-07-20T12:00:00Z",
   "status": "REVIEW_REQUIRED",
   "terminal_state": "AWAITING_HUMAN_DECISION_DEMO",
   "run_mode": "FOCUSED_DECISION_RUN",
-  "research_domain": "Cancer immunology",
-  "research_goal": "Show how a focused transfer decision can present mechanism, assay validity, and an unresolved human decision without implying experimental validation.",
-  "summary": "The synthetic run preserves a primary target-context gate and a conditional verifier-first contrast as separate reviewed objects. It does not claim that a broad discovery process occurred.",
-  "scientific_decision": "Review the target-context gate before any experimental recommendation and retain the verifier contrast conditionally. Literature-supported components are not promoted into candidate-level validation.",
-  "reading_order": ["Context and transfer boundary", "Target-context gate", "Verifier-first contrast", "Open review question"],
-  "tags": ["PRAME", "logic gate", "focused decision"],
-  "languages": ["en", "ko"],
+  "research_domain": {
+    "en": "Immuno-oncology",
+    "ko": "면역항암"
+  },
+  "research_goal": {
+    "en": "Define a target-context gate and a verifier-first contrast before any broader transfer claim.",
+    "ko": "광범위한 전이 주장에 앞서 표적 맥락 관문과 검증 우선 비교를 정의합니다."
+  },
+  "summary": {
+    "en": "The primary object is a target-context gate. A verifier-first contrast remains conditional on analytical identifiability.",
+    "ko": "주요 연구 대상은 표적 맥락 관문입니다. 검증 우선 비교는 분석적 식별 가능성이 확보될 때만 조건부로 진행합니다."
+  },
+  "scientific_decision": {
+    "en": "Resolve target context first and retain the verifier contrast only if it can distinguish the required molecular state.",
+    "ko": "표적 맥락을 먼저 확인하고, 필요한 분자 상태를 구분할 수 있을 때만 검증 비교를 유지합니다."
+  },
+  "reading_order": [
+    {
+      "en": "Scientific summary",
+      "ko": "연구 요약"
+    },
+    {
+      "en": "Transfer background",
+      "ko": "전이 배경"
+    },
+    {
+      "en": "Research objects",
+      "ko": "연구 대상"
+    },
+    {
+      "en": "Run specification",
+      "ko": "연구 명세"
+    }
+  ],
+  "tags": [
+    {
+      "en": "PRAME",
+      "ko": "PRAME"
+    },
+    {
+      "en": "transfer",
+      "ko": "전이"
+    },
+    {
+      "en": "evidence boundary",
+      "ko": "근거 경계"
+    }
+  ],
+  "languages": [
+    "en",
+    "ko"
+  ],
   "visibility": "PUBLIC_SANITIZED",
   "publication_status": "DEMO_ONLY",
   "idea_count": 2,
@@ -32,20 +86,232 @@
   "current_stage": "Human review",
   "progress_percent": 82,
   "timeline": [
-    {"date": "2026-07-17", "label": "Transfer framing", "detail": "A focused decision and non-goals were separated."},
-    {"date": "2026-07-19", "label": "Boundary review", "detail": "Direct and analogical support were labeled separately."},
-    {"date": "2026-07-20", "label": "Human decision", "detail": "One target-context assumption remains open for review."}
+    {
+      "date": "2026-07-17",
+      "label": {
+        "en": "Transfer framing",
+        "ko": "검토"
+      },
+      "detail": {
+        "en": "A focused decision and non-goals were separated.",
+        "ko": "해당 단계의 기록을 보존했습니다."
+      }
+    },
+    {
+      "date": "2026-07-19",
+      "label": {
+        "en": "Boundary review",
+        "ko": "검토"
+      },
+      "detail": {
+        "en": "Direct and analogical support were labeled separately.",
+        "ko": "해당 단계의 기록을 보존했습니다."
+      }
+    },
+    {
+      "date": "2026-07-20",
+      "label": {
+        "en": "Human decision",
+        "ko": "검토"
+      },
+      "detail": {
+        "en": "One target-context assumption remains open for review.",
+        "ko": "해당 단계의 기록을 보존했습니다."
+      }
+    }
   ],
-  "idea_refs": ["target-context-gate", "verifier-first-contrast"],
-  "report_refs": [
-    {"id": "prame-report-en", "title": "Logic-first report", "kind": "PDF", "path": "/artifacts/prame-logic-first-demo/logic-first-report-en.pdf", "language": "en"},
-    {"id": "prame-report-ko", "title": "Logic-first report - Korean", "kind": "PDF", "path": "/artifacts/prame-logic-first-demo/logic-first-report-ko.pdf", "language": "ko"},
-    {"id": "prame-verifier-en", "title": "Verifier-first report", "kind": "PDF", "path": "/artifacts/prame-logic-first-demo/verifier-report-en.pdf", "language": "en"},
-    {"id": "prame-verifier-ko", "title": "Verifier-first report - Korean", "kind": "PDF", "path": "/artifacts/prame-logic-first-demo/verifier-report-ko.pdf", "language": "ko"}
+  "idea_refs": [
+    "target-context-gate",
+    "verifier-first-contrast"
   ],
-  "knowledge_refs": [{"id": "prame-knowledge", "title": "Transfer background", "kind": "MARKDOWN", "path": "knowledge/transfer-background-en.md", "language": "en"}],
   "artifact_refs": [],
-  "portfolio_funnel": {"raw_generation_count": 2, "independent_generation_count": 2, "natural_family_count": 2, "developed_count": 2, "reviewed_count": 2, "arena_entrant_count": 0, "finalist_count": 0, "parked_count": 0, "dropped_count": 0},
+  "portfolio_funnel": {
+    "raw_generation_count": 2,
+    "independent_generation_count": 2,
+    "natural_family_count": 2,
+    "developed_count": 2,
+    "reviewed_count": 2,
+    "arena_entrant_count": 0,
+    "finalist_count": 0,
+    "parked_count": 0,
+    "dropped_count": 0
+  },
   "pairwise_comparisons": [],
-  "pairwise_selection_impact": "No pairwise comparison was required for this focused transfer decision."
+  "pairwise_selection_impact": {
+    "en": "No pairwise comparison was required for this focused transfer decision.",
+    "ko": "비교 신호는 연구 결정의 보조 자료로만 사용했습니다."
+  },
+  "research_question": {
+    "en": "Which target-context and verifier conditions must hold before a PRAME transfer claim is interpretable?",
+    "ko": "PRAME 전이 주장을 해석하려면 어떤 표적 맥락과 검증 조건이 먼저 충족되어야 하는가?"
+  },
+  "current_bottleneck": {
+    "en": "A positive downstream signal can remain ambiguous when target context and verifier recovery are not separated.",
+    "ko": "표적 맥락과 검증기의 회수 성능을 분리하지 않으면 하류 신호가 양성이어도 원인을 해석하기 어렵습니다."
+  },
+  "success_criteria": [
+    {
+      "en": "Produce an interpretable comparison tied to the stated decision.",
+      "ko": "명시된 결정과 연결되는 해석 가능한 비교를 제시합니다."
+    }
+  ],
+  "experimental_constraints": [
+    {
+      "en": "Remain within the bounded demonstration scope.",
+      "ko": "제한된 데모 범위를 유지합니다."
+    }
+  ],
+  "non_goals": [
+    {
+      "en": "No scientific validation claim.",
+      "ko": "과학적 검증을 주장하지 않습니다."
+    }
+  ],
+  "requested_outputs": [
+    {
+      "en": "Scientific summary",
+      "ko": "연구 요약"
+    },
+    {
+      "en": "Research-object portfolio",
+      "ko": "연구 대상 포트폴리오"
+    }
+  ],
+  "reports": [
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "prame-logic-first-demo-summary-en",
+      "translation_group_id": "prame-logic-first-demo-summary",
+      "role": "RESEARCH_SUMMARY",
+      "localized_title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "localized_description": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "language": "en",
+      "path": null,
+      "markdown_path": "reports/research-summary-en.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": true,
+      "display_order": 1,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "prame-logic-first-demo-summary-ko",
+      "translation_group_id": "prame-logic-first-demo-summary",
+      "role": "RESEARCH_SUMMARY",
+      "localized_title": {
+        "en": "Research summary",
+        "ko": "연구 요약"
+      },
+      "localized_description": {
+        "en": "A concise account of the question and current decision.",
+        "ko": "연구 질문과 현재 결정을 간결하게 정리합니다."
+      },
+      "language": "ko",
+      "path": null,
+      "markdown_path": "reports/research-summary-ko.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": true,
+      "display_order": 1,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "prame-logic-first-demo-spec-en",
+      "translation_group_id": "prame-logic-first-demo-spec",
+      "role": "RUN_SPECIFICATION",
+      "localized_title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "localized_description": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "language": "en",
+      "path": null,
+      "markdown_path": "reports/run-specification-en.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": false,
+      "display_order": 3,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "prame-logic-first-demo-spec-ko",
+      "translation_group_id": "prame-logic-first-demo-spec",
+      "role": "RUN_SPECIFICATION",
+      "localized_title": {
+        "en": "Run specification",
+        "ko": "연구 명세"
+      },
+      "localized_description": {
+        "en": "Question, goals, constraints, and requested outputs.",
+        "ko": "연구 질문, 목표, 제약 및 요청 산출물입니다."
+      },
+      "language": "ko",
+      "path": null,
+      "markdown_path": "reports/run-specification-ko.md",
+      "page_count": null,
+      "reference_count": null,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": false,
+      "display_order": 3,
+      "updated_at": "2026-07-22T00:00:00Z"
+    },
+    {
+      "schema_version": "ResearchReportManifestV2",
+      "report_id": "prame-logic-first-demo-knowledge-en",
+      "translation_group_id": "prame-logic-first-demo-knowledge",
+      "role": "KNOWLEDGE_BACKGROUND",
+      "localized_title": {
+        "en": "Knowledge background",
+        "ko": "지식 배경"
+      },
+      "localized_description": {
+        "en": "Background needed to assess this run.",
+        "ko": "이 연구를 평가하는 데 필요한 배경입니다."
+      },
+      "language": "en",
+      "path": null,
+      "markdown_path": "knowledge/transfer-background-en.md",
+      "page_count": null,
+      "reference_count": 3,
+      "primary_source_count": null,
+      "report_status": "DEMO_SUMMARY",
+      "is_primary": false,
+      "display_order": 2,
+      "updated_at": "2026-07-22T00:00:00Z"
+    }
+  ],
+  "primary_report_id": "prame-logic-first-demo-summary-en",
+  "primary_knowledge_id": "prame-logic-first-demo-knowledge-en",
+  "primary_summary_id": "prame-logic-first-demo-summary-en",
+  "run_specification_id": "prame-logic-first-demo-spec-en",
+  "literature_stats": {
+    "analyzed_unique_total": null,
+    "report_reference_count": 3
+  },
+  "literature_index": [],
+  "historical_fixture_paths": [
+    "reports/target-context-gate-en.md",
+    "reports/target-context-gate-ko.md",
+    "reports/verifier-first-contrast-en.md",
+    "reports/verifier-first-contrast-ko.md"
+  ]
 }

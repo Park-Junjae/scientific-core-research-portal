@@ -1,39 +1,131 @@
 {
-  "schema_version": "ResearchIdeaManifestV1",
+  "schema_version": "ResearchIdeaManifestV2",
   "idea_id": "demo_xrrna_idea_004",
   "slug": "quadpe-balancing-extension",
-  "title": "QuadPE balancing extension",
-  "short_title": "QuadPE balancing",
-  "abstract": "A synthetic parked extension that would balance multiple protected components but is retained only for provenance because it adds complexity before the primary causal gate is resolved.",
-  "category": "System extension",
+  "title": {
+    "en": "QuadPE balancing extension",
+    "ko": "QuadPE 균형 확장"
+  },
+  "short_title": {
+    "en": "QuadPE balancing",
+    "ko": "QuadPE 균형 확장"
+  },
+  "abstract": {
+    "en": "A parked extension considers whether four-arm balancing could rescue asymmetric losses after simpler contrasts are resolved.",
+    "ko": "더 단순한 비교가 끝난 뒤 네 arm의 균형 조절이 비대칭 손실을 보완할 수 있는지 검토하는 보류 확장입니다."
+  },
+  "category": {
+    "en": "System extension",
+    "ko": "기전 중심"
+  },
   "idea_type": "EXTENSION",
   "lifecycle_status": "PARKED",
   "featured": false,
-  "disposition": "Parked pending primary evidence",
-  "recommendation": "Parked",
-  "tags": ["balancing", "system extension", "parked"],
+  "disposition": {
+    "en": "Parked pending primary evidence",
+    "ko": "보류"
+  },
+  "recommendation": {
+    "en": "Parked",
+    "ko": "현재 보류"
+  },
+  "tags": [
+    {
+      "en": "balancing",
+      "ko": "balancing"
+    },
+    {
+      "en": "system extension",
+      "ko": "system extension"
+    },
+    {
+      "en": "parked",
+      "ko": "parked"
+    }
+  ],
   "origin": "Synthetic focused-decision demonstration",
   "updated_at": "2026-07-21T13:10:00Z",
-  "language_variants": {"en": "English"},
-  "knowledge_refs": ["knowledge-background-en"],
+  "knowledge_refs": [
+    "knowledge-background-en"
+  ],
   "reference_count": 1,
   "figure_count": 0,
   "publication_status": "DEMO_ONLY",
   "parent_idea_ids": [],
   "family_id": "family-quadpe-balancing",
-  "disposition_reason": "Added system complexity is unjustified until the primary motif-panel mechanism is supported.",
-  "nearest_prior_art": "Generic multi-component balancing strategies.",
-  "strongest_reason": "It anticipates stoichiometric imbalance if multiple protected components are later combined.",
-  "weakest_causal_edge": "There is no evidence that balancing, rather than the primary gate, is currently limiting.",
+  "disposition_reason": {
+    "en": "Added system complexity is unjustified until the primary motif-panel mechanism is supported.",
+    "ko": "주요 두 arm 비교를 해석하기 전에는 추가 복잡성을 정당화할 수 없습니다."
+  },
+  "nearest_prior_art": {
+    "en": "Generic multi-component balancing strategies.",
+    "ko": "직접적으로 일치하는 선행 사례는 기록되지 않았습니다."
+  },
+  "strongest_reason": {
+    "en": "It anticipates stoichiometric imbalance if multiple protected components are later combined.",
+    "ko": "주요 두 arm 비교를 해석하기 전에는 추가 복잡성을 정당화할 수 없습니다."
+  },
+  "weakest_causal_edge": {
+    "en": "There is no evidence that balancing, rather than the primary gate, is currently limiting.",
+    "ko": "핵심 인과 연결은 아직 직접 확인되지 않았습니다."
+  },
   "has_fatal_flaw": false,
   "fatal_flaw": null,
-  "scorecard": {"goal_alignment": 2, "evidence_grounding": 2, "causal_novelty": 2, "mechanistic_specificity": 3, "physical_coherence": 3, "decisive_test_quality": 2, "feasibility": 2, "expected_information_value": 2},
-  "pairwise_summary": "Not eligible for comparison while the upstream mechanism remains unresolved.",
-  "reviewer_disagreement": "No material disagreement; reviewers agreed to park the extension.",
-  "reviewer_critiques": ["Do not optimize multi-component balance before showing that the core gate changes the intended state."],
-  "reentry_condition": "Re-enter only after the primary panel is supported and a measurable component imbalance appears.",
-  "scientific_summary": "The extension would tune multiple protected components only after the primary mechanism is established.",
-  "causal_mechanism": "Component balancing would narrow stoichiometric variance across a larger architecture.",
-  "evidence_basis": "Synthetic systems-level reasoning without direct evidence of a present balancing bottleneck.",
-  "next_discriminating_experiment": "No experiment is currently recommended; first establish the primary motif-panel effect and quantify component imbalance."
+  "scorecard": {
+    "goal_alignment": 2,
+    "evidence_grounding": 2,
+    "causal_novelty": 2,
+    "mechanistic_specificity": 3,
+    "physical_coherence": 3,
+    "decisive_test_quality": 2,
+    "feasibility": 2,
+    "expected_information_value": 2
+  },
+  "pairwise_summary": {
+    "en": "Not eligible for comparison while the upstream mechanism remains unresolved.",
+    "ko": "별도 쌍대 비교는 필요하지 않았습니다."
+  },
+  "reviewer_disagreement": {
+    "en": "No material disagreement; reviewers agreed to park the extension.",
+    "ko": "중요한 검토자 이견은 기록되지 않았습니다."
+  },
+  "reviewer_critiques": [
+    {
+      "en": "Do not optimize multi-component balance before showing that the core gate changes the intended state.",
+      "ko": "판별 가능한 측정과 대조군이 필요합니다."
+    }
+  ],
+  "reentry_condition": {
+    "en": "Re-enter only after the primary panel is supported and a measurable component imbalance appears.",
+    "ko": "재검토 조건을 충족해야 합니다."
+  },
+  "scientific_summary": {
+    "en": "The extension would tune multiple protected components only after the primary mechanism is established.",
+    "ko": "더 단순한 비교가 끝난 뒤 네 arm의 균형 조절이 비대칭 손실을 보완할 수 있는지 검토하는 보류 확장입니다."
+  },
+  "causal_mechanism": {
+    "en": "Component balancing would narrow stoichiometric variance across a larger architecture.",
+    "ko": "개입이 관련 분자 상태의 분포를 바꾸고 최종 산물에 영향을 줄 수 있다는 가설입니다."
+  },
+  "evidence_basis": {
+    "en": "Synthetic systems-level reasoning without direct evidence of a present balancing bottleneck.",
+    "ko": "현재 근거는 제한된 성분 수준 또는 유추 근거입니다."
+  },
+  "next_discriminating_experiment": {
+    "en": "No experiment is currently recommended; first establish the primary motif-panel effect and quantify component imbalance.",
+    "ko": "판별 가능한 대조군과 함께 핵심 상태 및 최종 산물을 비교합니다."
+  },
+  "report_id": null,
+  "why_this_idea": {
+    "en": "Its complexity is not justified before the primary two-arm comparison is interpretable.",
+    "ko": "주요 두 arm 비교를 해석하기 전에는 추가 복잡성을 정당화할 수 없습니다."
+  },
+  "proposed_comparison": {
+    "en": "No experiment is currently recommended; first establish the primary motif-panel effect and quantify component imbalance.",
+    "ko": "관련 상태와 최종 산물을 같은 비교군에서 측정합니다."
+  },
+  "expected_result": {
+    "en": "A supportive result changes the intended product more strongly than bulk abundance or burden.",
+    "ko": "지지 결과에서는 전체 양이나 부담보다 의도한 산물이 더 선택적으로 변해야 합니다."
+  }
 }

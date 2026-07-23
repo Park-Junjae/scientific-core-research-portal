@@ -1,0 +1,27 @@
+:root {
+  --font-ui: "Noto Sans KR", sans-serif;
+  --font-reading: "Noto Sans KR", sans-serif;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-reading: 17px;
+  --text-lg: 19px;
+  --text-h3: 21px;
+  --text-h2: 28px;
+  --text-h1: 42px;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-synthesis: none;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-break: strict;
+}
+
+.prose-article {
+  max-width: 760px;
+  font-family: var(--font-reading);
+  font-size: var(--text-reading);
+  line-height: 1.76;
+}

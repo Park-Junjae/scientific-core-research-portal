@@ -1,39 +1,131 @@
 {
-  "schema_version": "ResearchIdeaManifestV1",
+  "schema_version": "ResearchIdeaManifestV2",
   "idea_id": "demo_xrrna_idea_003",
   "slug": "intermediate-readout",
-  "title": "E_A molecular-identity measurement architecture",
-  "short_title": "E_A measurement architecture",
-  "abstract": "This synthetic measurement program asks whether the proposed early intermediate can be identified on the same recovered molecule before any mechanistic conclusion is made, without treating the measurement object as a competing biological hypothesis.",
-  "category": "Measurement architecture",
+  "title": {
+    "en": "E_A molecular-identity measurement architecture",
+    "ko": "E_A 분자 정체성 측정 체계"
+  },
+  "short_title": {
+    "en": "E_A measurement architecture",
+    "ko": "E_A 분자 정체성 측정 체계"
+  },
+  "abstract": {
+    "en": "A measurement program asks whether the relevant early intermediate can be identified on the same recovered molecule.",
+    "ko": "관련 초기 중간체의 정체성을 같은 회수 분자에서 확인할 수 있는지 검토하는 측정 프로그램입니다."
+  },
+  "category": {
+    "en": "Measurement architecture",
+    "ko": "기전 중심"
+  },
   "idea_type": "MEASUREMENT_PROGRAM",
   "lifecycle_status": "MEASUREMENT_PROGRAM",
   "featured": false,
-  "disposition": "Retained as a measurement program",
-  "recommendation": "Measurement-method research",
-  "tags": ["molecular identity", "measurement", "uncertainty"],
+  "disposition": {
+    "en": "Retained as a measurement program",
+    "ko": "우선 검토"
+  },
+  "recommendation": {
+    "en": "Measurement-method research",
+    "ko": "제한된 후속 검토"
+  },
+  "tags": [
+    {
+      "en": "molecular identity",
+      "ko": "molecular identity"
+    },
+    {
+      "en": "measurement",
+      "ko": "measurement"
+    },
+    {
+      "en": "uncertainty",
+      "ko": "uncertainty"
+    }
+  ],
   "origin": "Synthetic focused-decision demonstration",
   "updated_at": "2026-07-21T13:20:00Z",
-  "language_variants": {"en": "English", "ko": "Korean"},
-  "knowledge_refs": ["knowledge-background-en"],
+  "knowledge_refs": [
+    "knowledge-background-en"
+  ],
   "reference_count": 3,
   "figure_count": 0,
   "publication_status": "DEMO_ONLY",
   "parent_idea_ids": [],
-  "family_id": "family-ea-measurement",
-  "disposition_reason": "It is retained to resolve identifiability before causal attribution, not as a biological finalist.",
-  "nearest_prior_art": "Generic molecular-identity and provenance measurements applied outside this synthetic decision context.",
-  "strongest_reason": "It can prevent causal interpretation when the required molecular object is not identifiable.",
-  "weakest_causal_edge": "Recovery bias may still decouple the observed molecule from the productive intermediate.",
+  "family_id": "family-demo-measurement-identity",
+  "disposition_reason": {
+    "en": "It is retained to resolve identifiability before causal attribution, not as a biological finalist.",
+    "ko": "출처가 보장된 분자 정체성 없이는 인과 관계를 해석할 수 없습니다."
+  },
+  "nearest_prior_art": {
+    "en": "Generic molecular-identity and provenance measurements applied outside this synthetic decision context.",
+    "ko": "직접적으로 일치하는 선행 사례는 기록되지 않았습니다."
+  },
+  "strongest_reason": {
+    "en": "It can prevent causal interpretation when the required molecular object is not identifiable.",
+    "ko": "출처가 보장된 분자 정체성 없이는 인과 관계를 해석할 수 없습니다."
+  },
+  "weakest_causal_edge": {
+    "en": "Recovery bias may still decouple the observed molecule from the productive intermediate.",
+    "ko": "핵심 인과 연결은 아직 직접 확인되지 않았습니다."
+  },
   "has_fatal_flaw": false,
   "fatal_flaw": null,
-  "scorecard": {"goal_alignment": 4, "evidence_grounding": 4, "causal_novelty": 3, "mechanistic_specificity": 4, "physical_coherence": 4, "decisive_test_quality": 5, "feasibility": 3, "expected_information_value": 5},
-  "pairwise_summary": "Kept outside biological ranking because it is a measurement architecture.",
-  "reviewer_disagreement": "Reviewers differed on technical recovery feasibility.",
-  "reviewer_critiques": ["Target linkage, provenance, sequence, and length class must be resolved on the same molecule."],
-  "reentry_condition": "Promote to an implementation plan only after recovery bias and same-molecule linkage are bounded.",
-  "scientific_summary": "The E_A object is a measurement architecture for identifying a proposed early intermediate before assigning mechanism.",
-  "causal_mechanism": "It does not posit a new biological mechanism; it conditions downstream inference on molecular identity and provenance.",
-  "evidence_basis": "Synthetic measurement logic and general identifiability principles.",
-  "next_discriminating_experiment": "Demonstrate same-molecule target linkage, provenance, sequence, length class, and quantified recovery bias."
+  "scorecard": {
+    "goal_alignment": 4,
+    "evidence_grounding": 4,
+    "causal_novelty": 3,
+    "mechanistic_specificity": 4,
+    "physical_coherence": 4,
+    "decisive_test_quality": 5,
+    "feasibility": 3,
+    "expected_information_value": 5
+  },
+  "pairwise_summary": {
+    "en": "Kept outside biological ranking because it is a measurement architecture.",
+    "ko": "별도 쌍대 비교는 필요하지 않았습니다."
+  },
+  "reviewer_disagreement": {
+    "en": "Reviewers differed on technical recovery feasibility.",
+    "ko": "중요한 검토자 이견은 기록되지 않았습니다."
+  },
+  "reviewer_critiques": [
+    {
+      "en": "Target linkage, provenance, sequence, and length class must be resolved on the same molecule.",
+      "ko": "판별 가능한 측정과 대조군이 필요합니다."
+    }
+  ],
+  "reentry_condition": {
+    "en": "Promote to an implementation plan only after recovery bias and same-molecule linkage are bounded.",
+    "ko": "재검토 조건을 충족해야 합니다."
+  },
+  "scientific_summary": {
+    "en": "The E_A object is a measurement architecture for identifying a proposed early intermediate before assigning mechanism.",
+    "ko": "관련 초기 중간체의 정체성을 같은 회수 분자에서 확인할 수 있는지 검토하는 측정 프로그램입니다."
+  },
+  "causal_mechanism": {
+    "en": "It does not posit a new biological mechanism; it conditions downstream inference on molecular identity and provenance.",
+    "ko": "개입이 관련 분자 상태의 분포를 바꾸고 최종 산물에 영향을 줄 수 있다는 가설입니다."
+  },
+  "evidence_basis": {
+    "en": "Synthetic measurement logic and general identifiability principles.",
+    "ko": "현재 근거는 제한된 성분 수준 또는 유추 근거입니다."
+  },
+  "next_discriminating_experiment": {
+    "en": "Demonstrate same-molecule target linkage, provenance, sequence, length class, and quantified recovery bias.",
+    "ko": "판별 가능한 대조군과 함께 핵심 상태 및 최종 산물을 비교합니다."
+  },
+  "report_id": null,
+  "why_this_idea": {
+    "en": "Causal attribution is not interpretable without provenance-secure molecular identity.",
+    "ko": "출처가 보장된 분자 정체성 없이는 인과 관계를 해석할 수 없습니다."
+  },
+  "proposed_comparison": {
+    "en": "Demonstrate same-molecule target linkage, provenance, sequence, length class, and quantified recovery bias.",
+    "ko": "관련 상태와 최종 산물을 같은 비교군에서 측정합니다."
+  },
+  "expected_result": {
+    "en": "A supportive result changes the intended product more strongly than bulk abundance or burden.",
+    "ko": "지지 결과에서는 전체 양이나 부담보다 의도한 산물이 더 선택적으로 변해야 합니다."
+  }
 }

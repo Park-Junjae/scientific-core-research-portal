@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scientific-core.local/schemas/run-request-v2.schema.json",
+  "title": "RunRequestV2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "created_at", "raw_research_request", "reference_material_or_constraints", "structured_fields", "requires_director_compilation", "inferred_defaults", "director_launch_prompt"],
+  "properties": {
+    "schema_version": {"const": "RunRequestV2"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "raw_research_request": {"type": "string", "minLength": 1},
+    "reference_material_or_constraints": {"type": "string"},
+    "structured_fields": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {"type": "string"},
+        "run_type": {"type": ["string", "null"], "enum": [null, "DISCOVERY_PORTFOLIO_RUN", "FOCUSED_DECISION_RUN", "VERIFICATION_RUN", "MEASUREMENT_DISCOVERY_RUN"]},
+        "research_question": {"type": "string"},
+        "research_goal": {"type": "string"},
+        "current_bottleneck": {"type": "string"},
+        "experimental_constraints": {"type": "string"},
+        "success_criteria": {"type": "string"},
+        "failure_criteria": {"type": "string"},
+        "non_goals": {"type": "string"},
+        "custom_requested_outputs": {"type": "array", "items": {"type": "string"}},
+        "output_language": {"type": ["string", "null"], "enum": [null, "en", "ko", "bilingual"]},
+        "visibility": {"enum": ["PRIVATE", "LAB_INTERNAL", "PUBLIC_SANITIZED"]},
+        "notes": {"type": "string"}
+      }
+    },
+    "requires_director_compilation": {"const": true},
+    "inferred_defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "run_type", "output_language", "visibility", "requested_outputs"],
+      "properties": {
+        "title": {"type": "string"},
+        "run_type": {"const": "AUTO"},
+        "output_language": {"enum": ["en", "ko", "bilingual"]},
+        "visibility": {"enum": ["PRIVATE", "LAB_INTERNAL", "PUBLIC_SANITIZED"]},
+        "requested_outputs": {"type": "array", "minItems": 6, "items": {"type": "string"}}
+      }
+    },
+    "director_launch_prompt": {"type": "string", "minLength": 1}
+  }
+}

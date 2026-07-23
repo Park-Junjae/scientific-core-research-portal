@@ -1,215 +1,59 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import {
-  ArrowDownAZ,
-  Grid2X2,
-  List,
-  MoreHorizontal,
-  Search,
-} from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { MoreHorizontal, Search } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import { formatDate } from "@/lib/display";
-import { usePreferences } from "@/lib/preferences";
-import type { RunStatus, RunWithIdeas, SearchRecord } from "@/lib/types";
+import { localized, useLocale } from "@/lib/locale";
+import { analyzedLiteratureCount } from "@/lib/literature";
+import type { Locale, RunStatus, RunWithIdeas } from "@/lib/types";
 import { StatusBadge } from "./status-badge";
 
-type Filter = "ALL" | Exclude<RunStatus, "ARCHIVED">;
-type Sort = "updated" | "created" | "title" | "ideas";
+type Filter = "ALL" | "DRAFT" | "RUNNING" | "REVIEW_REQUIRED" | "DONE" | "FAILED" | "ARCHIVED";
+type Sort = "updated" | "title" | "ideas" | "literature_desc" | "literature_asc";
 
-const filters: Array<{ value: Filter; label: string }> = [
-  { value: "ALL", label: "All" },
-  { value: "DRAFT", label: "Draft" },
-  { value: "RUNNING", label: "Running" },
-  { value: "REVIEW_REQUIRED", label: "Review" },
-  { value: "DONE", label: "Done" },
-  { value: "FAILED", label: "Failed" },
-  { value: "BLOCKED", label: "Blocked" },
-];
+const filters: Filter[] = ["ALL", "DRAFT", "RUNNING", "REVIEW_REQUIRED", "DONE", "FAILED", "ARCHIVED"];
 
-export function filterAndSortRuns(runs: RunWithIdeas[], query: string, filter: Filter, sort: Sort) {
+function allLocalized(value: Partial<Record<Locale, string>>) { return Object.values(value).join(" "); }
+function defaultRunHref(run: RunWithIdeas) { return run.run_mode === "DISCOVERY_PORTFOLIO_RUN" ? `/runs/${run.slug}/ideas/` : `/runs/${run.slug}/summary/`; }
+
+export function filterAndSortRuns(runs: RunWithIdeas[], query: string, filter: Filter, sort: Sort, locale: Locale = "en") {
   const normalized = query.trim().toLowerCase();
-  return runs
-    .filter((run) => filter === "ALL" || run.status === filter)
-    .filter((run) => {
-      if (!normalized) return true;
-      const searchable = [
-        run.title,
-        run.subtitle,
-        run.summary,
-        run.research_domain,
-        ...run.tags,
-        ...run.ideas.flatMap((idea) => [idea.title, idea.abstract]),
-      ]
-        .join(" ")
-        .toLowerCase();
-      return searchable.includes(normalized);
-    })
-    .sort((a, b) => {
-      if (sort === "title") return a.title.localeCompare(b.title);
-      if (sort === "ideas") return b.reviewed_idea_count - a.reviewed_idea_count;
-      if (sort === "created") return b.created_at.localeCompare(a.created_at);
-      return b.updated_at.localeCompare(a.updated_at);
-    });
+  return runs.filter((run) => filter === "ALL" || run.status === filter).filter((run) => {
+    if (!normalized) return true;
+    const searchable = [allLocalized(run.title), allLocalized(run.subtitle), allLocalized(run.research_question), allLocalized(run.summary), allLocalized(run.research_domain), ...run.tags.map(allLocalized), ...run.ideas.flatMap((idea) => [allLocalized(idea.title), allLocalized(idea.abstract), ...idea.tags.map(allLocalized)]), ...run.reports.flatMap((report) => [allLocalized(report.localized_title), allLocalized(report.localized_description)]), ...run.sources.flatMap((source) => [allLocalized(source.localized_title), source.doi ?? "", source.pmid ?? "", source.journal, ...source.authors])].join(" ").toLowerCase();
+    return searchable.includes(normalized);
+  }).sort((a, b) => {
+    if (sort === "title") return (localized(a.title, locale) ?? "").localeCompare(localized(b.title, locale) ?? "", locale);
+    if (sort === "ideas") return b.idea_count - a.idea_count;
+    if (sort === "literature_desc" || sort === "literature_asc") {
+      const aCount = analyzedLiteratureCount(a.literature_stats);
+      const bCount = analyzedLiteratureCount(b.literature_stats);
+      if (aCount === null || bCount === null) {
+        if (aCount === null && bCount === null) return (localized(a.title, locale) ?? "").localeCompare(localized(b.title, locale) ?? "", locale);
+        return aCount === null ? 1 : -1;
+      }
+      const difference = sort === "literature_desc" ? bCount - aCount : aCount - bCount;
+      return difference || (localized(a.title, locale) ?? "").localeCompare(localized(b.title, locale) ?? "", locale);
+    }
+    return b.updated_at.localeCompare(a.updated_at);
+  });
 }
 
-const searchGroupLabels: Record<SearchRecord["type"], string> = {
-  run: "Runs",
-  idea: "Ideas",
-  knowledge: "Knowledge",
-  report: "Reports",
-};
-
-export function RunsExplorer({ runs, searchRecords, heading }: { runs: RunWithIdeas[]; searchRecords: SearchRecord[]; heading: string }) {
-  const router = useRouter();
+export function RunsExplorer({ runs }: { runs: RunWithIdeas[] }) {
+  const { locale, t } = useLocale();
   const searchRef = useRef<HTMLInputElement>(null);
-  const { preferences } = usePreferences();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("ALL");
   const [sort, setSort] = useState<Sort>("updated");
-  const [viewOverride, setViewOverride] = useState<"list" | "grid" | null>(null);
-  const view = viewOverride ?? (preferences.view === "Grid" ? "grid" : "list");
-  const visible = useMemo(() => filterAndSortRuns(runs, query, filter, sort), [runs, query, filter, sort]);
-  const searchGroups = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return [];
-    return (["run", "idea", "knowledge", "report"] as const).map((type) => ({
-      type,
-      records: searchRecords.filter((record) => record.type === type && [record.title, record.summary, record.text].join(" ").toLowerCase().includes(normalized)).slice(0, 5),
-    })).filter((group) => group.records.length > 0);
-  }, [query, searchRecords]);
-
-  useEffect(() => {
-    const focusSearch = (event: KeyboardEvent) => {
-      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
-      const target = event.target as HTMLElement | null;
-      if (target?.matches("input, textarea, select, [contenteditable=true]")) return;
-      event.preventDefault();
-      searchRef.current?.focus();
-    };
-    window.addEventListener("keydown", focusSearch);
-    return () => window.removeEventListener("keydown", focusSearch);
-  }, []);
-
-  return (
-    <div className="page-container runs-page">
-      <div className="page-heading-row">
-        <div>
-          <p className="eyebrow">Research workspace</p>
-          <h1>{heading}</h1>
-          <p className="page-lede">Read approved reports, compare reviewed ideas, and follow each scientific decision.</p>
-        </div>
-        <Link href="/new-run/" prefetch={false} className="primary-button">
-          Create run request
-        </Link>
-      </div>
-
-      <div className="search-bar">
-        <Search size={21} aria-hidden="true" />
-        <label className="sr-only" htmlFor="run-search">Search research runs</label>
-        <input
-          ref={searchRef}
-          id="run-search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search runs, ideas, domains, or tags"
-        />
-        <kbd>/</kbd>
-      </div>
-
-      {query.trim() && (
-        <section className="search-results" aria-label="Search results">
-          <div className="search-results-head"><strong>Workspace matches</strong><span>{searchGroups.reduce((total, group) => total + group.records.length, 0)} shown</span></div>
-          {searchGroups.length === 0 ? <p>No idea, knowledge, or report heading matches this search.</p> : searchGroups.map((group) => (
-            <div className="search-result-group" key={group.type}>
-              <h2>{searchGroupLabels[group.type]}</h2>
-              <div>{group.records.map((record) => <Link key={`${record.type}-${record.id}`} href={record.href}><span>{record.title}</span><small>{record.summary}</small></Link>)}</div>
-            </div>
-          ))}
-        </section>
-      )}
-
-      <div className="runs-toolbar">
-        <div className="filter-chips" aria-label="Filter runs by status">
-          {filters.map((item) => (
-            <button
-              type="button"
-              key={item.value}
-              className={filter === item.value ? "filter-chip active" : "filter-chip"}
-              aria-pressed={filter === item.value}
-              onClick={() => setFilter(item.value)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-        <div className="view-controls">
-          <label className="sort-control">
-            <ArrowDownAZ size={17} />
-            <span className="sr-only">Sort runs</span>
-            <select value={sort} onChange={(event) => setSort(event.target.value as Sort)}>
-              <option value="updated">Last updated</option>
-              <option value="created">Created</option>
-              <option value="title">Title</option>
-              <option value="ideas">Idea count</option>
-            </select>
-          </label>
-          <div className="segmented-control" aria-label="Run display mode">
-            <button title="List view" aria-label="List view" aria-pressed={view === "list"} onClick={() => setViewOverride("list")}><List size={18} /></button>
-            <button title="Grid view" aria-label="Grid view" aria-pressed={view === "grid"} onClick={() => setViewOverride("grid")}><Grid2X2 size={18} /></button>
-          </div>
-        </div>
-      </div>
-
-      <p className="result-count" aria-live="polite">{visible.length} {visible.length === 1 ? "run" : "runs"}</p>
-      {visible.length === 0 ? (
-        <div className="empty-state">
-          <Search size={25} />
-          <h2>No matching research runs</h2>
-          <p>Clear the search or choose another status.</p>
-        </div>
-      ) : view === "list" ? (
-        <div className="run-table-wrap">
-          <table className="run-table">
-            <thead><tr><th>Title</th><th>Status</th><th>Reviewed ideas</th><th>Owner</th><th>Last updated</th><th><span className="sr-only">Actions</span></th></tr></thead>
-            <tbody>
-              {visible.map((run) => (
-                <tr key={run.run_id} className="clickable-run-row" onClick={(event) => { if (!(event.target as HTMLElement).closest("a, button, summary, details")) router.push(`/runs/${run.slug}/`); }}>
-                  <td>
-                    <Link className="run-title-link" href={`/runs/${run.slug}/`} prefetch={false}>
-                      <span>{run.title}</span>
-                      <small>{run.subtitle}</small>
-                    </Link>
-                  </td>
-                  <td><StatusBadge status={run.status} /></td>
-                  <td>{run.reviewed_idea_count}</td>
-                  <td>{run.owner}</td>
-                  <td>{formatDate(run.updated_at)}</td>
-                  <td>
-                    <details className="run-actions-menu" onClick={(event) => event.stopPropagation()}>
-                      <summary className="icon-button subtle" title="Run actions" aria-label={`Actions for ${run.title}`}><MoreHorizontal size={19} /></summary>
-                      <div><Link href={`/runs/${run.slug}/`}>Open run</Link><Link href={`/runs/${run.slug}/ideas/`}>Ideas</Link><Link href={`/runs/${run.slug}/reports/`}>Reports</Link></div>
-                    </details>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <div className="run-grid">
-          {visible.map((run) => (
-            <article className="run-card" key={run.run_id}>
-              <div className="run-card-top"><StatusBadge status={run.status} /><span>{formatDate(run.updated_at)}</span></div>
-              <h2><Link href={`/runs/${run.slug}/`} prefetch={false}>{run.title}</Link></h2>
-              <p>{run.summary}</p>
-              <div className="tag-row">{run.tags.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}</div>
-              <div className="run-card-meta"><span>{run.reviewed_idea_count} reviewed ideas</span><span>{run.owner}</span></div>
-            </article>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  const visible = useMemo(() => filterAndSortRuns(runs, query, filter, sort, locale), [runs, query, filter, sort, locale]);
+  const filterLabels: Record<Filter, string> = { ALL: t("all"), DRAFT: t("draft"), RUNNING: t("running"), REVIEW_REQUIRED: t("reviewRequired"), DONE: t("done"), FAILED: t("failed"), ARCHIVED: t("archived") };
+  const statusLabels: Record<RunStatus, string> = { DRAFT: t("draft"), RUNNING: t("running"), REVIEW_REQUIRED: t("reviewRequired"), DONE: t("done"), FAILED: t("failed"), BLOCKED: t("blocked"), ARCHIVED: t("archived") };
+  return <div className="page-container runs-page">
+    <div className="page-heading-row"><div><h1>{t("researchRuns")}</h1><p className="page-lede">{locale === "ko" ? "연구 질문, 아이디어, 지식 배경과 주요 보고서를 읽습니다." : "Read research questions, ideas, knowledge background, and principal reports."}</p></div><Link href="/new-run/" prefetch={false} className="primary-button">{t("createRequest")}</Link></div>
+    <label className="search-bar"><Search size={20} aria-hidden="true" /><span className="sr-only">{t("search")}</span><input ref={searchRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={locale === "ko" ? "제목, 질문, 아이디어, 저자, 논문 제목, DOI 검색" : "Search titles, questions, ideas, authors, papers, or DOI"} /></label>
+    <div className="runs-toolbar"><div className="text-filters" aria-label={locale === "ko" ? "상태별 필터" : "Filter runs by status"}>{filters.map((item) => <button type="button" key={item} className={filter === item ? "active" : ""} aria-pressed={filter === item} onClick={() => setFilter(item)}>{filterLabels[item]}</button>)}</div><label className="sort-control"><span>{locale === "ko" ? "정렬" : "Sort"}</span><select aria-label={locale === "ko" ? "연구 정렬" : "Sort runs"} value={sort} onChange={(event) => setSort(event.target.value as Sort)}><option value="updated">{t("lastUpdated")}</option><option value="title">{t("title")}</option><option value="ideas">{t("ideas")}</option><option value="literature_desc">{locale === "ko" ? "분석 문헌: 많은 순" : "Literature analyzed: high to low"}</option><option value="literature_asc">{locale === "ko" ? "분석 문헌: 적은 순" : "Literature analyzed: low to high"}</option></select></label></div>
+    <p className="result-count">{locale === "ko" ? `${visible.length}개 연구` : `${visible.length} runs`}</p>
+    <div className="run-table-wrap"><table className="run-table"><thead><tr><th>{t("title")}</th><th>{t("status")}</th><th>{t("ideas")}</th><th>{t("literatureAnalyzed")}</th><th>{t("lastUpdated")}</th><th><span className="sr-only">{t("more")}</span></th></tr></thead><tbody>{visible.map((run) => { const title = localized(run.title, locale); const subtitle = localized(run.subtitle, locale); const literature = analyzedLiteratureCount(run.literature_stats); const literatureDisplay = literature ?? "—"; const mobileMeta = locale === "ko" ? `${statusLabels[run.status]} · 아이디어 ${run.idea_count} · 분석 문헌 ${literatureDisplay}` : `${statusLabels[run.status]} · ${run.idea_count} ${run.idea_count === 1 ? "idea" : "ideas"} · ${literatureDisplay} papers analyzed`; return <tr key={run.run_id} data-run-id={run.run_id}><td><Link href={defaultRunHref(run)}>{title ?? t("noTranslation")}</Link>{subtitle && <small>{subtitle}</small>}<p className="run-mobile-meta">{mobileMeta}</p></td><td><StatusBadge status={run.status} /></td><td>{run.idea_count}</td><td>{literatureDisplay}</td><td>{formatDate(run.updated_at, locale)}</td><td><details className="run-actions-menu"><summary aria-label={`${t("more")}: ${title ?? run.slug}`}><MoreHorizontal size={18} /></summary><div><Link href={`/runs/${run.slug}/summary/`}>{t("summary")}</Link><Link href={`/runs/${run.slug}/ideas/`}>{t("ideas")}</Link><Link href={`/runs/${run.slug}/literature/`}>{t("literature")}</Link><Link href={`/runs/${run.slug}/knowledge/`}>{t("knowledge")}</Link><Link href={`/runs/${run.slug}/specification/`}>{t("specification")}</Link></div></details></td></tr>; })}</tbody></table>{visible.length === 0 && <p className="empty-state">{t("noResults")}</p>}</div>
+  </div>;
 }

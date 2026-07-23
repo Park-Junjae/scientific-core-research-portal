@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/noto-sans-kr':
+        specifier: 5.2.8
+        version: 5.2.8
       '@radix-ui/react-collapsible':
         specifier: ^1.1.17
         version: 1.1.17(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -317,6 +320,9 @@ packages:
 
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
+
+  '@fontsource/noto-sans-kr@5.2.8':
+    resolution: {integrity: sha512-2Nbu2Iy1YGUkHbOTF8mMchipbg8g4ZBTpUzHwg09/dz/9b7r5o5h2PF6hnbismsBp8GzpsBA66OlQJw3GZehuw==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -3573,6 +3579,8 @@ snapshots:
       react-dom: 19.2.4(react@19.2.4)
 
   '@floating-ui/utils@0.2.12': {}
+
+  '@fontsource/noto-sans-kr@5.2.8': {}
 
   '@humanfs/core@0.19.2':
     dependencies:

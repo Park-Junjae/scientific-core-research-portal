@@ -5,7 +5,7 @@
   "packageManager": "pnpm@11.9.0",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/copy-pdf-worker.mjs && node scripts/build-search-index.mjs",
+    "prebuild": "node scripts/stage-local-preview.mjs && node scripts/copy-pdf-worker.mjs && node scripts/build-search-index.mjs",
     "build": "next build",
     "preview": "python -m coscientist.site preview-site --portal-root .",
     "lint": "eslint .",
@@ -13,13 +13,19 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test:content": "python -m coscientist.site validate-content --portal-root .",
+    "test:python-env": "node scripts/run-python.mjs --check-only",
+    "test:python": "node scripts/run-python.mjs tests/run_all.py",
+    "test:content": "node scripts/run-python.mjs -m coscientist.site validate-content --portal-root .",
     "test:links": "node scripts/check-static-links.mjs",
     "test:basepath": "node scripts/check-basepath-export.mjs",
     "test:budget": "node scripts/check-asset-budget.mjs",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:content && pnpm build && pnpm test:links && pnpm test:budget"
+    "test:privacy": "node scripts/check-public-private-boundary.mjs",
+    "test:tracked-boundary": "node scripts/audit-tracked-publication-boundary.mjs --public-out=out --output=.publication-staging/tracked-tree-publication-boundary-audit.json",
+    "test:citations": "node scripts/audit-citation-resolution.mjs",
+    "verify": "pnpm test:python-env && pnpm lint && pnpm typecheck && pnpm test && pnpm test:python && pnpm test:content && pnpm build && pnpm test:links && pnpm test:budget && pnpm test:privacy && pnpm test:tracked-boundary"
   },
   "dependencies": {
+    "@fontsource/noto-sans-kr": "5.2.8",
     "@radix-ui/react-collapsible": "^1.1.17",
     "@radix-ui/react-tabs": "^1.1.18",
     "@radix-ui/react-tooltip": "^1.2.13",
@@ -27,9 +33,9 @@
     "lucide-react": "^1.25.0",
     "next": "16.2.10",
     "pdfjs-dist": "^6.1.200",
-    "react-markdown": "^10.1.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {

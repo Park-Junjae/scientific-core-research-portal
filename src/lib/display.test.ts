@@ -7,11 +7,11 @@ describe("display helpers", () => {
   });
 
   it("maps internal status to reader language", () => {
-    expect(statusLabels.REVIEW_REQUIRED).toBe("Review required");
+    expect(statusLabels.en.REVIEW_REQUIRED).toBe("Review required");
     expect(statusTone("REVIEW_REQUIRED")).toBe("review-required");
   });
 
   it("formats dates against UTC for stable server and browser output", () => {
-    expect(formatDate("2026-07-16T23:30:00Z")).toBe("Jul 16, 2026");
+    expect(formatDate("2026-07-16T23:30:00Z", "en")).toBe("Jul 16, 2026");
   });
 });

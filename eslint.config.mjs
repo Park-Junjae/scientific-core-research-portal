@@ -10,6 +10,13 @@ const eslintConfig = defineConfig([
     // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
+    "out-local/**",
+    "out-local-v3/**",
+    "out-public/**",
+    "out-public-v3/**",
+    "out-review-v3-final/**",
+    "out-local-v3-final/**",
+    "out-public-v3-final/**",
     "build/**",
     "test-results/**",
     "playwright-report/**",

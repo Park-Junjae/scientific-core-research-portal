@@ -1,55 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, FileText } from "lucide-react";
 import { useMemo, useState } from "react";
-import {
-  ideaMatchesLifecycle,
-  lifecycleFilters,
-  lifecycleLabels,
-  reportAvailability,
-  scoreVector,
-  type LifecycleFilter,
-} from "@/lib/portfolio";
-import type { ResearchIdeaManifest } from "@/lib/types";
+import { localized, useLocale } from "@/lib/locale";
+import { ideaMatchesLifecycle, lifecycleFilterLabels, lifecycleFilters, lifecycleLabels, type LifecycleFilter } from "@/lib/portfolio";
+import type { ResearchIdeaManifest, RunMode } from "@/lib/types";
 
-export function IdeasPortfolio({ ideas, runSlug }: { ideas: ResearchIdeaManifest[]; runSlug: string }) {
+const roleLabels = {
+  en: { PRIMARY: "Primary", ALTERNATIVE: "Alternative", CONDITIONAL: "Conditional", MEASUREMENT_PROGRAM: "Measurement program", EXTENSION: "Extension", SUPPORTING: "Supporting" },
+  ko: { PRIMARY: "주요", ALTERNATIVE: "대안", CONDITIONAL: "조건부", MEASUREMENT_PROGRAM: "측정 프로그램", EXTENSION: "확장", SUPPORTING: "지원" },
+} as const;
+
+export function IdeasPortfolio({ ideas, runSlug, runMode }: { ideas: ResearchIdeaManifest[]; runSlug: string; runMode: RunMode }) {
+  const { locale, t } = useLocale();
   const [filter, setFilter] = useState<LifecycleFilter>("ALL");
-  const visible = useMemo(() => ideas.filter((idea) => ideaMatchesLifecycle(idea, filter)), [filter, ideas]);
-
-  return (
-    <>
-      <div className="lifecycle-filters" role="group" aria-label="Filter ideas by lifecycle">
-        {lifecycleFilters.map((item) => (
-          <button key={item.value} type="button" className={filter === item.value ? "active" : ""} aria-pressed={filter === item.value} onClick={() => setFilter(item.value)}>{item.label}</button>
-        ))}
-      </div>
-      <div className="idea-list" aria-live="polite">
-        {visible.map((idea, index) => (
-          <article key={idea.idea_id} className="idea-row">
-            <div className="idea-index">{String(index + 1).padStart(2, "0")}</div>
-            <div className="idea-row-body">
-              <div className="idea-row-labels">
-                <span>{idea.idea_type.replaceAll("_", " ")}</span>
-                <strong>{lifecycleLabels[idea.lifecycle_status]}</strong>
-                <span>{idea.recommendation}</span>
-              </div>
-              <h3><Link href={`/runs/${runSlug}/ideas/${idea.slug}/`}>{idea.title}</Link></h3>
-              <p>{idea.abstract}</p>
-              <dl className="idea-reason-grid">
-                <div><dt>Strongest reason</dt><dd>{idea.strongest_reason}</dd></div>
-                <div><dt>Weakest edge</dt><dd>{idea.weakest_causal_edge}</dd></div>
-              </dl>
-              {idea.scorecard && <div className="score-vector" aria-label="Score vector">{scoreVector(idea).map((item) => <span key={item.axis}>{item.label} <b>{item.score}</b></span>)}</div>}
-              <div className="idea-row-footer">
-                <div className="report-availability"><FileText size={15} />{reportAvailability(idea)}</div>
-                <Link href={`/runs/${runSlug}/ideas/${idea.slug}/`}>View details <ArrowRight size={16} /></Link>
-              </div>
-            </div>
-          </article>
-        ))}
-        {visible.length === 0 && <div className="empty-portfolio"><h3>No ideas in this lifecycle</h3><p>The run retains no public idea record in the selected state.</p></div>}
-      </div>
-    </>
-  );
+  const visible = useMemo(() => ideas.filter((idea) => runMode !== "DISCOVERY_PORTFOLIO_RUN" || ideaMatchesLifecycle(idea, filter)), [filter, ideas, runMode]);
+  const focused = runMode !== "DISCOVERY_PORTFOLIO_RUN" && ideas.length < 8;
+  return <>
+    {runMode === "DISCOVERY_PORTFOLIO_RUN" && <div className="text-filters idea-filters" role="group" aria-label={locale === "ko" ? "아이디어 단계 필터" : "Filter ideas by lifecycle"}>{lifecycleFilters.map((item) => <button key={item} type="button" className={filter === item ? "active" : ""} aria-pressed={filter === item} onClick={() => setFilter(item)}>{lifecycleFilterLabels[locale][item]}</button>)}</div>}
+    <div className={`editorial-idea-list ${focused ? "focused" : "discovery"}`} aria-live="polite">{!focused && <div className="idea-list-head"><span>{t("idea")}</span><span>{t("portfolioRole")}</span><span>{t("rationale")}</span><span>{t("currentDecision")}</span><span>{t("report")}</span></div>}{visible.map((idea) => <article key={idea.idea_id} className="editorial-idea-row"><div className="idea-title-cell"><Link href={`/runs/${runSlug}/ideas/${idea.slug}/`}>{localized(idea.title, locale) ?? t("noTranslation")}</Link><p>{localized(idea.abstract, locale) ?? t("noTranslation")}</p></div><div className="idea-role-value">{roleLabels[locale][idea.idea_type]}</div><div className="idea-rationale-value">{localized(idea.strongest_reason, locale) ?? t("noTranslation")}</div><div className="idea-decision-value"><span className="decision-text">{lifecycleLabels[locale][idea.lifecycle_status]}</span><p>{localized(idea.disposition, locale) ?? t("noTranslation")}</p></div><div className="idea-report-value">{idea.report_id ? <Link href={`/runs/${runSlug}/reports/${idea.report_id}/`}>{t("readOnline")}</Link> : <span className="muted-text">{t("summaryOnly")}</span>}</div></article>)}{visible.length === 0 && <p className="empty-state">{locale === "ko" ? "이 단계의 아이디어가 없습니다." : "No ideas in this lifecycle."}</p>}</div>
+  </>;
 }
