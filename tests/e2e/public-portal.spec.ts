@@ -68,7 +68,8 @@ test("New Run remains a simple one-field intake", async ({ page }) => {
   await expect(page.locator("pre, code")).toHaveCount(0);
   const request = page.getByRole("textbox", { name: /What would you like to research/ });
   await request.fill("Why does product purity vary across otherwise similar conditions?");
-  await expect(page.getByRole("button", { name: "Create research request" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Prepare research run" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Save request" })).toBeEnabled();
 });
 
 test("mobile primary pages do not overflow", async ({ page }) => {
