@@ -78,15 +78,17 @@ describe("reader contracts", () => {
     expect(screen.queryByText("FOCUSED_DECISION_RUN")).not.toBeInTheDocument();
     expect(container.querySelectorAll("[required]")).toHaveLength(1);
     expect(container.querySelector(".advanced-fields")).not.toHaveAttribute("open");
-    expect(screen.queryByRole("heading", { name: "Research Request" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Create research request" })).toBeDisabled();
+    expect(screen.queryByRole("heading", { name: "Research request preview" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Prepare research run" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Save request" })).toBeDisabled();
 
     fireEvent.change(screen.getByRole("textbox", { name: /What would you like to research/ }), {
       target: { value: "Why does product purity collapse at this locus?" },
     });
 
-    expect(screen.getByRole("button", { name: "Create research request" })).toBeEnabled();
-    expect(screen.getByRole("heading", { name: "Research Request" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Prepare research run" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Save request" })).toBeEnabled();
+    expect(screen.getByRole("heading", { name: "Research request preview" })).toBeInTheDocument();
     expect(screen.getByText("Complete literature list and review scope")).toBeInTheDocument();
     expect(screen.getByText("Final PDF report")).toBeInTheDocument();
   });
