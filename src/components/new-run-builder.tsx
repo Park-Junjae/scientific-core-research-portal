@@ -1,8 +1,9 @@
 "use client";
 
-import { Check, FileJson, Upload } from "lucide-react";
+import { Check, Download, FlaskConical, LoaderCircle, LogIn, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLocale } from "@/lib/locale";
+import { withBasePath } from "@/lib/paths";
 import {
   buildRunRequest,
   defaultRequestedOutputs,
@@ -11,6 +12,12 @@ import {
   normalizeImportedRequest,
   type RunRequestDraft,
 } from "@/lib/run-request";
+import {
+  createControlledRun,
+  getRunControlSession,
+  runControlApiBase,
+  RunControlApiError,
+} from "@/lib/run-control-api";
 
 function downloadRequest(body: unknown) {
   const blob = new Blob([JSON.stringify(body, null, 2)], { type: "application/json" });
@@ -20,6 +27,10 @@ function downloadRequest(body: unknown) {
   anchor.download = "run-request.json";
   anchor.click();
   URL.revokeObjectURL(url);
+}
+
+function lines(value: string) {
+  return value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
 }
 
 type TextFieldKey =
@@ -38,7 +49,9 @@ export function NewRunBuilder() {
   const ko = locale === "ko";
   const [value, setValue] = useState<RunRequestDraft>(initialRunRequest);
   const [saved, setSaved] = useState(false);
-  const [importMessage, setImportMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+  const [authRequired, setAuthRequired] = useState(false);
   const request = useMemo(() => buildRunRequest(value, locale), [locale, value]);
   const ready = Boolean(value.raw_research_request.trim());
   const showPreview = Boolean(
@@ -49,17 +62,20 @@ export function NewRunBuilder() {
 
   const update = <K extends keyof RunRequestDraft>(key: K, next: RunRequestDraft[K]) => {
     setSaved(false);
+    setMessage("");
+    setAuthRequired(false);
     setValue((current) => ({ ...current, [key]: next }));
   };
 
   const labels = ko
     ? {
         raw: "무엇을 연구하고 싶나요?",
-        rawHelp: "연구 질문, 현재 고민, 원하는 방향을 자유롭게 작성하세요.",
+        rawHelp: "연구 질문, 현재 고민, 원하는 방향을 자연어로 작성하세요.",
         references: "문헌 검토 범위와 반드시 지켜야 할 조건",
         referencesHelp: "핵심 논문, DOI, 검토할 문헌 범위, 기존 결과, 실험 조건 또는 제외할 접근을 적어주세요.",
-        create: "요청서 저장",
-        saved: "요청 저장됨",
+        prepare: "연구 실행 준비",
+        save: "요청서 저장",
+        saved: "요청서 저장됨",
         advanced: "고급 설정",
         title: "제목",
         mode: "연구 유형",
@@ -75,16 +91,19 @@ export function NewRunBuilder() {
         visibility: "공개 범위",
         notes: "메모",
         creativity: "아이디어 탐색 방식",
-        preview: "연구 요청",
+        preview: "연구 요청 미리보기",
         imported: "기존 요청서를 불러왔습니다.",
         importError: "요청서 형식을 확인할 수 없습니다.",
+        auth: "직접 실행을 준비하려면 허용된 Cloudflare Access 계정으로 인증해야 합니다.",
+        backend: "Run Control API가 아직 배포 환경에 연결되지 않았습니다.",
       }
     : {
         raw: "What would you like to research?",
         rawHelp: "Describe the research question, current concern, and desired direction in your own words.",
         references: "Literature scope and constraints to preserve",
         referencesHelp: "Add key papers, DOIs, literature scope, prior results, experimental constraints, or approaches to exclude.",
-        create: "Save request file",
+        prepare: "Prepare research run",
+        save: "Save request",
         saved: "Request saved",
         advanced: "Advanced settings",
         title: "Title",
@@ -101,9 +120,11 @@ export function NewRunBuilder() {
         visibility: "Visibility",
         notes: "Notes",
         creativity: "Creativity profile",
-        preview: "Research Request",
+        preview: "Research request preview",
         imported: "Existing request loaded.",
         importError: "The request format could not be read.",
+        auth: "Authenticate with an allowlisted Cloudflare Access account to prepare a direct run.",
+        backend: "The Run Control API is not connected in this deployment.",
       };
 
   const modes: Array<[RunRequestDraft["run_type"], string]> = ko
@@ -121,6 +142,7 @@ export function NewRunBuilder() {
         ["VERIFICATION_RUN", "Verification"],
         ["MEASUREMENT_DISCOVERY_RUN", "Measurement discovery"],
       ];
+
   const modeLabel = modes.find(([id]) => id === value.run_type)?.[1];
   const title = value.title.trim()
     || deriveRequestTitle(value.raw_research_request)
@@ -145,21 +167,80 @@ export function NewRunBuilder() {
     </label>
   );
 
+  async function prepareRun() {
+    if (!ready || busy) return;
+    if (!runControlApiBase) {
+      setMessage(labels.backend);
+      return;
+    }
+    setBusy(true);
+    setMessage("");
+    setAuthRequired(false);
+    try {
+      const session = await getRunControlSession();
+      const researchQuestion = value.research_question.trim() || value.raw_research_request.trim();
+      const objectives = lines(value.research_goal || value.success_criteria);
+      const constraints = lines(
+        [
+          value.reference_material_or_constraints,
+          value.experimental_constraints,
+          value.failure_criteria,
+          value.non_goals,
+        ].filter(Boolean).join("\n"),
+      );
+      const run = await createControlledRun(
+        {
+          research_question: researchQuestion,
+          objectives,
+          constraints,
+          requested_mode: value.creativity_profile === "BREAKTHROUGH_DISCOVERY"
+            ? "DISCOVERY_PORTFOLIO_RUN"
+            : value.run_type || "AUTO",
+          include_literature_list_and_review_scope: true,
+          execution_mode: "PROVIDER_BACKED",
+          budget_profile: value.creativity_profile === "BREAKTHROUGH_DISCOVERY"
+            ? "breakthrough_discovery"
+            : "standard",
+          ...(value.creativity_profile === "BREAKTHROUGH_DISCOVERY"
+            ? {
+                creativity_profile: "BREAKTHROUGH_DISCOVERY",
+                creativity_profile_selection_reviewed: true,
+                raw_spark_target: 60,
+              }
+            : {}),
+        },
+        session.csrf_token,
+      );
+      window.location.assign(withBasePath(`/run-control/?run_id=${encodeURIComponent(run.run_id)}`));
+    } catch (reason) {
+      if (reason instanceof RunControlApiError && reason.status === 401) {
+        setAuthRequired(true);
+        setMessage(labels.auth);
+      } else {
+        setMessage(reason instanceof Error ? reason.message : "Unable to prepare the run.");
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const loginUrl = runControlApiBase
+    ? `${runControlApiBase}/api/session`
+    : "#";
+
   return (
     <div className={`intake-layout${showPreview ? " has-preview" : ""}`}>
       <form
         className="intake-form"
         onSubmit={(event) => {
           event.preventDefault();
-          if (!ready) return;
-          downloadRequest(request);
-          setSaved(true);
+          prepareRun();
         }}
       >
         <p className="intake-scope">
           {ko
-            ? "이 화면에서는 요청서 파일만 준비합니다. 외부 모델 실행과 비용 사용은 별도 점검 및 승인 전에는 시작되지 않습니다."
-            : "This page prepares a request file only. External model execution and provider spending require separate preflight and approval."}
+            ? "먼저 간단히 적어주세요. 실행 전 Scientific Director가 전체 연구 명세와 자동 해석 항목을 정리하고 확인을 요청합니다."
+            : "Start with a simple request. Before execution, the Scientific Director compiles the full specification and asks for confirmation."}
         </p>
 
         <label className="primary-request-field">
@@ -214,11 +295,34 @@ export function NewRunBuilder() {
         </fieldset>
 
         <div className="run-request-actions">
-          <button className="primary-button" type="submit" disabled={!ready}>
-            {saved ? <Check size={18} /> : <FileJson size={18} />}
-            {saved ? labels.saved : labels.create}
+          <button className="primary-button" type="submit" disabled={!ready || busy}>
+            {busy ? <LoaderCircle className="spin" size={18} /> : <FlaskConical size={18} />}
+            {labels.prepare}
+          </button>
+          <button
+            className="secondary-button"
+            type="button"
+            disabled={!ready}
+            onClick={() => {
+              downloadRequest(request);
+              setSaved(true);
+            }}
+          >
+            {saved ? <Check size={18} /> : <Download size={18} />}
+            {saved ? labels.saved : labels.save}
           </button>
         </div>
+
+        {message && (
+          <div className="intake-message" role={authRequired ? "status" : "alert"}>
+            <p>{message}</p>
+            {authRequired && (
+              <a className="secondary-button" href={loginUrl}>
+                <LogIn size={17} /> {ko ? "Cloudflare Access 인증" : "Authenticate with Cloudflare Access"}
+              </a>
+            )}
+          </div>
+        )}
 
         <label className="reference-request-field">
           <span>{labels.references}</span>
@@ -278,14 +382,13 @@ export function NewRunBuilder() {
                   if (!file) return;
                   try {
                     setValue(normalizeImportedRequest(JSON.parse(await file.text()), locale));
-                    setImportMessage(labels.imported);
+                    setMessage(labels.imported);
                   } catch {
-                    setImportMessage(labels.importError);
+                    setMessage(labels.importError);
                   }
                 }}
               />
             </label>
-            {importMessage && <p className="import-status" role="status">{importMessage}</p>}
           </div>
         </details>
       </form>
@@ -319,13 +422,15 @@ export function NewRunBuilder() {
               <h4>{ko ? "실행 전 확인" : "Confirmation before execution"}</h4>
               <p>
                 {ko
-                  ? "Scientific Director가 전체 연구 명세와 불명확한 가정을 정리해 보여준 뒤 멈춥니다. 사용자가 확인하기 전에는 provider 기반 연구를 시작하지 않습니다."
-                  : "The Scientific Director compiles the full specification and ambiguous assumptions, presents them, and stops. Provider-backed research starts only after user confirmation."}
+                  ? "무과금 preflight가 연구 유형, 자동 해석, 문헌 범위, 예산 상한을 먼저 보여줍니다. 명시적으로 승인하기 전에는 provider 기반 연구가 시작되지 않습니다."
+                  : "A zero-provider preflight first shows the run type, inferences, literature scope, and budget ceilings. Provider-backed research does not begin without explicit approval."}
               </p>
             </section>
           </div>
           <small className="preview-footnote">
-            {ko ? "이 정적 화면은 연구 실행을 시작하지 않습니다." : "This static page does not start a scientific run."}
+            {ko
+              ? "브라우저에는 API 키나 GitHub 토큰이 저장되지 않습니다."
+              : "No API key or GitHub token is stored in the browser."}
           </small>
         </aside>
       )}
