@@ -74,6 +74,7 @@ export function NewRunBuilder() {
         language: "출력 언어",
         visibility: "공개 범위",
         notes: "메모",
+        creativity: "아이디어 탐색 방식",
         preview: "연구 요청",
         imported: "기존 요청서를 불러왔습니다.",
         importError: "요청서 형식을 확인할 수 없습니다.",
@@ -99,6 +100,7 @@ export function NewRunBuilder() {
         language: "Output language",
         visibility: "Visibility",
         notes: "Notes",
+        creativity: "Creativity profile",
         preview: "Research Request",
         imported: "Existing request loaded.",
         importError: "The request format could not be read.",
@@ -170,6 +172,46 @@ export function NewRunBuilder() {
           />
           <small>{labels.rawHelp}</small>
         </label>
+
+        <fieldset className="creativity-selector">
+          <legend>{ko ? "아이디어 탐색 방식" : labels.creativity}</legend>
+          <div className="creativity-options">
+            <label className={value.creativity_profile === "STANDARD" ? "selected" : ""}>
+              <input
+                type="radio"
+                name="creativity-profile"
+                value="STANDARD"
+                checked={value.creativity_profile === "STANDARD"}
+                onChange={() => update("creativity_profile", "STANDARD")}
+              />
+              <span>
+                <strong>{ko ? "표준 연구 탐색" : "Standard research search"}</strong>
+                <small>
+                  {ko
+                    ? "문헌과 근거를 먼저 정리한 뒤 검증 가능한 연구 방향을 발전시킵니다."
+                    : "Organizes literature and evidence first, then develops testable research directions."}
+                </small>
+              </span>
+            </label>
+            <label className={value.creativity_profile === "BREAKTHROUGH_DISCOVERY" ? "selected" : ""}>
+              <input
+                type="radio"
+                name="creativity-profile"
+                value="BREAKTHROUGH_DISCOVERY"
+                checked={value.creativity_profile === "BREAKTHROUGH_DISCOVERY"}
+                onChange={() => update("creativity_profile", "BREAKTHROUGH_DISCOVERY")}
+              />
+              <span>
+                <strong>{ko ? "돌파형 아이디어 탐색" : "Breakthrough idea search"}</strong>
+                <small>
+                  {ko
+                    ? "문헌 검색 전에 문제를 기전적으로 분해하고, 다른 분야 원리와 제약 반전으로 아이디어를 먼저 만든 뒤 문헌으로 검토합니다. 새로운 발견을 보장하지 않습니다."
+                    : "Generates ideas from mechanism decomposition, cross-domain principles, and constraint inversion before literature review. Novelty is not guaranteed."}
+                </small>
+              </span>
+            </label>
+          </div>
+        </fieldset>
 
         <div className="run-request-actions">
           <button className="primary-button" type="submit" disabled={!ready}>
@@ -261,6 +303,14 @@ export function NewRunBuilder() {
               </section>
             ))}
             {value.run_type && <section><h4>{labels.mode}</h4><p>{modeLabel}</p></section>}
+            <section>
+              <h4>{ko ? "아이디어 탐색 방식" : labels.creativity}</h4>
+              <p>
+                {value.creativity_profile === "BREAKTHROUGH_DISCOVERY"
+                  ? (ko ? "돌파형 아이디어 탐색" : "Breakthrough idea search")
+                  : (ko ? "표준 연구 탐색" : "Standard research search")}
+              </p>
+            </section>
             <section>
               <h4>{ko ? "기본 산출물" : "Default outputs"}</h4>
               <ul>{defaultRequestedOutputs(locale).map((output) => <li key={output}>{output}</li>)}</ul>

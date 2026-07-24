@@ -19,6 +19,42 @@ export type RunMode =
   | "VERIFICATION_RUN"
   | "MEASUREMENT_DISCOVERY_RUN";
 
+export type CreativityProfile = "STANDARD" | "BREAKTHROUGH_DISCOVERY";
+
+export interface BreakthroughPresearchIdea {
+  spark_id: string;
+  title: LocalizedText;
+  summary: LocalizedText;
+  generation_lens: string;
+  provenance_category: "GROUNDED_EXTENSION" | "CROSS_DOMAIN_TRANSFER" | "FIRST_PRINCIPLES_SPECULATION";
+}
+
+export interface BreakthroughMechanismFamily {
+  family_id: string;
+  thesis: LocalizedText;
+  shared_causal_variable: LocalizedText;
+  member_count: number;
+}
+
+export interface BreakthroughDevelopedProposal {
+  proposal_id: string;
+  title: LocalizedText;
+  core_thesis: LocalizedText;
+  evidence_status: LocalizedText;
+  invention_band: "HIGH" | "MODERATE" | "LOW";
+  validation_band: "HIGH" | "MODERATE" | "LOW";
+  lane: "HIGH_INVENTION_HIGH_VALIDATION" | "HIGH_RISK_BREAKTHROUGH" | "MODERATE_INVENTION_HIGH_VALIDATION" | "LOW_INVENTION_LOW_VALIDATION";
+}
+
+export interface BreakthroughDiscoveryView {
+  presearch_freeze_digest: string;
+  presearch_ideas: BreakthroughPresearchIdea[];
+  mechanism_families: BreakthroughMechanismFamily[];
+  novelty_audit_summary: LocalizedText;
+  developed_proposals: BreakthroughDevelopedProposal[];
+  finalists: string[];
+}
+
 export type IdeaLifecycleStatus =
   | "GENERATED"
   | "MERGED_INTO_FAMILY"
@@ -277,6 +313,8 @@ export interface ResearchRunManifest {
   status: RunStatus;
   terminal_state: string;
   run_mode: RunMode;
+  creativity_profile?: CreativityProfile;
+  breakthrough_discovery?: BreakthroughDiscoveryView;
   research_domain: LocalizedText;
   research_question: LocalizedText;
   research_goal: LocalizedText;

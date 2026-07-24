@@ -84,13 +84,16 @@ test("public Literature exposes a sanitized source detail", async ({ page }) => 
   await expect(page.getByText("10.1038/s41586-019-1711-4")).toBeVisible();
 });
 
-test("New Run remains a simple one-field intake", async ({ page }) => {
+test("New Run keeps one required field and exposes an optional creativity profile", async ({ page }) => {
   await page.goto("/new-run/?lang=en");
   await expect(page.locator("[required]")).toHaveCount(1);
   await expect(page.locator(".advanced-fields")).not.toHaveAttribute("open", "");
   await expect(page.locator("pre, code")).toHaveCount(0);
   const request = page.getByRole("textbox", { name: /What would you like to research/ });
   await request.fill("Why does product purity vary across otherwise similar conditions?");
+  await expect(page.getByRole("radio", { name: /Standard research search/ })).toBeChecked();
+  await page.getByRole("radio", { name: /Breakthrough idea search/ }).check();
+  await expect(page.getByText(/Novelty is not guaranteed/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Save request file" })).toBeEnabled();
 });
 
