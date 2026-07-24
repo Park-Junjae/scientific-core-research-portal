@@ -10,6 +10,20 @@
     "created_at": {"type": "string", "format": "date-time"}, "updated_at": {"type": "string", "format": "date-time"},
     "status": {"enum": ["DRAFT", "RUNNING", "REVIEW_REQUIRED", "DONE", "FAILED", "BLOCKED", "ARCHIVED"]}, "terminal_state": {"type": "string"},
     "run_mode": {"enum": ["DISCOVERY_PORTFOLIO_RUN", "FOCUSED_DECISION_RUN", "VERIFICATION_RUN", "MEASUREMENT_DISCOVERY_RUN"]},
+    "creativity_profile": {"enum": ["STANDARD", "BREAKTHROUGH_DISCOVERY"]},
+    "breakthrough_discovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["presearch_freeze_digest", "presearch_ideas", "mechanism_families", "novelty_audit_summary", "developed_proposals", "finalists"],
+      "properties": {
+        "presearch_freeze_digest": {"type": "string"},
+        "presearch_ideas": {"type": "array", "items": {"type": "object"}},
+        "mechanism_families": {"type": "array", "items": {"type": "object"}},
+        "novelty_audit_summary": {"$ref": "#/$defs/localized"},
+        "developed_proposals": {"type": "array", "items": {"type": "object"}},
+        "finalists": {"type": "array", "items": {"type": "string"}}
+      }
+    },
     "research_domain": {"$ref": "#/$defs/localized"}, "research_question": {"$ref": "#/$defs/localized"}, "research_goal": {"$ref": "#/$defs/localized"}, "current_bottleneck": {"$ref": "#/$defs/localized"},
     "success_criteria": {"$ref": "#/$defs/localizedArray"}, "experimental_constraints": {"$ref": "#/$defs/localizedArray"}, "non_goals": {"$ref": "#/$defs/localizedArray"}, "requested_outputs": {"$ref": "#/$defs/localizedArray"},
     "summary": {"$ref": "#/$defs/localized"}, "scientific_decision": {"$ref": "#/$defs/localized"}, "reading_order": {"$ref": "#/$defs/localizedArray"}, "tags": {"$ref": "#/$defs/localizedArray"},

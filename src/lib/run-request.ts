@@ -7,6 +7,7 @@ export type RequestRunType =
   | "VERIFICATION_RUN"
   | "MEASUREMENT_DISCOVERY_RUN";
 export type RequestOutputLanguage = "" | "en" | "ko" | "bilingual";
+export type CreativityProfile = "STANDARD" | "BREAKTHROUGH_DISCOVERY";
 
 export interface RunRequestDraft {
   raw_research_request: string;
@@ -24,6 +25,7 @@ export interface RunRequestDraft {
   output_language: RequestOutputLanguage;
   visibility: "PRIVATE" | "LAB_INTERNAL" | "PUBLIC_SANITIZED";
   notes: string;
+  creativity_profile: CreativityProfile;
 }
 
 export interface StructuredRunRequestFields {
@@ -65,6 +67,7 @@ export function initialRunRequest(): RunRequestDraft {
     output_language: "",
     visibility: "PRIVATE",
     notes: "",
+    creativity_profile: "STANDARD",
   };
 }
 
@@ -156,6 +159,12 @@ export function buildRunRequest(
       requested_outputs: defaultRequestedOutputs(locale),
     },
     director_launch_prompt: DIRECTOR_CONFIRMATION_PROMPT,
+    ...(value.creativity_profile === "BREAKTHROUGH_DISCOVERY"
+      ? {
+          creativity_profile: "BREAKTHROUGH_DISCOVERY" as const,
+          creativity_profile_selection_reviewed: true as const,
+        }
+      : {}),
   };
 }
 
@@ -211,6 +220,9 @@ export function normalizeImportedRequest(input: unknown, locale: Locale): RunReq
       output_language: validOutputLanguage(structured.output_language),
       visibility: validVisibility(structured.visibility),
       notes: String(structured.notes ?? ""),
+      creativity_profile: record.creativity_profile === "BREAKTHROUGH_DISCOVERY"
+        ? "BREAKTHROUGH_DISCOVERY"
+        : "STANDARD",
     };
   }
 
@@ -252,5 +264,8 @@ export function normalizeImportedRequest(input: unknown, locale: Locale): RunReq
     output_language: legacyLanguage,
     visibility: validVisibility(record.visibility),
     notes: String(record.notes ?? ""),
+    creativity_profile: record.creativity_profile === "BREAKTHROUGH_DISCOVERY"
+      ? "BREAKTHROUGH_DISCOVERY"
+      : "STANDARD",
   };
 }

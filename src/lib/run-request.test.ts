@@ -67,4 +67,25 @@ describe("RunRequestV2", () => {
     expect(restored.output_language).toBe("");
     expect(restored.visibility).toBe("PRIVATE");
   });
+
+  it("adds breakthrough discovery only when explicitly selected", () => {
+    const standard = buildRunRequest(
+      { ...initialRunRequest(), raw_research_request: "Standard request." },
+      "en",
+      "2026-07-22T00:00:00.000Z",
+    );
+    expect("creativity_profile" in standard).toBe(false);
+
+    const breakthrough = buildRunRequest(
+      {
+        ...initialRunRequest(),
+        raw_research_request: "Explore overlooked causal bridges.",
+        creativity_profile: "BREAKTHROUGH_DISCOVERY",
+      },
+      "en",
+      "2026-07-22T00:00:00.000Z",
+    );
+    expect(breakthrough.creativity_profile).toBe("BREAKTHROUGH_DISCOVERY");
+    expect(breakthrough.creativity_profile_selection_reviewed).toBe(true);
+  });
 });
