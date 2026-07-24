@@ -8,7 +8,7 @@ const storageKey = "scientific-core-locale";
 const copy = {
   en: {
     runs: "Runs", newRun: "New Run", about: "About", settings: "Settings",
-    ideas: "Ideas", literature: "Literature", knowledge: "Knowledge Base", summary: "Summary", specification: "Run Specification",
+    ideas: "Ideas", literature: "Literature", knowledge: "Knowledge Base", summary: "Overview", specification: "Specification",
     more: "More", reportsDownloads: "Reports and downloads", files: "Files", technical: "Technical details",
     publication: "Publication information", build: "Build information", status: "Status", runMode: "Run mode",
     domain: "Domain", updated: "Updated", all: "All", draft: "Draft", running: "Running",
@@ -32,7 +32,7 @@ const copy = {
   },
   ko: {
     runs: "연구 목록", newRun: "새 연구", about: "소개", settings: "설정",
-    ideas: "아이디어", literature: "문헌", knowledge: "지식 배경", summary: "연구 요약", specification: "연구 명세",
+    ideas: "아이디어", literature: "문헌", knowledge: "지식 배경", summary: "개요", specification: "연구 명세",
     more: "기타 자료", reportsDownloads: "보고서 및 다운로드", files: "파일", technical: "기술 세부사항",
     publication: "공개 정보", build: "빌드 정보", status: "상태", runMode: "연구 유형",
     domain: "분야", updated: "수정", all: "전체", draft: "초안", running: "진행 중",
@@ -67,10 +67,14 @@ function localeFromUrl(): Locale | null {
 }
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
+  const [locale, setLocaleState] = useState<Locale>(() => (
+    typeof document !== "undefined" && document.documentElement.lang !== "ko" ? "en" : "ko"
+  ));
 
   useEffect(() => {
-    const requested = localeFromUrl() ?? (localStorage.getItem(storageKey) === "ko" ? "ko" : "en");
+    const stored = localStorage.getItem(storageKey);
+    const documentLocale = document.documentElement.lang === "ko" ? "ko" : "en";
+    const requested = localeFromUrl() ?? (stored === "en" || stored === "ko" ? stored : documentLocale);
     // Locale is a browser preference; hydrate it only after the client owns the URL.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocaleState(requested);

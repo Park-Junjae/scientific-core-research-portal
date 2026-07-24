@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MoreHorizontal, Search } from "lucide-react";
+import { ArrowRight, MoreHorizontal, Search } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { formatDate } from "@/lib/display";
 import { localized, useLocale } from "@/lib/locale";
@@ -40,7 +40,7 @@ export function filterAndSortRuns(runs: RunWithIdeas[], query: string, filter: F
   });
 }
 
-export function RunsExplorer({ runs }: { runs: RunWithIdeas[] }) {
+export function RunsExplorer({ runs, home = false }: { runs: RunWithIdeas[]; home?: boolean }) {
   const { locale, t } = useLocale();
   const searchRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
@@ -49,8 +49,37 @@ export function RunsExplorer({ runs }: { runs: RunWithIdeas[] }) {
   const visible = useMemo(() => filterAndSortRuns(runs, query, filter, sort, locale), [runs, query, filter, sort, locale]);
   const filterLabels: Record<Filter, string> = { ALL: t("all"), DRAFT: t("draft"), RUNNING: t("running"), REVIEW_REQUIRED: t("reviewRequired"), DONE: t("done"), FAILED: t("failed"), ARCHIVED: t("archived") };
   const statusLabels: Record<RunStatus, string> = { DRAFT: t("draft"), RUNNING: t("running"), REVIEW_REQUIRED: t("reviewRequired"), DONE: t("done"), FAILED: t("failed"), BLOCKED: t("blocked"), ARCHIVED: t("archived") };
-  return <div className="page-container runs-page">
-    <div className="page-heading-row"><div><h1>{t("researchRuns")}</h1><p className="page-lede">{locale === "ko" ? "연구 질문, 아이디어, 지식 배경과 주요 보고서를 읽습니다." : "Read research questions, ideas, knowledge background, and principal reports."}</p></div><Link href="/new-run/" prefetch={false} className="primary-button">{t("createRequest")}</Link></div>
+  const reviewCount = runs.filter((run) => run.status === "REVIEW_REQUIRED").length;
+  const ideaTotal = runs.reduce((total, run) => total + run.idea_count, 0);
+  return <div className={`page-container runs-page${home ? " home-page" : ""}`}>
+    {home ? (
+      <header className="research-entry">
+        <p className="product-context">AI Cho-Scientist</p>
+        <h1>{locale === "ko" ? "어떤 연구 질문을 탐구하시겠습니까?" : "What research question would you like to investigate?"}</h1>
+        <p>
+          {locale === "ko"
+            ? "문헌 탐색, 가설 생성, 기전 검토와 연구 보고서 작성을 하나의 흐름으로 수행합니다."
+            : "Move from literature review and hypothesis generation to mechanism review and a readable research report."}
+        </p>
+        <Link className="research-composer" href="/new-run/" prefetch={false}>
+          <span>{locale === "ko" ? "연구 질문이나 해결하려는 문제를 적어주세요." : "Describe the research question or problem to solve."}</span>
+          <strong>{locale === "ko" ? "새 연구 시작" : "Start new research"}<ArrowRight size={18} /></strong>
+        </Link>
+        <p className="research-entry-note">
+          {locale === "ko"
+            ? "요청서를 준비하는 단계이며, 확인 없이 외부 모델을 실행하거나 비용을 사용하지 않습니다."
+            : "This prepares a request only. It does not run an external model or spend provider budget without approval."}
+        </p>
+        <p className="research-overview" aria-label={locale === "ko" ? "연구 현황" : "Research overview"}>
+          <span>{locale === "ko" ? `연구 ${runs.length}건` : `${runs.length} research runs`}</span>
+          <span>{locale === "ko" ? `검토 대기 ${reviewCount}건` : `${reviewCount} awaiting review`}</span>
+          <span>{locale === "ko" ? `아이디어 ${ideaTotal}건` : `${ideaTotal} ideas`}</span>
+        </p>
+      </header>
+    ) : (
+      <div className="page-heading-row"><div><h1>{t("researchRuns")}</h1><p className="page-lede">{locale === "ko" ? "연구 질문, 아이디어, 지식 배경과 주요 보고서를 읽습니다." : "Read research questions, ideas, knowledge background, and principal reports."}</p></div><Link href="/new-run/" prefetch={false} className="primary-button">{t("createRequest")}</Link></div>
+    )}
+    {home && <div className="section-heading"><div><p className="section-label">{locale === "ko" ? "연구 워크스페이스" : "Research workspace"}</p><h2>{locale === "ko" ? "최근 연구" : "Recent research"}</h2></div><Link href="/runs/">{locale === "ko" ? "전체 연구 보기" : "View all runs"}<ArrowRight size={16} /></Link></div>}
     <label className="search-bar"><Search size={20} aria-hidden="true" /><span className="sr-only">{t("search")}</span><input ref={searchRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={locale === "ko" ? "제목, 질문, 아이디어, 저자, 논문 제목, DOI 검색" : "Search titles, questions, ideas, authors, papers, or DOI"} /></label>
     <div className="runs-toolbar"><div className="text-filters" aria-label={locale === "ko" ? "상태별 필터" : "Filter runs by status"}>{filters.map((item) => <button type="button" key={item} className={filter === item ? "active" : ""} aria-pressed={filter === item} onClick={() => setFilter(item)}>{filterLabels[item]}</button>)}</div><label className="sort-control"><span>{locale === "ko" ? "정렬" : "Sort"}</span><select aria-label={locale === "ko" ? "연구 정렬" : "Sort runs"} value={sort} onChange={(event) => setSort(event.target.value as Sort)}><option value="updated">{t("lastUpdated")}</option><option value="title">{t("title")}</option><option value="ideas">{t("ideas")}</option><option value="literature_desc">{locale === "ko" ? "분석 문헌: 많은 순" : "Literature analyzed: high to low"}</option><option value="literature_asc">{locale === "ko" ? "분석 문헌: 적은 순" : "Literature analyzed: low to high"}</option></select></label></div>
     <p className="result-count">{locale === "ko" ? `${visible.length}개 연구` : `${visible.length} runs`}</p>

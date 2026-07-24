@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Beaker,
+  BookOpen,
   ChevronRight,
+  FileText,
   FlaskConical,
   Info,
   Menu,
@@ -68,8 +70,10 @@ function Sidebar({
 }) {
   const { locale, t } = useLocale();
   const nav = [
-    { href: "/new-run/", label: t("newRun"), icon: Plus },
-    { href: "/runs/", label: t("runs"), icon: Beaker },
+    { href: "/new-run/", label: locale === "ko" ? "새 연구" : "New Research", icon: Plus },
+    { href: "/runs/", label: locale === "ko" ? "연구 목록" : "Research Runs", icon: Beaker },
+    { href: "/literature/", label: locale === "ko" ? "문헌" : "Literature", icon: BookOpen },
+    { href: "/reports/", label: locale === "ko" ? "보고서" : "Reports", icon: FileText },
   ];
   return (
     <aside className="sidebar" aria-label={locale === "ko" ? "주요 탐색" : "Primary navigation"}>
