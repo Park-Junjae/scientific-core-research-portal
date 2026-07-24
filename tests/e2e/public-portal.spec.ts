@@ -90,6 +90,6 @@ test("primary public reader pages have no serious accessibility violations", asy
 test("bundled Korean font and heading scale remain stable", async ({ page }) => {
   await page.goto(`${demoRun}/summary/?lang=ko`);
   await page.evaluate(() => document.fonts.ready);
-  expect(await page.evaluate(() => document.fonts.check('16px "Noto Sans KR"', "연구 요약 Scientific Core"))).toBeTruthy();
+  expect(await page.evaluate(() => document.fonts.check('16px "Noto Sans KR"', "연구 요약 AI Cho-Scientist"))).toBeTruthy();
   expect(await page.locator("h1").first().evaluate((node) => parseFloat(getComputedStyle(node).fontSize))).toBeLessThanOrEqual(48);
 });
