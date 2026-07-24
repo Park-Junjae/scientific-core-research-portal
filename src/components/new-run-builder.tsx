@@ -56,9 +56,9 @@ export function NewRunBuilder() {
     ? {
         raw: "무엇을 연구하고 싶나요?",
         rawHelp: "연구 질문, 현재 고민, 원하는 방향을 자유롭게 작성하세요.",
-        references: "참고 자료나 반드시 지켜야 할 조건",
-        referencesHelp: "논문, DOI, 기존 결과, 실험 조건 또는 제외할 접근을 적어주세요.",
-        create: "연구 요청 만들기",
+        references: "문헌 검토 범위와 반드시 지켜야 할 조건",
+        referencesHelp: "핵심 논문, DOI, 검토할 문헌 범위, 기존 결과, 실험 조건 또는 제외할 접근을 적어주세요.",
+        create: "요청서 저장",
         saved: "요청 저장됨",
         advanced: "고급 설정",
         title: "제목",
@@ -81,9 +81,9 @@ export function NewRunBuilder() {
     : {
         raw: "What would you like to research?",
         rawHelp: "Describe the research question, current concern, and desired direction in your own words.",
-        references: "References or constraints to preserve",
-        referencesHelp: "Add papers, DOIs, prior results, experimental constraints, or approaches to exclude.",
-        create: "Create research request",
+        references: "Literature scope and constraints to preserve",
+        referencesHelp: "Add key papers, DOIs, literature scope, prior results, experimental constraints, or approaches to exclude.",
+        create: "Save request file",
         saved: "Request saved",
         advanced: "Advanced settings",
         title: "Title",
@@ -156,8 +156,8 @@ export function NewRunBuilder() {
       >
         <p className="intake-scope">
           {ko
-            ? "먼저 간단히 적어주세요. 실행 전 Scientific Director가 전체 연구 명세로 정리하고 확인을 요청합니다."
-            : "Start with a simple request. Before execution, the Scientific Director compiles it into a full specification for confirmation."}
+            ? "이 화면에서는 요청서 파일만 준비합니다. 외부 모델 실행과 비용 사용은 별도 점검 및 승인 전에는 시작되지 않습니다."
+            : "This page prepares a request file only. External model execution and provider spending require separate preflight and approval."}
         </p>
 
         <label className="primary-request-field">

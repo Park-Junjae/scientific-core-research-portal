@@ -79,13 +79,13 @@ describe("reader contracts", () => {
     expect(container.querySelectorAll("[required]")).toHaveLength(1);
     expect(container.querySelector(".advanced-fields")).not.toHaveAttribute("open");
     expect(screen.queryByRole("heading", { name: "Research Request" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Create research request" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Save request file" })).toBeDisabled();
 
     fireEvent.change(screen.getByRole("textbox", { name: /What would you like to research/ }), {
       target: { value: "Why does product purity collapse at this locus?" },
     });
 
-    expect(screen.getByRole("button", { name: "Create research request" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Save request file" })).toBeEnabled();
     expect(screen.getByRole("heading", { name: "Research Request" })).toBeInTheDocument();
     expect(screen.getByText("Complete literature list and review scope")).toBeInTheDocument();
     expect(screen.getByText("Final PDF report")).toBeInTheDocument();

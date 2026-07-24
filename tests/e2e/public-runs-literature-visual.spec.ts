@@ -7,6 +7,10 @@ const output = join(process.cwd(), ".publication-staging", "public-visual-qa");
 test.beforeAll(() => mkdirSync(output, { recursive: true }));
 
 for (const item of [
+  { name: "home-ko-desktop", route: "/?lang=ko", viewport: { width: 1440, height: 1000 }, kind: "home" },
+  { name: "run-detail-ko-desktop", route: "/runs/xrrna-prime-assembly-demo/summary/?lang=ko", viewport: { width: 1440, height: 1000 }, kind: "run" },
+  { name: "home-ko-mobile", route: "/?lang=ko", viewport: { width: 390, height: 844 }, kind: "home" },
+  { name: "run-detail-ko-mobile", route: "/runs/xrrna-prime-assembly-demo/summary/?lang=ko", viewport: { width: 390, height: 844 }, kind: "run" },
   { name: "runs-desktop", route: "/runs/?lang=en", viewport: { width: 1440, height: 900 } },
   { name: "runs-mobile", route: "/runs/?lang=en", viewport: { width: 390, height: 844 } },
   { name: "literature-desktop", route: "/runs/xrrna-prime-assembly-demo/literature/?lang=en", viewport: { width: 1440, height: 900 } },
@@ -17,7 +21,11 @@ for (const item of [
     await page.goto(item.route);
     await page.evaluate(() => document.fonts.ready);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
-    if (item.route.includes("literature")) {
+    if ("kind" in item && item.kind === "home") {
+      await expect(page.getByRole("heading", { name: "어떤 연구 질문을 탐구하시겠습니까?" })).toBeVisible();
+    } else if ("kind" in item && item.kind === "run") {
+      await expect(page.getByText("현재 결론", { exact: true })).toBeVisible();
+    } else if (item.route.includes("literature")) {
       await expect(page.getByRole("heading", { name: "Literature", exact: true })).toBeVisible();
       await expect(page.locator(".literature-page > section").nth(2).locator(".source-row")).toHaveCount(1);
     } else {

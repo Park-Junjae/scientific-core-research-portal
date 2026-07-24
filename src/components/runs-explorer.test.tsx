@@ -1,6 +1,6 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { LocaleProvider } from "@/lib/locale";
 import type { RunWithIdeas } from "@/lib/types";
 import { testRun } from "@/test/fixtures";
@@ -11,6 +11,8 @@ function runWith(overrides: Partial<RunWithIdeas>): RunWithIdeas {
 }
 
 describe("RunsExplorer", () => {
+  beforeEach(() => window.history.replaceState({}, "", "/runs/?lang=en"));
+
   it("searches DOI, author, localized title, and question without indexing the count", () => {
     for (const query of ["10.0000/test", "A Researcher", "집중 연구", "What state controls"]) {
       expect(filterAndSortRuns([testRun], query, "ALL", "updated")).toHaveLength(1);
