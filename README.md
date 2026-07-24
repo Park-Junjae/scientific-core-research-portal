@@ -1,8 +1,8 @@
-# Scientific Core Research Portal
+# AI Cho-Scientist Public Research Portal
 
-A static, read-only research workspace for approved Scientific Core runs. It publishes a validated `ResearchRunBundleV1` into a readable Next.js site that remains available without the scientific VM.
+A static, read-only research workspace for approved AI Cho-Scientist runs. It publishes a validated `ResearchRunBundleV1` into a readable Next.js site that remains available without the scientific VM.
 
-Public synthetic demonstration: [Scientific Core Research Portal](https://best916116-crypto.github.io/scientific-core-research-portal/)
+Public synthetic demonstration: [AI Cho-Scientist](https://app.aichoscientist.com/)
 
 ## Current mode
 

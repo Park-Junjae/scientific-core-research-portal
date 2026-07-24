@@ -41,8 +41,8 @@ def build_pdf(target: Path, title: str, subtitle: str, sections: list[tuple[str,
     subtitle_style = ParagraphStyle("Subtitle", parent=styles["Normal"], fontName=regular, fontSize=10, leading=15, textColor=HexColor("#66726e"), spaceAfter=16 * mm)
     heading_style = ParagraphStyle("Heading", parent=styles["Heading2"], fontName=bold, fontSize=15, leading=20, textColor=HexColor("#0b6b50"), spaceBefore=7 * mm, spaceAfter=3 * mm)
     body_style = ParagraphStyle("Body", parent=styles["BodyText"], fontName=regular, fontSize=10.5, leading=17, textColor=HexColor("#34423e"), spaceAfter=5 * mm)
-    doc = SimpleDocTemplate(str(target), pagesize=A4, rightMargin=24 * mm, leftMargin=24 * mm, topMargin=24 * mm, bottomMargin=22 * mm, title=title, author="Scientific Core synthetic demo")
-    story = [Paragraph("SCIENTIFIC CORE · SYNTHETIC DEMONSTRATION", subtitle_style), Paragraph(title, title_style), Paragraph(subtitle, subtitle_style)]
+    doc = SimpleDocTemplate(str(target), pagesize=A4, rightMargin=24 * mm, leftMargin=24 * mm, topMargin=24 * mm, bottomMargin=22 * mm, title=title, author="AI Cho-Scientist synthetic demo")
+    story = [Paragraph("AI CHO-SCIENTIST · SYNTHETIC DEMONSTRATION", subtitle_style), Paragraph(title, title_style), Paragraph(subtitle, subtitle_style)]
     for heading, body in sections:
         story.extend([Paragraph(heading, heading_style), Paragraph(body, body_style)])
     story.extend([Spacer(1, 10 * mm), Paragraph("This PDF contains synthetic public-safe demonstration content. It is not scientific evidence and is not copied from a private run.", subtitle_style)])

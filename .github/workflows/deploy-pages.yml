@@ -47,7 +47,8 @@ jobs:
       # The production site is served from the custom-domain root
       # (https://app.aichoscientist.com), not from a repository subpath.
       - run: NEXT_PUBLIC_BASE_PATH= pnpm build
-      - run: pnpm test:links && pnpm test:budget
+      - run: pnpm test:basepath -- --root
+      - run: pnpm test:links && pnpm test:budget && pnpm test:privacy && pnpm test:tracked-boundary
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

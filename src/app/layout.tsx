@@ -17,11 +17,11 @@ export const metadata: Metadata = {
     default: "AI Cho-Scientist",
     template: "%s | AI Cho-Scientist",
   },
-  description: "A literature-first AI research workspace for scientific discovery, review, and private research execution.",
+  description: "문헌, 아이디어, 기전 분석과 연구 보고서를 통합하는 AI 연구 워크스페이스",
   applicationName: "AI Cho-Scientist",
   openGraph: {
     title: "AI Cho-Scientist",
-    description: "A literature-first AI research workspace for scientific discovery and review.",
+    description: "문헌, 아이디어, 기전 분석과 연구 보고서를 통합하는 AI 연구 워크스페이스",
     type: "website",
     siteName: "AI Cho-Scientist",
   },
