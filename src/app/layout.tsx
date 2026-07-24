@@ -12,11 +12,19 @@ import { getRuns } from "@/lib/content";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://app.aichoscientist.com"),
   title: {
-    default: "Scientific Core",
-    template: "%s | Scientific Core",
+    default: "AI Cho-Scientist",
+    template: "%s | AI Cho-Scientist",
   },
-  description: "A static, readable workspace for approved Scientific Core research runs.",
+  description: "A literature-first AI research workspace for scientific discovery, review, and private research execution.",
+  applicationName: "AI Cho-Scientist",
+  openGraph: {
+    title: "AI Cho-Scientist",
+    description: "A literature-first AI research workspace for scientific discovery and review.",
+    type: "website",
+    siteName: "AI Cho-Scientist",
+  },
 };
 
 export default function RootLayout({
@@ -32,7 +40,7 @@ export default function RootLayout({
   }));
 
   return (
-    <html lang="en" data-font-family="Noto Sans KR">
+    <html lang="ko" data-font-family="Noto Sans KR">
       <body>
         <AppShell recentRuns={recentRuns}>{children}</AppShell>
       </body>
