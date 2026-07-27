@@ -24,51 +24,51 @@ colors:
   lamp-fault: "#B0574C"
 typography:
   display:
-    fontFamily: Noto Sans KR
+    fontFamily: Pretendard Variable
     fontSize: 60px
     fontWeight: 600
     lineHeight: 1.08
     letterSpacing: -0.03em
   h1:
-    fontFamily: Noto Sans KR
+    fontFamily: Pretendard Variable
     fontSize: 42px
     fontWeight: 600
     lineHeight: 1.12
     letterSpacing: -0.025em
   h2:
-    fontFamily: Noto Sans KR
+    fontFamily: Pretendard Variable
     fontSize: 28px
     fontWeight: 600
     lineHeight: 1.3
     letterSpacing: -0.015em
   h3:
-    fontFamily: Noto Sans KR
+    fontFamily: Pretendard Variable
     fontSize: 17px
     fontWeight: 600
     lineHeight: 1.45
   lede:
-    fontFamily: Noto Sans KR
+    fontFamily: Pretendard Variable
     fontSize: 18px
     fontWeight: 400
     lineHeight: 1.7
   body:
-    fontFamily: Noto Sans KR
+    fontFamily: Pretendard Variable
     fontSize: 16px
     fontWeight: 400
     lineHeight: 1.62
   reading:
-    fontFamily: Noto Sans KR
+    fontFamily: Pretendard Variable
     fontSize: 17px
     fontWeight: 400
     lineHeight: 1.76
   stat:
-    fontFamily: Noto Sans KR
+    fontFamily: Pretendard Variable
     fontSize: 36px
     fontWeight: 700
     lineHeight: 1
     letterSpacing: -0.02em
   label:
-    fontFamily: Noto Sans KR
+    fontFamily: Pretendard Variable
     fontSize: 11px
     fontWeight: 700
     letterSpacing: 0.06em
@@ -191,11 +191,13 @@ gradients.
 
 ## Typography
 
-One family, Noto Sans KR, bundled locally at **400/500/600/700 only**, with
-`font-synthesis: none`. Because synthesis is off, any weight outside those four
-snaps to the nearest loaded face — a `font-weight: 650` renders as 700, not as
-something between. Never write an intermediate weight; the hierarchy must be
-built from the four real ones. Korean and Latin share the family, so a bilingual
+One family, **Pretendard Variable**, self-hosted as a dynamic subset, with
+Noto Sans KR bundled behind it as the fallback. Pretendard is a variable face
+covering 45-920, so every weight in the scale renders as a real weight even
+though `font-synthesis: none` is set. Because synthesis is off, any weight outside those four
+is interpolated by the variable face rather than snapped. The scale still uses
+400/500/600/700 so the fallback stays faithful — do not introduce intermediate
+weights that only work when Pretendard loads. Korean and Latin share the family, so a bilingual
 page holds one texture.
 
 The character comes from the **scale**, not from mixing faces. Display

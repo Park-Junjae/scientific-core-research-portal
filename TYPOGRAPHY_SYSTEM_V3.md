@@ -2,7 +2,7 @@
 
 ## Decision
 
-The portal uses one locally bundled Noto Sans KR family for Korean and Latin UI and scientific reading. The supported weights are 400, 500, 600, and limited 700 emphasis. Synthetic bold is disabled.
+The portal uses Pretendard Variable, self-hosted as a dynamic subset, for Korean and Latin UI and scientific reading. Noto Sans KR remains bundled as the fallback. The scale uses weights 400, 500, 600, and limited 700 emphasis so it renders faithfully on either face. Synthetic bold is disabled.
 
 ## Scale
 

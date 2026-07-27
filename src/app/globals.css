@@ -1985,3 +1985,21 @@ input, textarea { caret-color: var(--accent); }
 .hero-grid { display: block; }
 .research-entry { padding: 6px 0 4px; }
 .home-page > .section-heading { margin-top: 34px; }
+
+/* ============================================================
+   Pretendard
+   The UI moves to Pretendard Variable, self-hosted as a dynamic
+   subset. Noto Sans KR stays bundled as the fallback, so nothing
+   breaks if a subset fails to load — and because each face carries a
+   unicode-range, the browser never fetches the fallback unless it is
+   actually needed.
+
+   Pretendard is a variable face covering 45-920, so 400/500/600/700
+   all render as real weights even with font-synthesis: none.
+   ============================================================ */
+:root {
+  --font-ui: "Pretendard Variable", "Noto Sans KR";
+  --font-reading: "Pretendard Variable", "Noto Sans KR";
+}
+body { font-family: var(--font-ui), sans-serif; }
+.prose-article { font-family: var(--font-reading), sans-serif; }
