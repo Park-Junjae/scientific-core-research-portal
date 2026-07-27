@@ -1046,13 +1046,16 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
   --sidebar: #ffffff;
   --ink: #10201b;
   --ink-soft: #45544e;
-  --ink-faint: #69766f;
+  /* Meets 4.5:1 against the canvas at 12px; do not lighten. */
+  --ink-faint: #626f68;
   --line: #e3ebe6;
   --line-strong: #c9d6cf;
   --accent: #0ea472;
   --accent-dark: #0a7350;
-  --accent-light: #18b98a;
-  --accent-water: #0aa29f;
+  /* Gradient stops carry white text, so every stop clears 4.5:1 on its own.
+     The bright emerald these replaced sat at 2.5:1 — unreadable. */
+  --accent-light: #0d8560;
+  --accent-water: #0a7f74;
   --accent-soft: #dff5ec;
   --accent-softer: #eefaf4;
   --accent-ring: rgba(14, 164, 114, 0.22);
@@ -1065,8 +1068,9 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
   --shadow-lg: 0 20px 50px -18px rgba(11, 40, 30, 0.26);
   --shadow-accent: 0 12px 30px -12px rgba(14, 164, 114, 0.45);
 
-  --grad-accent: linear-gradient(135deg, var(--accent-light), var(--accent) 48%, var(--accent-water));
-  --grad-brand: linear-gradient(145deg, #1fc793, #0a8f62);
+  --grad-accent: linear-gradient(135deg, var(--accent-light), var(--accent-dark) 55%, var(--accent-water));
+  /* The mark's white glyph needs 3:1 as a graphic; the old #1fc793 gave 2.2:1. */
+  --grad-brand: linear-gradient(145deg, #119a70, #0a6d4c);
   --grad-hero:
     radial-gradient(120% 92% at -4% -18%, rgba(16, 179, 163, 0.20), transparent 55%),
     radial-gradient(90% 80% at 104% -8%, rgba(14, 164, 114, 0.16), transparent 52%);
@@ -1299,8 +1303,8 @@ h1, h2 { letter-spacing: -0.015em; }
 }
 .text-filters button:hover { border-color: var(--line-strong); color: var(--ink); }
 .text-filters button.active {
-  border-color: var(--accent);
-  background: var(--accent);
+  border-color: var(--accent-dark);
+  background: var(--accent-dark);
   color: #fff;
 }
 .sort-control select { border-radius: var(--radius-sm); }

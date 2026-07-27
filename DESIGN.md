@@ -8,13 +8,13 @@ colors:
   surface-muted: "#ECF3EF"
   ink: "#10201B"
   ink-soft: "#45544E"
-  ink-faint: "#69766F"
+  ink-faint: "#626F68"
   rule: "#E3EBE6"
   rule-strong: "#C9D6CF"
   green: "#0EA472"
   green-deep: "#0A7350"
-  green-light: "#18B98A"
-  water: "#0AA29F"
+  green-light: "#0D8560"
+  water: "#0A7F74"
   green-wash: "#DFF5EC"
   green-mist: "#EEFAF4"
   lamp-idle: "#99A49E"
@@ -91,8 +91,8 @@ elevation:
   floating: "0 20px 50px -18px rgba(11,40,30,.26)"
   accent: "0 12px 30px -12px rgba(14,164,114,.45)"
 gradients:
-  action: "linear-gradient(135deg, #18B98A, #0EA472 48%, #0AA29F)"
-  brand: "linear-gradient(145deg, #1FC793, #0A8F62)"
+  action: "linear-gradient(135deg, #0D8560, #0A7350 55%, #0A7F74)"
+  brand: "linear-gradient(145deg, #119A70, #0A6D4C)"
   daylight: "radial-gradient(120% 92% at -4% -18%, rgba(16,179,163,.20), transparent 55%), radial-gradient(90% 80% at 104% -8%, rgba(14,164,114,.16), transparent 52%)"
 motion:
   feedback: 120ms
@@ -121,7 +121,7 @@ components:
     rounded: "{rounded.pill}"
     height: 36px
   filter-chip-active:
-    backgroundColor: "{colors.green}"
+    backgroundColor: "{colors.green-deep}"
     textColor: "{colors.surface}"
   input:
     backgroundColor: "{colors.surface}"
@@ -175,6 +175,12 @@ appears only inside gradients.
   **green-mist** {colors.green-mist} is row hover.
 - **Focus** uses {colors.green} at low opacity as a 3px outline. The focus ring
   is part of the accent family, never a browser-default blue.
+- **Contrast is a constraint on the palette, not an afterthought.** Any surface
+  that carries white text must clear 4.5:1 on its own — including *every stop of
+  a gradient*, since a gradient has no single background colour for a checker to
+  measure. {colors.green} is bright enough that white on it fails at 3.2:1, so
+  white-on-green surfaces use {colors.green-deep}. {colors.ink-faint} is tuned to
+  clear 4.5:1 against {colors.canvas} at 12px; lightening either one breaks it.
 - **Lamps** — {colors.lamp-active}, {colors.lamp-running},
   {colors.lamp-attention}, {colors.lamp-fault}, {colors.lamp-idle} — are
   deliberately desaturated and appear **only** as a 7px dot beside a text label.
@@ -297,6 +303,8 @@ Quick and light. Things lift toward the light; nothing bounces.
   wrong; widen the blur and lower the opacity.
 - **Don't** compress the rows to fit more on screen.
 - **Don't** introduce a dark mode, glassmorphism, or a serif display face.
+- **Don't** put white text on {colors.green}. It is a border, ring, and lamp
+  colour; when it must sit under white text it becomes {colors.green-deep}.
 - **Don't** write an intermediate font weight. 645, 650, 660, and 680 are not
   loaded; they all resolve to 700 and quietly flatten the hierarchy you thought
   you were building.
