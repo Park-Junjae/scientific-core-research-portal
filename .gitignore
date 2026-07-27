@@ -102,3 +102,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# local editor/agent scratch
+.claude/

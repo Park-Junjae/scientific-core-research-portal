@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./pretendard.css";
 import "@fontsource/noto-sans-kr/korean-400.css";
 import "@fontsource/noto-sans-kr/korean-500.css";
 import "@fontsource/noto-sans-kr/korean-600.css";
@@ -40,7 +41,7 @@ export default function RootLayout({
   }));
 
   return (
-    <html lang="ko" data-font-family="Noto Sans KR">
+    <html lang="ko" data-font-family="Pretendard Variable">
       <body>
         <AppShell recentRuns={recentRuns}>{children}</AppShell>
       </body>

@@ -7,9 +7,11 @@ const css = readFileSync(join(root, "src", "app", "globals.css"), "utf8");
 const layout = readFileSync(join(root, "src", "app", "layout.tsx"), "utf8");
 
 describe("Korean-first typography contract", () => {
-  it("bundles Noto Sans KR Korean and Latin subsets at supported weights", () => {
+  it("bundles Pretendard as the primary face with Noto Sans KR behind it", () => {
+    expect(layout).toContain('./pretendard.css');
     for (const subset of ["korean", "latin"]) for (const weight of [400, 500, 600, 700]) expect(layout).toContain(`@fontsource/noto-sans-kr/${subset}-${weight}.css`);
-    expect(layout).toContain('data-font-family="Noto Sans KR"');
+    expect(layout).toContain('data-font-family="Pretendard Variable"');
+    expect(css).toContain('"Pretendard Variable", "Noto Sans KR"');
     expect(css).toContain('font-synthesis: none');
   });
 

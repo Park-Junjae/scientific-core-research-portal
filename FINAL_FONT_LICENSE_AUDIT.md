@@ -4,7 +4,8 @@ Status: PASS
 
 ## Runtime typography
 
-- Noto Sans KR is the sole primary UI and reading family.
+- Pretendard Variable is the primary UI and reading family, vendored into `public/fonts/pretendard/` as a 92-file dynamic subset (SIL OFL 1.1, `licenses/Pretendard-OFL.txt`).
+- Noto Sans KR remains bundled as the fallback family.
 - Korean and Latin subsets are bundled for weights 400, 500, 600, and 700.
 - `font-synthesis: none` prevents synthetic bold or italic rendering.
 - Desktop H1 is capped at 42 px; mobile H1 is capped at 32 px.
