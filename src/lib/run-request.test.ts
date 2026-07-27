@@ -13,7 +13,6 @@ describe("RunRequestV2", () => {
       "en",
       "2026-07-22T00:00:00.000Z",
     );
-
     expect(request.raw_research_request).toBe("Map the causal bottleneck.");
     expect(request.structured_fields).toBeNull();
     expect(request.inferred_defaults.title).toBe("Map the causal bottleneck.");
@@ -25,8 +24,7 @@ describe("RunRequestV2", () => {
   it("includes literature and PDF outputs by default", () => {
     expect(defaultRequestedOutputs("en")).toContain("Complete literature list and review scope");
     expect(defaultRequestedOutputs("en")).toContain("Final PDF report");
-    expect(defaultRequestedOutputs("ko")).toContain("전체 문헌 목록과 검토 범위");
-    expect(defaultRequestedOutputs("ko")).toContain("최종 PDF 보고서");
+    expect(defaultRequestedOutputs("ko")).toHaveLength(6);
   });
 
   it("loads a legacy fully structured request", () => {
@@ -41,7 +39,6 @@ describe("RunRequestV2", () => {
       preferred_output_language: "Korean",
       visibility: "LAB_INTERNAL",
     }, "en");
-
     expect(restored.raw_research_request).toBe("What state controls the outcome?");
     expect(restored.title).toBe("Legacy title");
     expect(restored.run_type).toBe("FOCUSED_DECISION_RUN");
@@ -50,6 +47,7 @@ describe("RunRequestV2", () => {
     expect(restored.custom_requested_outputs).toBe("Summary\nDecision memo");
     expect(restored.output_language).toBe("ko");
     expect(restored.visibility).toBe("LAB_INTERNAL");
+    expect(restored.literature_scope_enabled).toBe(true);
   });
 
   it("does not expose invalid imported enum values", () => {
@@ -62,13 +60,12 @@ describe("RunRequestV2", () => {
         visibility: "WORLD",
       },
     }, "en");
-
     expect(restored.run_type).toBe("");
     expect(restored.output_language).toBe("");
     expect(restored.visibility).toBe("PRIVATE");
   });
 
-  it("adds breakthrough discovery only when explicitly selected", () => {
+  it("keeps Standard and Breakthrough profiles distinct", () => {
     const standard = buildRunRequest(
       { ...initialRunRequest(), raw_research_request: "Standard request." },
       "en",

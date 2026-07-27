@@ -60,7 +60,7 @@ describe("run control browser client", () => {
     await readPrivateArtifact("run-owner", "artifact-summary");
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://control.example/api/runs/run-owner/artifacts/artifact-summary/download",
+      "https://control.example/api/runs/run-owner/artifacts/artifact-summary/download?disposition=inline",
       { credentials: "include" },
     );
     expect(JSON.stringify(fetchMock.mock.calls[0][1])).not.toMatch(
@@ -75,6 +75,8 @@ describe("run control browser client", () => {
       objectives: ["Preserve activity"],
       constraints: ["No exact sequence design"],
       requestedMode: "AUTO",
+      includeLiteratureScope: true,
+      reportLanguage: "en",
     };
     const standard = buildControlledRunPayload({
       ...common,

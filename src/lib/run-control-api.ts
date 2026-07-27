@@ -126,6 +126,15 @@ export interface RunControlEvent {
     output_tokens: number;
     cost_usd: number;
   };
+  metrics?: {
+    raw_ideas?: number;
+    independent_ideas?: number;
+    families?: number;
+    developed_proposals?: number;
+    literature_analyzed?: number;
+    sources_cited?: number;
+    elapsed_seconds?: number;
+  };
   message: string;
 }
 
@@ -138,6 +147,13 @@ export interface PrivateArtifact {
   size_bytes: number;
   sha256: string;
   status: "PENDING" | "AVAILABLE";
+  metadata?: {
+    language?: string;
+    page_count?: number;
+    reference_count?: number;
+    updated_at?: string;
+    title?: string;
+  };
 }
 
 export interface PrivateRunBundle {
@@ -166,6 +182,8 @@ export interface ControlledRunPayloadInput {
   constraints: string[];
   requestedMode: string;
   creativityProfile: "STANDARD" | "BREAKTHROUGH_DISCOVERY";
+  includeLiteratureScope: boolean;
+  reportLanguage: string;
 }
 
 export function buildControlledRunPayload(input: ControlledRunPayloadInput) {
@@ -175,9 +193,10 @@ export function buildControlledRunPayload(input: ControlledRunPayloadInput) {
     objectives: input.objectives,
     constraints: input.constraints,
     requested_mode: breakthrough ? "DISCOVERY_PORTFOLIO_RUN" : input.requestedMode,
-    include_literature_list_and_review_scope: true,
+    include_literature_list_and_review_scope: input.includeLiteratureScope,
     execution_mode: "PROVIDER_BACKED",
     budget_profile: breakthrough ? "breakthrough_discovery" : "standard",
+    report_language: input.reportLanguage,
     ...(breakthrough
       ? {
           creativity_profile: "BREAKTHROUGH_DISCOVERY",
@@ -276,12 +295,31 @@ export function getPrivateRunBundle(runId: string) {
   return request<PrivateRunBundle>(`/api/runs/${encodeURIComponent(runId)}/bundle`);
 }
 
-export async function readPrivateArtifact(runId: string, artifactId: string) {
+export async function getPrivateArtifacts(runId: string) {
+  const result = await request<{ artifacts: PrivateArtifact[] }>(
+    `/api/runs/${encodeURIComponent(runId)}/artifacts`,
+  );
+  return result.artifacts;
+}
+
+export function privateArtifactUrl(
+  runId: string,
+  artifactId: string,
+  disposition: "inline" | "attachment" = "attachment",
+) {
+  return `${runControlApiBase}/api/runs/${encodeURIComponent(runId)}/artifacts/${encodeURIComponent(artifactId)}/download?disposition=${disposition}`;
+}
+
+export async function readPrivateArtifact(
+  runId: string,
+  artifactId: string,
+  disposition: "inline" | "attachment" = "inline",
+) {
   if (!runControlApiBase) {
     throw new RunControlApiError("Run Control API is not configured.", 503);
   }
   const response = await fetch(
-    `${runControlApiBase}/api/runs/${encodeURIComponent(runId)}/artifacts/${encodeURIComponent(artifactId)}/download`,
+    privateArtifactUrl(runId, artifactId, disposition),
     { credentials: "include" },
   );
   if (!response.ok) {

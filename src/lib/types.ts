@@ -341,6 +341,7 @@ export interface ResearchRunManifest {
   source_bundle_hash: string;
   current_stage: string;
   progress_percent: number;
+  literature_scope_enabled?: boolean;
   timeline: TimelineEntry[];
   idea_refs: string[];
   reports: ResearchReportManifestV2[];

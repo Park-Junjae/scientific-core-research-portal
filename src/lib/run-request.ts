@@ -26,6 +26,7 @@ export interface RunRequestDraft {
   visibility: "PRIVATE" | "LAB_INTERNAL" | "PUBLIC_SANITIZED";
   notes: string;
   creativity_profile: CreativityProfile;
+  literature_scope_enabled: boolean;
 }
 
 export interface StructuredRunRequestFields {
@@ -42,6 +43,7 @@ export interface StructuredRunRequestFields {
   output_language: Exclude<RequestOutputLanguage, ""> | null;
   visibility: RunRequestDraft["visibility"];
   notes: string;
+  literature_scope_enabled: boolean;
 }
 
 export const DIRECTOR_CONFIRMATION_PROMPT =
@@ -68,6 +70,7 @@ export function initialRunRequest(): RunRequestDraft {
     visibility: "PRIVATE",
     notes: "",
     creativity_profile: "STANDARD",
+    literature_scope_enabled: true,
   };
 }
 
@@ -118,6 +121,7 @@ export function hasAdvancedOverrides(value: RunRequestDraft): boolean {
     || value.output_language
     || value.visibility !== "PRIVATE"
     || value.notes.trim()
+    || value.literature_scope_enabled === false
   );
 }
 
@@ -141,6 +145,7 @@ export function buildRunRequest(
         output_language: value.output_language || null,
         visibility: value.visibility,
         notes: value.notes.trim(),
+        literature_scope_enabled: value.literature_scope_enabled,
       }
     : null;
 
@@ -223,6 +228,7 @@ export function normalizeImportedRequest(input: unknown, locale: Locale): RunReq
       creativity_profile: record.creativity_profile === "BREAKTHROUGH_DISCOVERY"
         ? "BREAKTHROUGH_DISCOVERY"
         : "STANDARD",
+      literature_scope_enabled: structured.literature_scope_enabled !== false,
     };
   }
 
@@ -267,5 +273,6 @@ export function normalizeImportedRequest(input: unknown, locale: Locale): RunReq
     creativity_profile: record.creativity_profile === "BREAKTHROUGH_DISCOVERY"
       ? "BREAKTHROUGH_DISCOVERY"
       : "STANDARD",
+    literature_scope_enabled: record.literature_scope_enabled !== false,
   };
 }

@@ -1,9 +1,48 @@
 import { expect, test } from "@playwright/test";
 
 const runId = "run-synthetic-private";
-const artifactId = "artifact-summary";
 
-test("authenticated owner reads a completed private bundle", async ({ page }) => {
+test("authenticated owner sees an artifact-first completed bundle", async ({ page }) => {
+  const artifacts = [
+    {
+      artifact_id: "artifact-pdf",
+      run_id: runId,
+      role: "pdf_report",
+      filename: "final-report.pdf",
+      mime_type: "application/pdf",
+      size_bytes: 1200,
+      sha256: "a".repeat(64),
+      status: "AVAILABLE",
+      metadata: {
+        title: "Synthetic final report",
+        language: "en",
+        page_count: 12,
+        reference_count: 18,
+        updated_at: "2026-07-23T00:05:00Z",
+      },
+    },
+    {
+      artifact_id: "artifact-markdown",
+      run_id: runId,
+      role: "summary",
+      filename: "final-report.md",
+      mime_type: "text/markdown",
+      size_bytes: 42,
+      sha256: "b".repeat(64),
+      status: "AVAILABLE",
+    },
+    {
+      artifact_id: "artifact-bundle",
+      run_id: runId,
+      role: "complete_bundle",
+      filename: "complete-bundle.zip",
+      mime_type: "application/zip",
+      size_bytes: 2400,
+      sha256: "c".repeat(64),
+      status: "AVAILABLE",
+    },
+  ];
+
   await page.route("https://control.example/**", async (route) => {
     const url = new URL(route.request().url());
     const json = (value: unknown, status = 200) => route.fulfill({
@@ -25,48 +64,36 @@ test("authenticated owner reads a completed private bundle", async ({ page }) =>
         created_at: "2026-07-23T00:00:00Z",
         updated_at: "2026-07-23T00:05:00Z",
         status: "COMPLETED",
-        request_sha256: "a".repeat(64),
+        request_sha256: "d".repeat(64),
         budget_profile: "synthetic",
-        runtime_ref: "d".repeat(40),
+        runtime_ref: "e".repeat(40),
         queue_expires_at: "2026-07-24T00:00:00Z",
         compiled_contract: null,
         result_locator: "private",
         safe_message: "Synthetic private run completed.",
       });
     }
-    if (url.pathname === `/api/runs/${runId}/events`) {
-      return json({ events: [] });
-    }
+    if (url.pathname === `/api/runs/${runId}/events`) return json({ events: [] });
     if (url.pathname === "/api/runners/scientific-core-vm") {
       return json({ runner: "scientific-core-vm", online: true, fallback_runner: null });
     }
     if (url.pathname === `/api/runs/${runId}/bundle`) {
-      const artifact = {
-        artifact_id: artifactId,
-        run_id: runId,
-        role: "summary",
-        filename: "summary.md",
-        mime_type: "text/markdown",
-        size_bytes: 42,
-        sha256: "b".repeat(64),
-        status: "AVAILABLE",
-      };
       return json({
         manifest: {
           schema_version: "PrivateArtifactManifestV1",
           run_id: runId,
-          artifacts: [artifact],
+          artifacts,
         },
-        manifest_sha256: "c".repeat(64),
+        manifest_sha256: "f".repeat(64),
         created_at: "2026-07-23T00:05:00Z",
-        artifacts: [artifact],
+        artifacts,
       });
     }
-    if (url.pathname.endsWith(`/artifacts/${artifactId}/download`)) {
+    if (url.pathname.endsWith("/artifacts/artifact-pdf/download")) {
       return route.fulfill({
         status: 200,
-        contentType: "text/markdown",
-        body: "# Synthetic summary\n\nPrivate owner-only delivery works.",
+        contentType: "application/pdf",
+        body: "%PDF-1.4 synthetic",
         headers: {
           "Access-Control-Allow-Origin": "http://127.0.0.1:4175",
           "Access-Control-Allow-Credentials": "true",
@@ -77,9 +104,13 @@ test("authenticated owner reads a completed private bundle", async ({ page }) =>
   });
 
   await page.goto(`/run-control/?run_id=${runId}&lang=ko`);
-  await expect(page.getByRole("heading", { name: "연구 실행 제어" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "비공개 연구 결과" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Synthetic summary" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "연구 계획과 실행 상태" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "연구 결과 파일" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Synthetic final report" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "PDF 열기" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "PDF 다운로드" })).toHaveAttribute("href", /disposition=attachment/);
+  await expect(page.getByRole("link", { name: /Markdown 다운로드/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /ZIP 다운로드/ })).toBeVisible();
   await expect(page.locator("body")).not.toContainText("API key");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

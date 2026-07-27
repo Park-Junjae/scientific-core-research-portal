@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { evidenceRoleLabels, isAnalyzedSource, orderedSources, sourceCitation } from "@/lib/literature";
 import { localized, useLocale } from "@/lib/locale";
+import { isVisiblePublicReport } from "@/lib/report-visibility";
 import type { ResearchSourceManifestV1, RunWithIdeas } from "@/lib/types";
 
 interface SourceListProps {
@@ -22,7 +23,7 @@ export function SourceList({ runSlug, sources, compact = false, run }: SourceLis
           ? source.related_idea_ids.map((id) => run.ideas.find((idea) => idea.idea_id === id)).filter(Boolean)
           : [];
         const reports = run
-          ? source.related_report_ids.map((id) => run.reports.find((report) => report.report_id === id)).filter(Boolean)
+          ? source.related_report_ids.map((id) => run.reports.find((report) => report.report_id === id && isVisiblePublicReport(report))).filter(Boolean)
           : [];
         return (
           <article key={source.source_id} className="source-row">

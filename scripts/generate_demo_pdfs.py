@@ -65,10 +65,11 @@ def main() -> None:
         ("taled-historical-demo/exposure-case-ko.pdf", "노출 시간 분포", "산물 순도에 대한 보관된 동역학 해석입니다.", [("가설", "표적 단일 편집과 다중 편집 산물은 서로 다른 노출 시간을 요구할 수 있습니다."), ("경계", "실용적인 미토콘드리아 제어 기전은 확립되지 않았습니다."), ("중단 기준", "시간 단축이 모든 산물을 비례적으로 바꾸거나 부담이 우세하면 중단합니다.")]),
     ]
     for relative, title, subtitle, sections in jobs:
-        public_pdf = ROOT / "public" / "artifacts" / relative
+        fixture_root = ROOT / "tests" / "fixtures" / "demo-content"
+        public_pdf = fixture_root / "public" / "artifacts" / relative
         build_pdf(public_pdf, title, subtitle, sections)
         run_slug, filename = relative.split("/", 1)
-        canonical_pdf = ROOT / "content" / "runs" / run_slug / "reports" / filename
+        canonical_pdf = fixture_root / "runs" / run_slug / "reports" / filename
         canonical_pdf.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(public_pdf, canonical_pdf)
     print(f"Generated {len(jobs)} synthetic demonstration PDFs.")
