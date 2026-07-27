@@ -4,12 +4,13 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { evidenceRoleLabels, sourceCitation } from "@/lib/literature";
 import { localized, useLocale } from "@/lib/locale";
+import { isVisiblePublicReport } from "@/lib/report-visibility";
 import type { ResearchSourceManifestV1, RunWithIdeas } from "@/lib/types";
 
 export function SourceDetail({ run, source }: { run: RunWithIdeas; source: ResearchSourceManifestV1 }) {
   const { locale, t } = useLocale();
   const ideas = source.related_idea_ids.map((id) => run.ideas.find((idea) => idea.idea_id === id)).filter(Boolean);
-  const reports = source.related_report_ids.map((id) => run.reports.find((report) => report.report_id === id)).filter(Boolean);
+  const reports = source.related_report_ids.map((id) => run.reports.find((report) => report.report_id === id && isVisiblePublicReport(report))).filter(Boolean);
   const membershipLabels = locale === "ko" ? {
     SOURCE_ATLAS_ONLY: "Source Atlas 수록 · 최종 보고서 미인용",
     SOURCE_ATLAS_AND_FINAL_REPORT: "Source Atlas 수록 · 최종 보고서 인용",

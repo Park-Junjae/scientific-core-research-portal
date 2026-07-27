@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "pretest:e2e": "node scripts/build-e2e-fixtures.mjs",
     "test:e2e": "playwright test",
     "test:python-env": "node scripts/run-python.mjs --check-only",
     "test:python": "node scripts/run-python.mjs tests/run_all.py",

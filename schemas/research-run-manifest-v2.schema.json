@@ -10,12 +10,26 @@
     "created_at": {"type": "string", "format": "date-time"}, "updated_at": {"type": "string", "format": "date-time"},
     "status": {"enum": ["DRAFT", "RUNNING", "REVIEW_REQUIRED", "DONE", "FAILED", "BLOCKED", "ARCHIVED"]}, "terminal_state": {"type": "string"},
     "run_mode": {"enum": ["DISCOVERY_PORTFOLIO_RUN", "FOCUSED_DECISION_RUN", "VERIFICATION_RUN", "MEASUREMENT_DISCOVERY_RUN"]},
+    "creativity_profile": {"enum": ["STANDARD", "BREAKTHROUGH_DISCOVERY"]},
+    "breakthrough_discovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["presearch_freeze_digest", "presearch_ideas", "mechanism_families", "novelty_audit_summary", "developed_proposals", "finalists"],
+      "properties": {
+        "presearch_freeze_digest": {"type": "string"},
+        "presearch_ideas": {"type": "array", "items": {"type": "object"}},
+        "mechanism_families": {"type": "array", "items": {"type": "object"}},
+        "novelty_audit_summary": {"$ref": "#/$defs/localized"},
+        "developed_proposals": {"type": "array", "items": {"type": "object"}},
+        "finalists": {"type": "array", "items": {"type": "string"}}
+      }
+    },
     "research_domain": {"$ref": "#/$defs/localized"}, "research_question": {"$ref": "#/$defs/localized"}, "research_goal": {"$ref": "#/$defs/localized"}, "current_bottleneck": {"$ref": "#/$defs/localized"},
     "success_criteria": {"$ref": "#/$defs/localizedArray"}, "experimental_constraints": {"$ref": "#/$defs/localizedArray"}, "non_goals": {"$ref": "#/$defs/localizedArray"}, "requested_outputs": {"$ref": "#/$defs/localizedArray"},
     "summary": {"$ref": "#/$defs/localized"}, "scientific_decision": {"$ref": "#/$defs/localized"}, "reading_order": {"$ref": "#/$defs/localizedArray"}, "tags": {"$ref": "#/$defs/localizedArray"},
     "languages": {"type": "array", "items": {"enum": ["ko", "en"]}}, "visibility": {"enum": ["PRIVATE", "LAB_INTERNAL", "PUBLIC_SANITIZED"]}, "publication_status": {"enum": ["DRAFT", "APPROVED", "DEMO_ONLY", "WITHHELD"]},
     "idea_count": {"type": "integer", "minimum": 0}, "reviewed_idea_count": {"type": "integer", "minimum": 0}, "retained_idea_count": {"type": "integer", "minimum": 0}, "report_count": {"type": "integer", "minimum": 0}, "knowledge_document_count": {"type": "integer", "minimum": 0}, "featured": {"type": "boolean"},
-    "source_type": {"enum": ["SYNTHETIC_DEMO", "SANITIZED_EXPORT", "HISTORICAL_SANITIZED", "APPROVED_LOCAL_REPORT"]}, "source_commit": {"type": "string"}, "source_bundle_hash": {"type": "string"}, "current_stage": {"type": "string"}, "progress_percent": {"type": "integer", "minimum": 0, "maximum": 100},
+    "source_type": {"enum": ["SYNTHETIC_DEMO", "SANITIZED_EXPORT", "HISTORICAL_SANITIZED", "APPROVED_LOCAL_REPORT"]}, "source_commit": {"type": "string"}, "source_bundle_hash": {"type": "string"}, "current_stage": {"type": "string"}, "progress_percent": {"type": "integer", "minimum": 0, "maximum": 100}, "literature_scope_enabled": {"type": "boolean"},
     "timeline": {"type": "array", "items": {"type": "object"}}, "idea_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "reports": {"type": "array", "items": {"type": "object", "required": ["schema_version", "report_id", "translation_group_id", "role", "localized_title", "localized_description", "language", "path", "markdown_path", "page_count", "reference_count", "primary_source_count", "report_status", "is_primary", "display_order", "updated_at"]}}, "artifact_refs": {"type": "array", "items": {"type": "object"}}, "historical_fixture_paths": {"type": "array", "items": {"type": "string"}},
     "primary_report_id": {"type": "string"}, "primary_knowledge_id": {"type": "string"}, "primary_summary_id": {"type": "string"}, "run_specification_id": {"type": "string"},

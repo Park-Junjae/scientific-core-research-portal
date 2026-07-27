@@ -7,9 +7,9 @@ const visibleFiles = [
   "src/app/layout.tsx",
   "src/app/about/page.tsx",
   "src/components/site-navigation.tsx",
-  "content/runs/prame-logic-first-demo/run.json",
-  "content/runs/taled-historical-demo/run.json",
-  "content/runs/xrrna-prime-assembly-demo/run.json",
+  "tests/fixtures/demo-content/runs/prame-logic-first-demo/run.json",
+  "tests/fixtures/demo-content/runs/taled-historical-demo/run.json",
+  "tests/fixtures/demo-content/runs/xrrna-prime-assembly-demo/run.json",
 ];
 
 describe("public product branding", () => {

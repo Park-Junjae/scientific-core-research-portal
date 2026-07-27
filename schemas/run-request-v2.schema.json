@@ -10,6 +10,8 @@
     "created_at": {"type": "string", "format": "date-time"},
     "raw_research_request": {"type": "string", "minLength": 1},
     "reference_material_or_constraints": {"type": "string"},
+    "creativity_profile": {"const": "BREAKTHROUGH_DISCOVERY"},
+    "creativity_profile_selection_reviewed": {"const": true},
     "structured_fields": {
       "type": ["object", "null"],
       "additionalProperties": false,

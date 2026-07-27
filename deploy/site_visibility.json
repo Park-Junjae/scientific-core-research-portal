@@ -1,11 +1,7 @@
 {
   "mode": "PUBLIC_SANITIZED",
-  "approved_by": "user-explicit-github-pages-approval",
-  "approved_at": "2026-07-21T14:00:00Z",
-  "approved_run_ids": [
-    "demo_xrrna_prime_assembly_001",
-    "demo_prame_logic_first_001",
-    "demo_taled_historical_001"
-  ],
+  "approved_by": "production-artifact-only-policy",
+  "approved_at": "2026-07-27T00:00:00Z",
+  "approved_run_ids": [],
   "public_release_approved": true
 }

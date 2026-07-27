@@ -33,6 +33,11 @@ def make_empty_portal(root: Path) -> Path:
     portal = root / "portal"
     shutil.copytree(PORTAL / "schemas", portal / "schemas")
     shutil.copytree(PORTAL / "deploy", portal / "deploy")
+    visibility_path = portal / "deploy" / "site_visibility.json"
+    visibility = json.loads(visibility_path.read_text(encoding="utf-8"))
+    visibility["approved_run_ids"] = ["demo_xrrna_prime_assembly_001"]
+    visibility["public_release_approved"] = True
+    visibility_path.write_text(json.dumps(visibility), encoding="utf-8")
     (portal / "content" / "runs").mkdir(parents=True)
     (portal / "public" / "artifacts").mkdir(parents=True)
     (portal / "content" / "runs" / "index.json").write_text(
@@ -50,7 +55,10 @@ def make_empty_portal(root: Path) -> Path:
 
 def make_source(root: Path) -> Path:
     source = root / "source"
-    shutil.copytree(PORTAL / "content" / "runs" / DEMO_SLUG, source)
+    shutil.copytree(
+        PORTAL / "tests" / "fixtures" / "demo-content" / "runs" / DEMO_SLUG,
+        source,
+    )
     for name in (
         "PUBLICATION_RECEIPT.json",
         "PUBLICATION_CONTENT_HASHES.json",
@@ -155,6 +163,16 @@ class PublicationCliTests(unittest.TestCase):
         ]
         self.assertEqual(derive_analyzed_unique_total_from_ledger(sources), 1)
 
+    def test_cited_but_not_analyzed_ledger_record_does_not_count(self) -> None:
+        sources = [{
+            "doi": "10.1000/cited-only",
+            "normalized_title": "cited only",
+            "year": 2026,
+            "final_report_cited": True,
+            "analysis_events": [],
+        }]
+        self.assertIsNone(derive_analyzed_unique_total_from_ledger(sources))
+
     def test_publish_derives_analyzed_total_from_staged_source_registry(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -179,20 +197,17 @@ class PublicationCliTests(unittest.TestCase):
     def test_current_content_validates(self) -> None:
         result = validate_content(PORTAL)
         self.assertEqual(result["status"], "PASS", result["errors"])
-        self.assertEqual(result["run_count"], 3)
-        run = json.loads(
-            (PORTAL / "content" / "runs" / DEMO_SLUG / "run.json").read_text(
-                encoding="utf-8"
-            )
+        self.assertEqual(result["run_count"], 0)
+        index = json.loads(
+            (PORTAL / "content" / "runs" / "index.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(run["run_mode"], "FOCUSED_DECISION_RUN")
-        self.assertEqual(run["idea_count"], 4)
-        self.assertEqual(run["report_count"], 4)
-        self.assertNotRegex(
-            " ".join(
-                [run["title"]["en"], run["subtitle"]["en"], run["summary"]["en"]]
-            ),
-            r"(?i)arena[- ]selected|top-?1|tournament",
+        self.assertEqual(index["runs"], [])
+        self.assertTrue(
+            (
+                PORTAL
+                / ".publication-staging"
+                / "literature_count_reconciliation.json"
+            ).is_file()
         )
 
     def test_twenty_ideas_and_two_pdfs_remain_independent_counts(self) -> None:
@@ -267,11 +282,8 @@ class PublicationCliTests(unittest.TestCase):
     def test_completed_discovery_requires_generation_accounting(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            portal = root / "portal"
-            shutil.copytree(PORTAL / "schemas", portal / "schemas")
-            shutil.copytree(PORTAL / "deploy", portal / "deploy")
-            shutil.copytree(PORTAL / "content", portal / "content")
-            shutil.copytree(PORTAL / "public" / "artifacts", portal / "public" / "artifacts")
+            portal = make_empty_portal(root)
+            publish_run(make_source(root), portal, "PUBLIC_SANITIZED")
             run_path = portal / "content" / "runs" / DEMO_SLUG / "run.json"
             run = json.loads(run_path.read_text(encoding="utf-8"))
             run["run_mode"] = "DISCOVERY_PORTFOLIO_RUN"
@@ -283,11 +295,9 @@ class PublicationCliTests(unittest.TestCase):
 
     def test_duplicate_doi_is_rejected_at_run_level(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
-            portal = Path(temporary) / "portal"
-            shutil.copytree(PORTAL / "schemas", portal / "schemas")
-            shutil.copytree(PORTAL / "deploy", portal / "deploy")
-            shutil.copytree(PORTAL / "content", portal / "content")
-            shutil.copytree(PORTAL / "public" / "artifacts", portal / "public" / "artifacts")
+            root = Path(temporary)
+            portal = make_empty_portal(root)
+            publish_run(make_source(root), portal, "PUBLIC_SANITIZED")
             source_path = portal / "content" / "runs" / DEMO_SLUG / "literature" / "index.json"
             index = json.loads(source_path.read_text(encoding="utf-8"))
             duplicate = dict(index["sources"][0])
@@ -297,6 +307,40 @@ class PublicationCliTests(unittest.TestCase):
             result = validate_content(portal)
             self.assertEqual(result["status"], "FAIL")
             self.assertTrue(any("duplicate DOI" in item for item in result["errors"]))
+
+    def test_completed_real_literature_run_requires_source_ledger_and_counts(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            portal = make_empty_portal(root)
+            publish_run(make_source(root), portal, "PUBLIC_SANITIZED")
+            run_path = portal / "content" / "runs" / DEMO_SLUG / "run.json"
+            run = json.loads(run_path.read_text(encoding="utf-8"))
+            run["publication_status"] = "APPROVED"
+            run["source_type"] = "APPROVED_LOCAL_REPORT"
+            run["literature_scope_enabled"] = True
+            run["status"] = "DONE"
+            run["literature_stats"]["analyzed_unique_total"] = None
+            run_path.write_text(json.dumps(run), encoding="utf-8")
+            result = validate_content(portal)
+            self.assertEqual(result["status"], "FAIL")
+            self.assertTrue(any("requires RunSourceLedgerV1" in item for item in result["errors"]))
+            self.assertTrue(any("requires analyzed_unique_total" in item for item in result["errors"]))
+
+    def test_report_reference_repetition_is_counted_without_inflating_analyzed(self) -> None:
+        source = {
+            "doi": "10.1000/repeated",
+            "analysis_stage": "FULL_TEXT_REVIEWED",
+            "cited_in_reports": [
+                {"report_id": "report-a", "citation_numbers": [1, 2]},
+                {"report_id": "report-b", "citation_numbers": [1]},
+            ],
+        }
+        self.assertEqual(derive_analyzed_unique_total([source]), 1)
+        reference_entries = sum(
+            len(citation["citation_numbers"])
+            for citation in source["cited_in_reports"]
+        )
+        self.assertEqual(reference_entries, 3)
 
     def test_fatal_flaw_cannot_be_rescued_by_finalist_status(self) -> None:
         idea = {
