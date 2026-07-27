@@ -56,16 +56,10 @@ export function RunsExplorer({ runs, home = false }: { runs: RunWithIdeas[]; hom
       <header className="research-entry">
         <div className="hero-grid">
           <div className="hero-main">
-            <p className="product-context">AI Cho-Scientist</p>
-            <h1>{locale === "ko" ? "어떤 연구 질문을 탐구하시겠습니까?" : "What research question would you like to investigate?"}</h1>
-            <p className="hero-lede">
-              {locale === "ko"
-                ? "문헌 탐색, 가설 생성, 기전 검토와 연구 보고서 작성을 하나의 흐름으로 수행합니다."
-                : "Move from literature review and hypothesis generation to mechanism review and a readable research report."}
-            </p>
+            <h1>{locale === "ko" ? "새 연구" : "New research"}</h1>
             <Link className="research-composer" href="/new-run/" prefetch={false}>
               <span className="composer-hint">{locale === "ko" ? "연구 질문이나 해결하려는 문제를 적어주세요." : "Describe the research question or problem to solve."}</span>
-              <span className="composer-cta">{locale === "ko" ? "새 연구 시작" : "Start new research"}</span>
+              <span className="composer-cta">{locale === "ko" ? "요청서 작성" : "Write the request"}</span>
             </Link>
             <p className="research-entry-note">
               {locale === "ko"

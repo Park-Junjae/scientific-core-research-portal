@@ -1885,3 +1885,29 @@ input, textarea { caret-color: var(--accent); }
 .status-dot.review-required, .run-dot.review_required { background: #b07f31; }
 .status-dot.failed, .run-dot.failed { background: #b0574c; }
 .run-request-hint { color: var(--ink-faint); }
+
+/* ============================================================
+   Home reads as a workspace, not a landing page
+   The hero carried the three components of the generic AI landing
+   template: an uppercase pill badge repeating the product name that
+   the sidebar already shows, an oversized rhetorical question, and a
+   feature-list lede. None of it is useful to someone who opens this
+   every morning, and DESIGN.md already said this is a tool rather
+   than a marketing site. The composer is the subject now; the
+   heading is its label.
+   ============================================================ */
+.research-entry { padding-top: 12px; }
+.research-entry h1 {
+  max-width: none;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+.research-composer { margin-top: 16px; }
+.hero-glance { margin-top: 4px; }
+
+/* .product-context and .hero-lede no longer appear in any markup. Their older
+   rules are left inert rather than forced to display:none, so the classes stay
+   reusable instead of becoming an invisible trap for whoever reaches for them
+   next. */
