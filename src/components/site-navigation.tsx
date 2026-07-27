@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { localized, useLocale } from "@/lib/locale";
+import { withBasePath } from "@/lib/paths";
 import { usePreferences } from "@/lib/preferences";
 import type { LocalizedText, RunStatus } from "@/lib/types";
 
@@ -27,12 +28,10 @@ export type RecentRunLink = {
 function ProductMark() {
   return (
     <span className="product-mark" aria-hidden="true">
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-        <path d="M12 6.2 6 17.4M12 6.2 18 17.4M6 17.4H18" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
-        <circle cx="12" cy="6.2" r="2.7" fill="#fff" />
-        <circle cx="6" cy="17.4" r="2.1" fill="#fff" />
-        <circle cx="18" cy="17.4" r="2.1" fill="#fff" />
-      </svg>
+      {/* The mark is a fixed 36px brand asset and images are unoptimized in this
+          static export, so next/image would add nothing here. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={withBasePath("/brand/app-icon.png")} alt="" width={36} height={36} />
     </span>
   );
 }
@@ -80,13 +79,19 @@ function Sidebar({
   ];
   return (
     <aside className="sidebar" aria-label={locale === "ko" ? "주요 탐색" : "Primary navigation"}>
-      <div className="sidebar-brand">
+      <Link
+        href="/"
+        prefetch={false}
+        onClick={onNavigate}
+        className="sidebar-brand"
+        aria-label={locale === "ko" ? "홈으로" : "Go to home"}
+      >
         <ProductMark />
         <div>
           <strong>AI Cho-Scientist</strong>
           <span>{locale === "ko" ? "AI 연구 워크스페이스" : "AI Research Workspace"}</span>
         </div>
-      </div>
+      </Link>
       <nav className="sidebar-nav">
         {nav.map(({ href, label, icon: Icon }) => (
           <Link
@@ -165,7 +170,12 @@ export function SiteNavigation({ recentRuns }: { recentRuns: RecentRunLink[] }) 
         >
           <Menu size={21} />
         </button>
-        <Link href="/runs/" prefetch={false} className="mobile-brand">
+        <Link
+          href="/"
+          prefetch={false}
+          className="mobile-brand"
+          aria-label={locale === "ko" ? "홈으로" : "Go to home"}
+        >
           <ProductMark />
           <strong>AI Cho-Scientist</strong>
         </Link>

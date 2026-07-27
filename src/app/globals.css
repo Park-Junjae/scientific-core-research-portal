@@ -1752,3 +1752,131 @@ input, textarea { caret-color: var(--accent); }
 /* Link affordance in prose: underline on hover rather than always-on,
    with room to breathe under Korean glyphs. */
 .prose-article a { color: var(--accent-dark); text-underline-offset: 4px; }
+
+/* ---- Disabled buttons ----
+   Fading a gradient button to 48% opacity left its white label unreadable, so
+   the control read as broken rather than merely inactive. A disabled button
+   now changes colour instead of dissolving, and its label stays legible. */
+.primary-button:disabled,
+.primary-button:disabled:hover {
+  opacity: 1;
+  border-color: var(--line-strong);
+  background: var(--surface-muted);
+  background-image: none;
+  color: var(--ink-faint);
+  box-shadow: none;
+  transform: none;
+}
+.secondary-button:disabled {
+  opacity: 1;
+  border-color: var(--line);
+  color: var(--ink-faint);
+}
+
+/* ---- The brand mark is the way home ---- */
+.sidebar-brand {
+  border-radius: var(--radius-md);
+  margin: -4px -4px 10px;
+  padding: 8px;
+  text-decoration: none;
+  transition: background-color 120ms ease;
+}
+.sidebar-brand:hover { background: var(--surface-muted); }
+.sidebar-brand strong { color: var(--ink); }
+.mobile-brand { border-radius: var(--radius-sm); }
+
+/* ---- Intake: the submit action belongs at the end of the form ----
+   It previously sat between the two question fields, inviting submission
+   before the rest of the form had even been seen. */
+.run-request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 4px 0 0;
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+}
+
+/* ============================================================
+   v7 — the accent moves to blue
+   The product takes its identity from the lab's own brand: blue DNA
+   renders under cool, clean light. The neutrals move with it from
+   green-grey to blue-grey so the accent sits in its own world rather
+   than on a green ground.
+
+   Every value carrying white text clears 4.5:1 on its own, gradient
+   stops included. Do not lighten them.
+   ============================================================ */
+:root {
+  /* Canvas and sheets */
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface-muted: #eaf0f6;
+  --sidebar: #ffffff;
+
+  /* Blue-black ink. --ink-faint must clear 4.5:1 on every ground it lands on,
+     and the tightest of those is --accent-soft (the active stepper row), not
+     the canvas. Tuned there: 4.89:1 on the wash, 5.42:1 on the canvas. */
+  --ink: #101a24;
+  --ink-soft: #42505f;
+  --ink-faint: #56657a;
+  --line: #e2e8ef;
+  --line-strong: #c4d0dc;
+
+  /* One accent: azure. 4.87:1 with white. */
+  --accent: #1e74c0;
+  --accent-dark: #14589a;
+  --accent-light: #1e74c0;
+  --accent-water: #12789f;
+  --accent-soft: #dcebf9;
+  --accent-softer: #eff5fc;
+  --accent-ring: rgba(30, 116, 192, 0.22);
+  --focus: #1e74c0;
+
+  --shadow-xs: 0 1px 2px rgba(16, 30, 46, 0.05);
+  --shadow-sm: 0 1px 2px rgba(16, 30, 46, 0.04), 0 3px 8px rgba(16, 30, 46, 0.05);
+  --shadow-md: 0 5px 14px -5px rgba(16, 30, 46, 0.12), 0 12px 30px -14px rgba(16, 30, 46, 0.14);
+  --shadow-lg: 0 20px 50px -18px rgba(16, 30, 46, 0.26);
+  --shadow-accent: 0 12px 30px -12px rgba(30, 116, 192, 0.45);
+
+  /* Azure into the cyan of the mark's blocks. Every stop clears 4.5:1. */
+  --grad-accent: linear-gradient(135deg, var(--accent-light), var(--accent-dark) 55%, var(--accent-water));
+  --grad-brand: linear-gradient(145deg, #2280cc, #124f8c);
+  --grad-hero:
+    radial-gradient(120% 92% at -4% -18%, rgba(18, 120, 159, 0.16), transparent 55%),
+    radial-gradient(90% 80% at 104% -8%, rgba(30, 116, 192, 0.14), transparent 52%);
+}
+
+/* ---- The brand mark is now the lab's own artwork ----
+   It ships with its own rounded frame and light background, so the coloured
+   tile it used to sit on is removed. Painting a gradient behind it would put
+   two frames around one mark. */
+.product-mark {
+  width: 36px;
+  height: 36px;
+  flex-basis: 36px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.product-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.mobile-header .product-mark {
+  width: 30px;
+  height: 30px;
+  flex-basis: 30px;
+}
+
+/* Status lamps stay semantic and desaturated. "Running" keeps a steel blue
+   that reads as a lamp, not as the accent. Idle moves to blue-grey. */
+.status-dot, .run-dot { background: #8f9aa8; }
+.status-dot.done, .run-dot.done { background: #2f8f66; }
+.status-dot.running, .run-dot.running { background: #4a7d9e; }
+.status-dot.review-required, .run-dot.review_required { background: #b07f31; }
+.status-dot.failed, .run-dot.failed { background: #b0574c; }
+.run-request-hint { color: var(--ink-faint); }

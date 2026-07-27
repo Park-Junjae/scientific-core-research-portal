@@ -1,24 +1,24 @@
 ---
 version: alpha
-name: Glasshouse
-description: The visual identity of the AI Cho-Scientist research portal — a daylit glasshouse laboratory.
+name: Cold Light
+description: The visual identity of the AI Cho-Scientist research portal — the lab's own blue, under cold clean light.
 colors:
-  canvas: "#EFF5F1"
+  canvas: "#F1F5F9"
   surface: "#FFFFFF"
-  surface-muted: "#ECF3EF"
-  ink: "#10201B"
-  ink-soft: "#45544E"
-  ink-faint: "#626F68"
-  rule: "#E3EBE6"
-  rule-strong: "#C9D6CF"
-  green: "#0EA472"
-  green-deep: "#0A7350"
-  green-light: "#0D8560"
-  water: "#0A7F74"
-  green-wash: "#DFF5EC"
-  green-mist: "#EEFAF4"
-  lamp-idle: "#99A49E"
-  lamp-active: "#2F9068"
+  surface-muted: "#EAF0F6"
+  ink: "#101A24"
+  ink-soft: "#42505F"
+  ink-faint: "#56657A"
+  rule: "#E2E8EF"
+  rule-strong: "#C4D0DC"
+  azure: "#1E74C0"
+  azure-deep: "#14589A"
+  azure-light: "#1E74C0"
+  cyan-deep: "#12789F"
+  azure-wash: "#DCEBF9"
+  azure-mist: "#EFF5FC"
+  lamp-idle: "#8F9AA8"
+  lamp-active: "#2F8F66"
   lamp-running: "#4A7D9E"
   lamp-attention: "#B07F31"
   lamp-fault: "#B0574C"
@@ -86,14 +86,14 @@ spacing:
   xl: 42px
   xxl: 72px
 elevation:
-  flat: "0 1px 2px rgba(11,40,30,.05)"
-  raised: "0 5px 14px -5px rgba(11,40,30,.12), 0 12px 30px -14px rgba(11,40,30,.14)"
-  floating: "0 20px 50px -18px rgba(11,40,30,.26)"
-  accent: "0 12px 30px -12px rgba(14,164,114,.45)"
+  flat: "0 1px 2px rgba(16,30,46,.05)"
+  raised: "0 5px 14px -5px rgba(16,30,46,.12), 0 12px 30px -14px rgba(16,30,46,.14)"
+  floating: "0 20px 50px -18px rgba(16,30,46,.26)"
+  accent: "0 12px 30px -12px rgba(30,116,192,.45)"
 gradients:
-  action: "linear-gradient(135deg, #0D8560, #0A7350 55%, #0A7F74)"
-  brand: "linear-gradient(145deg, #119A70, #0A6D4C)"
-  daylight: "radial-gradient(120% 92% at -4% -18%, rgba(16,179,163,.20), transparent 55%), radial-gradient(90% 80% at 104% -8%, rgba(14,164,114,.16), transparent 52%)"
+  action: "linear-gradient(135deg, #1E74C0, #14589A 55%, #12789F)"
+  brand: "linear-gradient(145deg, #2280CC, #124F8C)"
+  daylight: "radial-gradient(120% 92% at -4% -18%, rgba(18,120,159,.16), transparent 55%), radial-gradient(90% 80% at 104% -8%, rgba(30,116,192,.14), transparent 52%)"
 motion:
   feedback: 120ms
   content: 180ms
@@ -114,14 +114,14 @@ components:
     rounded: "{rounded.lg}"
     padding: 24px
   row-hover:
-    backgroundColor: "{colors.green-mist}"
+    backgroundColor: "{colors.azure-mist}"
   filter-chip:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink-soft}"
     rounded: "{rounded.pill}"
     height: 36px
   filter-chip-active:
-    backgroundColor: "{colors.green-deep}"
+    backgroundColor: "{colors.azure-deep}"
     textColor: "{colors.surface}"
   input:
     backgroundColor: "{colors.surface}"
@@ -131,18 +131,17 @@ components:
 
 ## Overview
 
-**A daylit glasshouse laboratory.**
+**The lab's own blue, under cold clean light.**
 
-The reference is a modern research glasshouse: a white-framed building full of
-northern light, white staging benches, living green, and air. Everything in it
-is clean and cultivated, but nothing is sterile — light falls softly across the
-surfaces and the green is alive rather than institutional.
+The reference is the imagery this product is named for: a blue DNA render on a
+white field, lit evenly and photographed cold — the visual language of the
+genome-editing lab whose work the portal serves. Not a marketing site, not a
+government form, not a dark-mode terminal. White sheets on a cool blue-grey
+ground, wide margins, and a single azure that carries every action.
 
-This is a working scientific instrument that a researcher opens every morning,
-and it should feel like a good place to start a day of thinking. Not a
-government form, not a lecture handout, not a dark-mode terminal. The register
-is **bright, calm, and generous** — white benches on a tinted-glass canvas, wide
-margins, and one living green that carries every action.
+The register is **bright, calm, and clinical without being cold to use.** A
+researcher opens this every morning and reads it for hours; it should feel like
+good light on a clean bench.
 
 The product turns literature into structured evidence, so the interface has two
 jobs: give the researcher one obvious place to ask a new question, and keep the
@@ -155,36 +154,40 @@ those two things.
 
 ## Colors
 
-A white-and-glass base with one living green, plus a cooler water-green that
-appears only inside gradients.
+A white-and-blue-grey base with one azure accent, deepening into cyan inside
+gradients.
 
-- **Canvas** {colors.canvas} is the ground — white passed through green glass.
-  Never pure white, never grey, never cream.
-- **Surface** {colors.surface} is the staging bench. All content sits on white
-  panels laid over the canvas. **Surface-muted** {colors.surface-muted} is a
-  recessed area *inside* a panel, such as the composer's prompt well.
-- **Ink** {colors.ink} is green-black and carries all primary type.
+- **Canvas** {colors.canvas} is the ground — a cool blue-grey, never pure white,
+  never cream, never green.
+- **Surface** {colors.surface} is the sheet. Content sits on white panels laid
+  over the canvas. **Surface-muted** {colors.surface-muted} is a recessed area
+  *inside* a panel, such as the composer's prompt well.
+- **Ink** {colors.ink} is blue-black and carries all primary type.
   **Ink-soft** {colors.ink-soft} is prose; **ink-faint** {colors.ink-faint} is
   metadata and captions.
 - **Rule** {colors.rule} divides rows and sections. **Rule-strong**
   {colors.rule-strong} outlines something the user types into.
-- **Green** {colors.green} is the single accent identity. **Green-light**
-  {colors.green-light} and **water** {colors.water} exist *only* as the endpoints
-  of {gradients.action} and {gradients.brand} — never as flat fills in their own
-  right. **Green-wash** {colors.green-wash} tints the active navigation item;
-  **green-mist** {colors.green-mist} is row hover.
-- **Focus** uses {colors.green} at low opacity as a 3px outline. The focus ring
-  is part of the accent family, never a browser-default blue.
+- **Azure** {colors.azure} is the single accent identity, taken from the lab's
+  own blue. **Azure-deep** {colors.azure-deep} and **cyan-deep**
+  {colors.cyan-deep} are the other gradient stops. **Azure-wash**
+  {colors.azure-wash} tints the active navigation item; **azure-mist**
+  {colors.azure-mist} is row hover.
+- **Focus** uses {colors.azure} at low opacity as a 3px outline. The focus ring
+  is part of the accent family, never a browser-default blue of its own.
 - **Contrast is a constraint on the palette, not an afterthought.** Any surface
   that carries white text must clear 4.5:1 on its own — including *every stop of
   a gradient*, since a gradient has no single background colour for a checker to
-  measure. {colors.green} is bright enough that white on it fails at 3.2:1, so
-  white-on-green surfaces use {colors.green-deep}. {colors.ink-faint} is tuned to
-  clear 4.5:1 against {colors.canvas} at 12px; lightening either one breaks it.
+  measure. {colors.azure} clears it at 4.87:1 and is the lightest value allowed
+  under white text. {colors.ink-faint} must clear 4.5:1 on *every* ground it
+  lands on, and the tightest is {colors.azure-wash} — the active stepper row —
+  not the canvas: 4.89:1 there, 5.42:1 on the canvas. A tint light enough to
+  look harmless is exactly where small faint text quietly fails. Lightening
+  any of these breaks the page.
 - **Lamps** — {colors.lamp-active}, {colors.lamp-running},
   {colors.lamp-attention}, {colors.lamp-fault}, {colors.lamp-idle} — are
   deliberately desaturated and appear **only** as a 7px dot beside a text label.
-  Status is never a filled badge and never coloured text.
+  The running lamp is a steel blue: muted enough that it reads as a lamp rather
+  than as the accent. Status is never a filled badge and never coloured text.
 
 ## Typography
 
@@ -294,8 +297,8 @@ Quick and light. Things lift toward the light; nothing bounces.
   control: navigation items, search, the row overflow menu. No icon beside a
   statistic, no icon inside a button that already states its verb, no icon as a
   section ornament, no emoji.
-- **Don't** let a third hue in. Blue, purple, amber, and red exist solely as
-  status lamps. Everything expressive is green.
+- **Don't** let a second identity hue in. Green, purple, amber, and red exist
+  solely as status lamps. Everything expressive is azure.
 - **Don't** use the gradient as decoration. It belongs to the brand mark, the
   primary action, and the ambient daylight wash — nowhere else. No gradient
   text, no gradient borders, no gradient cards.
@@ -303,8 +306,8 @@ Quick and light. Things lift toward the light; nothing bounces.
   wrong; widen the blur and lower the opacity.
 - **Don't** compress the rows to fit more on screen.
 - **Don't** introduce a dark mode, glassmorphism, or a serif display face.
-- **Don't** put white text on {colors.green}. It is a border, ring, and lamp
-  colour; when it must sit under white text it becomes {colors.green-deep}.
+- **Don't** put white text on anything lighter than {colors.azure}. It is the
+  lightest surface in the palette that carries a white label.
 - **Don't** write an intermediate font weight. 645, 650, 660, and 680 are not
   loaded; they all resolve to 700 and quietly flatten the hierarchy you thought
   you were building.

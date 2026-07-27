@@ -171,13 +171,6 @@ export function NewRunBuilder() {
           <small>{labels.rawHelp}</small>
         </label>
 
-        <div className="run-request-actions">
-          <button className="primary-button" type="submit" disabled={!ready}>
-            {saved ? <Check size={18} /> : <FileJson size={18} />}
-            {saved ? labels.saved : labels.create}
-          </button>
-        </div>
-
         <label className="reference-request-field">
           <span>{labels.references}</span>
           <textarea
@@ -246,6 +239,20 @@ export function NewRunBuilder() {
             {importMessage && <p className="import-status" role="status">{importMessage}</p>}
           </div>
         </details>
+
+        <div className="run-request-actions">
+          <button className="primary-button" type="submit" disabled={!ready}>
+            {saved ? <Check size={18} /> : <FileJson size={18} />}
+            {saved ? labels.saved : labels.create}
+          </button>
+          {!ready && (
+            <small className="run-request-hint">
+              {ko
+                ? "연구 질문을 입력하면 요청서를 저장할 수 있습니다."
+                : "Describe the research question to enable saving."}
+            </small>
+          )}
+        </div>
       </form>
 
       {showPreview && (
