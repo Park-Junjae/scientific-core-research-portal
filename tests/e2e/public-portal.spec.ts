@@ -7,12 +7,11 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
 });
 
-test("home is Korean-first and presents a bounded research entry point", async ({ page }) => {
+test("home is Korean-first and links to the research entry point", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "ko");
-  await expect(page.getByRole("heading", { name: "어떤 연구 질문을 탐구하시겠습니까?" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /새 연구 시작/ })).toHaveAttribute("href", "/new-run/");
-  await expect(page.getByText(/외부 모델을 실행하거나 비용을 사용하지 않습니다/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "새 연구", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: /요청서 작성/ })).toHaveAttribute("href", "/new-run/");
 });
 
 test("desktop and mobile navigation expose the scientific workspace", async ({ page }) => {
