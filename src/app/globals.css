@@ -1752,3 +1752,49 @@ input, textarea { caret-color: var(--accent); }
 /* Link affordance in prose: underline on hover rather than always-on,
    with room to breathe under Korean glyphs. */
 .prose-article a { color: var(--accent-dark); text-underline-offset: 4px; }
+
+/* ---- Disabled buttons ----
+   Fading a gradient button to 48% opacity left its white label unreadable, so
+   the control read as broken rather than merely inactive. A disabled button
+   now changes colour instead of dissolving, and its label stays legible. */
+.primary-button:disabled,
+.primary-button:disabled:hover {
+  opacity: 1;
+  border-color: var(--line-strong);
+  background: var(--surface-muted);
+  background-image: none;
+  color: var(--ink-faint);
+  box-shadow: none;
+  transform: none;
+}
+.secondary-button:disabled {
+  opacity: 1;
+  border-color: var(--line);
+  color: var(--ink-faint);
+}
+
+/* ---- The brand mark is the way home ---- */
+.sidebar-brand {
+  border-radius: var(--radius-md);
+  margin: -4px -4px 10px;
+  padding: 8px;
+  text-decoration: none;
+  transition: background-color 120ms ease;
+}
+.sidebar-brand:hover { background: var(--surface-muted); }
+.sidebar-brand strong { color: var(--ink); }
+.mobile-brand { border-radius: var(--radius-sm); }
+
+/* ---- Intake: the submit action belongs at the end of the form ----
+   It previously sat between the two question fields, inviting submission
+   before the rest of the form had even been seen. */
+.run-request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 4px 0 0;
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+}
+.run-request-hint { color: var(--ink-faint); }

@@ -80,13 +80,19 @@ function Sidebar({
   ];
   return (
     <aside className="sidebar" aria-label={locale === "ko" ? "주요 탐색" : "Primary navigation"}>
-      <div className="sidebar-brand">
+      <Link
+        href="/"
+        prefetch={false}
+        onClick={onNavigate}
+        className="sidebar-brand"
+        aria-label={locale === "ko" ? "홈으로" : "Go to home"}
+      >
         <ProductMark />
         <div>
           <strong>AI Cho-Scientist</strong>
           <span>{locale === "ko" ? "AI 연구 워크스페이스" : "AI Research Workspace"}</span>
         </div>
-      </div>
+      </Link>
       <nav className="sidebar-nav">
         {nav.map(({ href, label, icon: Icon }) => (
           <Link
@@ -165,7 +171,12 @@ export function SiteNavigation({ recentRuns }: { recentRuns: RecentRunLink[] }) 
         >
           <Menu size={21} />
         </button>
-        <Link href="/runs/" prefetch={false} className="mobile-brand">
+        <Link
+          href="/"
+          prefetch={false}
+          className="mobile-brand"
+          aria-label={locale === "ko" ? "홈으로" : "Go to home"}
+        >
           <ProductMark />
           <strong>AI Cho-Scientist</strong>
         </Link>
