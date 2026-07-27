@@ -308,6 +308,11 @@ Quick and light. Things lift toward the light; nothing bounces.
 - **Don't** introduce a dark mode, glassmorphism, or a serif display face.
 - **Don't** put white text on anything lighter than {colors.azure}. It is the
   lightest surface in the palette that carries a white label.
+- **Don't** hardcode the accent inside a shadow, gradient, or `color-mix()`
+  literal. Reference the token. A literal survives a palette change and
+  leaves a stray behind — a green hover glow outlived the move to blue
+  precisely this way, and it is invisible in review because it only appears
+  on hover.
 - **Don't** write an intermediate font weight. 645, 650, 660, and 680 are not
   loaded; they all resolve to 700 and quietly flatten the hierarchy you thought
   you were building.
