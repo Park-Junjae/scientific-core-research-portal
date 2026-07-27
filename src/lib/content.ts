@@ -1,16 +1,20 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Locale, ResearchIdeaManifest, ResearchReportManifestV2, ResearchRunManifest, ResearchSourceIndexV1, ResearchSourceManifestV1, RunWithIdeas, SearchRecord } from "./types";
+import { isVisiblePublicReport } from "./report-visibility";
 
 const publicRunsRoot = path.join(process.cwd(), "content", "runs");
 const localRunsRoot = path.join(process.cwd(), ".local-preview", "content", "runs");
+const demoRunsRoot = path.join(process.cwd(), "tests", "fixtures", "demo-content", "runs");
 const includeLocalPreview = process.env.SCIENTIFIC_CORE_INCLUDE_LOCAL_PREVIEW === "1";
+const includeDemoFixtures = process.env.SCIENTIFIC_CORE_TEST_ONLY_DEMO_FIXTURES === "1";
 
 function readJson<T>(filePath: string): T { return JSON.parse(fs.readFileSync(filePath, "utf8")) as T; }
 
 function runRoots() {
   const roots = [publicRunsRoot];
   if (includeLocalPreview && fs.existsSync(localRunsRoot)) roots.push(localRunsRoot);
+  if (includeDemoFixtures && fs.existsSync(demoRunsRoot)) roots.push(demoRunsRoot);
   return roots;
 }
 
@@ -36,7 +40,14 @@ export function getRuns(): RunWithIdeas[] {
   const byRunId = new Map<string, RunWithIdeas>();
   for (const slug of slugs) {
     const run = getRun(slug);
-    if (!byRunId.has(run.run_id)) byRunId.set(run.run_id, run);
+    const productionVisible = run.publication_status === "APPROVED"
+      && run.source_type !== "SYNTHETIC_DEMO";
+    if (
+      (includeDemoFixtures || includeLocalPreview || productionVisible)
+      && !byRunId.has(run.run_id)
+    ) {
+      byRunId.set(run.run_id, run);
+    }
   }
   return Array.from(byRunId.values());
 }
@@ -88,16 +99,28 @@ export function markdownForReports(run: ResearchRunManifest, reports = run.repor
   return Object.fromEntries(reports.filter((report) => report.markdown_path).map((report) => [report.report_id, readApprovedMarkdown(run.slug, report.markdown_path!)]));
 }
 
+const EMPTY_RUN_SLUG = "__no_public_run__";
+
+export function getAllRunParams() {
+  const params = getRuns().map((run) => ({ run_slug: run.slug }));
+  return params.length > 0 ? params : [{ run_slug: EMPTY_RUN_SLUG }];
+}
+
 export function getAllIdeaParams() {
-  return getRuns().flatMap((run) => run.ideas.map((idea) => ({ run_slug: run.slug, idea_slug: idea.slug })));
+  const params = getRuns().flatMap((run) => run.ideas.map((idea) => ({ run_slug: run.slug, idea_slug: idea.slug })));
+  return params.length > 0 ? params : [{ run_slug: EMPTY_RUN_SLUG, idea_slug: "__no_public_idea__" }];
 }
 
 export function getAllReportParams() {
-  return getRuns().flatMap((run) => run.reports.map((report) => ({ run_slug: run.slug, report_id: report.report_id })));
+  const params = getRuns().flatMap((run) => run.reports
+    .filter(isVisiblePublicReport)
+    .map((report) => ({ run_slug: run.slug, report_id: report.report_id })));
+  return params.length > 0 ? params : [{ run_slug: EMPTY_RUN_SLUG, report_id: "__no_public_report__" }];
 }
 
 export function getAllSourceParams() {
-  return getRuns().flatMap((run) => run.sources.map((source) => ({ run_slug: run.slug, source_id: source.source_id })));
+  const params = getRuns().flatMap((run) => run.sources.map((source) => ({ run_slug: run.slug, source_id: source.source_id })));
+  return params.length > 0 ? params : [{ run_slug: EMPTY_RUN_SLUG, source_id: "__no_public_source__" }];
 }
 
 export function getSearchRecords(): SearchRecord[] {
@@ -106,3 +129,5 @@ export function getSearchRecords(): SearchRecord[] {
 }
 
 export function isLocalPreviewEnabled() { return includeLocalPreview; }
+
+export function isDemoFixtureEnabled() { return includeDemoFixtures; }

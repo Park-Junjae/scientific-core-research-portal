@@ -7,6 +7,7 @@ export type RequestRunType =
   | "VERIFICATION_RUN"
   | "MEASUREMENT_DISCOVERY_RUN";
 export type RequestOutputLanguage = "" | "en" | "ko" | "bilingual";
+export type CreativityProfile = "STANDARD" | "BREAKTHROUGH_DISCOVERY";
 
 export interface RunRequestDraft {
   raw_research_request: string;
@@ -24,6 +25,8 @@ export interface RunRequestDraft {
   output_language: RequestOutputLanguage;
   visibility: "PRIVATE" | "LAB_INTERNAL" | "PUBLIC_SANITIZED";
   notes: string;
+  creativity_profile: CreativityProfile;
+  literature_scope_enabled: boolean;
 }
 
 export interface StructuredRunRequestFields {
@@ -40,6 +43,7 @@ export interface StructuredRunRequestFields {
   output_language: Exclude<RequestOutputLanguage, ""> | null;
   visibility: RunRequestDraft["visibility"];
   notes: string;
+  literature_scope_enabled: boolean;
 }
 
 export const DIRECTOR_CONFIRMATION_PROMPT =
@@ -65,6 +69,8 @@ export function initialRunRequest(): RunRequestDraft {
     output_language: "",
     visibility: "PRIVATE",
     notes: "",
+    creativity_profile: "STANDARD",
+    literature_scope_enabled: true,
   };
 }
 
@@ -115,6 +121,7 @@ export function hasAdvancedOverrides(value: RunRequestDraft): boolean {
     || value.output_language
     || value.visibility !== "PRIVATE"
     || value.notes.trim()
+    || value.literature_scope_enabled === false
   );
 }
 
@@ -138,6 +145,7 @@ export function buildRunRequest(
         output_language: value.output_language || null,
         visibility: value.visibility,
         notes: value.notes.trim(),
+        literature_scope_enabled: value.literature_scope_enabled,
       }
     : null;
 
@@ -156,6 +164,12 @@ export function buildRunRequest(
       requested_outputs: defaultRequestedOutputs(locale),
     },
     director_launch_prompt: DIRECTOR_CONFIRMATION_PROMPT,
+    ...(value.creativity_profile === "BREAKTHROUGH_DISCOVERY"
+      ? {
+          creativity_profile: "BREAKTHROUGH_DISCOVERY" as const,
+          creativity_profile_selection_reviewed: true as const,
+        }
+      : {}),
   };
 }
 
@@ -211,6 +225,10 @@ export function normalizeImportedRequest(input: unknown, locale: Locale): RunReq
       output_language: validOutputLanguage(structured.output_language),
       visibility: validVisibility(structured.visibility),
       notes: String(structured.notes ?? ""),
+      creativity_profile: record.creativity_profile === "BREAKTHROUGH_DISCOVERY"
+        ? "BREAKTHROUGH_DISCOVERY"
+        : "STANDARD",
+      literature_scope_enabled: structured.literature_scope_enabled !== false,
     };
   }
 
@@ -252,5 +270,9 @@ export function normalizeImportedRequest(input: unknown, locale: Locale): RunReq
     output_language: legacyLanguage,
     visibility: validVisibility(record.visibility),
     notes: String(record.notes ?? ""),
+    creativity_profile: record.creativity_profile === "BREAKTHROUGH_DISCOVERY"
+      ? "BREAKTHROUGH_DISCOVERY"
+      : "STANDARD",
+    literature_scope_enabled: record.literature_scope_enabled !== false,
   };
 }

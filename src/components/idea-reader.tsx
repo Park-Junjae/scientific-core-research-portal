@@ -6,20 +6,21 @@ import { formatDate } from "@/lib/display";
 import { localized, useLocale } from "@/lib/locale";
 import { lifecycleLabels, scoreVector } from "@/lib/portfolio";
 import { withBasePath } from "@/lib/paths";
+import { isVisiblePublicReport } from "@/lib/report-visibility";
 import type { ResearchIdeaManifest, ResearchReportManifestV2, ResearchSourceManifestV1 } from "@/lib/types";
 import { SourceList } from "./source-list";
 
 function reportVariant(reports: ResearchReportManifestV2[], id: string | null, locale: "ko" | "en") {
   if (!id) return null;
-  const base = reports.find((report) => report.report_id === id);
+  const base = reports.find((report) => report.report_id === id && isVisiblePublicReport(report));
   if (!base) return null;
-  return reports.find((report) => report.translation_group_id === base.translation_group_id && report.language === locale) ?? null;
+  return reports.find((report) => report.translation_group_id === base.translation_group_id && report.language === locale && isVisiblePublicReport(report)) ?? null;
 }
 
 export function IdeaReader({ idea, runSlug, reports, sources }: { idea: ResearchIdeaManifest; runSlug: string; reports: ResearchReportManifestV2[]; sources: ResearchSourceManifestV1[] }) {
   const { locale, t } = useLocale();
   const report = reportVariant(reports, idea.report_id, locale);
-  const baseReport = idea.report_id ? reports.find((item) => item.report_id === idea.report_id) : null;
+  const baseReport = idea.report_id ? reports.find((item) => item.report_id === idea.report_id && isVisiblePublicReport(item)) : null;
   const missingTranslation = Boolean(baseReport && !report);
   const keyLiterature = sources.filter((source) => source.related_idea_ids.includes(idea.idea_id)).sort((a, b) => Number(b.load_bearing) - Number(a.load_bearing) || (a.display_order ?? 9999) - (b.display_order ?? 9999)).slice(0, 5);
   return <article className="idea-reading-page">
