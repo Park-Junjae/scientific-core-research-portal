@@ -8,7 +8,7 @@ colors:
   surface-muted: "#EAF0F6"
   ink: "#101A24"
   ink-soft: "#42505F"
-  ink-faint: "#5B6B80"
+  ink-faint: "#56657A"
   rule: "#E2E8EF"
   rule-strong: "#C4D0DC"
   azure: "#1E74C0"
@@ -178,8 +178,11 @@ gradients.
   that carries white text must clear 4.5:1 on its own — including *every stop of
   a gradient*, since a gradient has no single background colour for a checker to
   measure. {colors.azure} clears it at 4.87:1 and is the lightest value allowed
-  under white text. {colors.ink-faint} clears 4.5:1 against {colors.canvas} at
-  12px. Lightening any of these breaks the page.
+  under white text. {colors.ink-faint} must clear 4.5:1 on *every* ground it
+  lands on, and the tightest is {colors.azure-wash} — the active stepper row —
+  not the canvas: 4.89:1 there, 5.42:1 on the canvas. A tint light enough to
+  look harmless is exactly where small faint text quietly fails. Lightening
+  any of these breaks the page.
 - **Lamps** — {colors.lamp-active}, {colors.lamp-running},
   {colors.lamp-attention}, {colors.lamp-fault}, {colors.lamp-idle} — are
   deliberately desaturated and appear **only** as a 7px dot beside a text label.

@@ -1815,10 +1815,12 @@ input, textarea { caret-color: var(--accent); }
   --surface-muted: #eaf0f6;
   --sidebar: #ffffff;
 
-  /* Blue-black ink; --ink-faint is tuned to 4.97:1 on the canvas */
+  /* Blue-black ink. --ink-faint must clear 4.5:1 on every ground it lands on,
+     and the tightest of those is --accent-soft (the active stepper row), not
+     the canvas. Tuned there: 4.89:1 on the wash, 5.42:1 on the canvas. */
   --ink: #101a24;
   --ink-soft: #42505f;
-  --ink-faint: #5b6b80;
+  --ink-faint: #56657a;
   --line: #e2e8ef;
   --line-strong: #c4d0dc;
 
