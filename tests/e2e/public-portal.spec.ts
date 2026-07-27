@@ -11,7 +11,7 @@ test("home is Korean-first and presents a bounded research entry point", async (
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "ko");
   await expect(page.getByRole("heading", { name: "어떤 연구 질문을 탐구하시겠습니까?" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /새 연구 시작/ })).toHaveAttribute("href", "/new-run/");
+  await expect(page.locator(".research-composer")).toHaveAttribute("href", "/new-run/");
   await expect(page.locator(".research-entry-note")).toBeVisible();
 });
 
