@@ -3,9 +3,7 @@ import type { Locale } from "./types";
 export type RequestRunType =
   | ""
   | "DISCOVERY_PORTFOLIO_RUN"
-  | "FOCUSED_DECISION_RUN"
-  | "VERIFICATION_RUN"
-  | "MEASUREMENT_DISCOVERY_RUN";
+  | "FOCUSED_DECISION_RUN";
 export type RequestOutputLanguage = "" | "en" | "ko" | "bilingual";
 export type CreativityProfile = "STANDARD" | "BREAKTHROUGH_DISCOVERY";
 
@@ -178,8 +176,6 @@ function validRunType(value: unknown): RequestRunType {
     "",
     "DISCOVERY_PORTFOLIO_RUN",
     "FOCUSED_DECISION_RUN",
-    "VERIFICATION_RUN",
-    "MEASUREMENT_DISCOVERY_RUN",
   ];
   const candidate = String(value ?? "") as RequestRunType;
   return allowed.includes(candidate) ? candidate : "";

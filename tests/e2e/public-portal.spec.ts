@@ -104,7 +104,12 @@ test("New Research exposes Request, Preflight, and Approval workflow", async ({ 
   await expect(page.getByRole("radio", { name: /Standard/ })).toBeChecked();
   await page.getByRole("radio", { name: /Breakthrough/ }).check();
   await expect(page.getByText(/independently approved runtime/)).toBeVisible();
-  await expect(page.getByRole("button", { name: "Review research plan" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Review research plan" })).toBeDisabled();
+  await expect(page.getByRole("link", { name: "Connect lab account" })).toHaveAttribute(
+    "target",
+    "_blank",
+  );
+  await expect(page.getByRole("button", { name: "Check connection" })).toBeEnabled();
   await expect(page.getByText(/does not call an external model/)).toBeVisible();
   await page.locator(".advanced-fields").click();
   await expect(page.getByRole("button", { name: "Save request file" })).toBeEnabled();

@@ -1,7 +1,8 @@
 "use client";
 
-import { Check, Download, FlaskConical, LoaderCircle, LogIn, Upload } from "lucide-react";
+import { Check, Download, FlaskConical, LoaderCircle, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
+import { AccessConnectionPanel } from "@/components/access-connection-panel";
 import { useLocale } from "@/lib/locale";
 import { withBasePath } from "@/lib/paths";
 import {
@@ -14,9 +15,9 @@ import {
 import {
   buildControlledRunPayload,
   createControlledRun,
-  getRunControlSession,
   runControlApiBase,
-  RunControlApiError,
+  type PortalSelectableRunMode,
+  type RunControlSession,
 } from "@/lib/run-control-api";
 
 function downloadRequest(body: unknown) {
@@ -37,8 +38,6 @@ const modes: Array<[RunRequestDraft["run_type"], { ko: string; en: string }]> = 
   ["", { ko: "자동 선택", en: "Choose automatically" }],
   ["FOCUSED_DECISION_RUN", { ko: "집중 의사결정", en: "Focused decision" }],
   ["DISCOVERY_PORTFOLIO_RUN", { ko: "탐색 포트폴리오", en: "Discovery portfolio" }],
-  ["VERIFICATION_RUN", { ko: "검증", en: "Verification" }],
-  ["MEASUREMENT_DISCOVERY_RUN", { ko: "측정법 탐색", en: "Measurement discovery" }],
 ];
 
 export function NewRunBuilder() {
@@ -48,7 +47,7 @@ export function NewRunBuilder() {
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const [authRequired, setAuthRequired] = useState(false);
+  const [session, setSession] = useState<RunControlSession | null>(null);
   const request = useMemo(() => buildRunRequest(value, locale), [locale, value]);
   const ready = Boolean(value.raw_research_request.trim());
   const showPreview = ready
@@ -58,17 +57,20 @@ export function NewRunBuilder() {
   const update = <K extends keyof RunRequestDraft>(key: K, next: RunRequestDraft[K]) => {
     setSaved(false);
     setMessage("");
-    setAuthRequired(false);
     setValue((current) => ({ ...current, [key]: next }));
   };
 
   async function prepareRun() {
     if (!ready || busy || !runControlApiBase) return;
+    if (!session) {
+      setMessage(ko
+        ? "먼저 랩 계정을 연결하고 연결 상태를 확인하세요."
+        : "Connect the lab account and check the connection first.");
+      return;
+    }
     setBusy(true);
     setMessage("");
-    setAuthRequired(false);
     try {
-      const session = await getRunControlSession();
       const run = await createControlledRun(
         buildControlledRunPayload({
           researchQuestion: value.research_question.trim() || value.raw_research_request.trim(),
@@ -79,7 +81,7 @@ export function NewRunBuilder() {
             value.failure_criteria,
             value.non_goals,
           ].filter(Boolean).join("\n")),
-          requestedMode: value.run_type || "AUTO",
+          requestedMode: (value.run_type || "AUTO") as PortalSelectableRunMode,
           creativityProfile: value.creativity_profile,
           includeLiteratureScope: value.literature_scope_enabled,
           reportLanguage: value.output_language || locale,
@@ -88,14 +90,7 @@ export function NewRunBuilder() {
       );
       window.location.assign(withBasePath(`/run-control/?run_id=${encodeURIComponent(run.run_id)}`));
     } catch (reason) {
-      if (reason instanceof RunControlApiError && reason.status === 401) {
-        setAuthRequired(true);
-        setMessage(ko
-          ? "허용된 Cloudflare Access 계정으로 인증해야 합니다."
-          : "Authenticate with an allowlisted Cloudflare Access account.");
-      } else {
-        setMessage(reason instanceof Error ? reason.message : "Unable to prepare the run.");
-      }
+      setMessage(reason instanceof Error ? reason.message : "Unable to prepare the run.");
     } finally {
       setBusy(false);
     }
@@ -212,8 +207,12 @@ export function NewRunBuilder() {
           </div>
         </details>
 
+        {runControlApiBase && (
+          <AccessConnectionPanel onConnected={setSession} compact />
+        )}
+
         <div className="run-request-actions">
-          <button className="primary-button" type="submit" disabled={!ready || busy || !runControlApiBase}>
+          <button className="primary-button" type="submit" disabled={!ready || busy || !runControlApiBase || !session}>
             {busy ? <LoaderCircle className="spin" size={18} /> : <FlaskConical size={18} />}
             {ko ? "연구 계획 확인" : "Review research plan"}
           </button>
@@ -230,9 +229,8 @@ export function NewRunBuilder() {
         </p>
         {!runControlApiBase && <div className="intake-message" role="status"><p>{ko ? "연구 실행 기능은 준비 중입니다." : "Research execution is being prepared."}</p></div>}
         {message && (
-          <div className="intake-message" role={authRequired ? "status" : "alert"}>
+          <div className="intake-message" role="alert">
             <p>{message}</p>
-            {authRequired && <a className="secondary-button" href={`${runControlApiBase}/api/session`}><LogIn size={17} />Cloudflare Access</a>}
           </div>
         )}
       </form>

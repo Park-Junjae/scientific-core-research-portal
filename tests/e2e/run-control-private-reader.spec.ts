@@ -41,6 +41,26 @@ test("authenticated owner sees an artifact-first completed bundle", async ({ pag
       sha256: "c".repeat(64),
       status: "AVAILABLE",
     },
+    {
+      artifact_id: "artifact-ledger",
+      run_id: runId,
+      role: "source_ledger",
+      filename: "source-ledger.json",
+      mime_type: "application/json",
+      size_bytes: 500,
+      sha256: "d".repeat(64),
+      status: "AVAILABLE",
+    },
+    {
+      artifact_id: "artifact-manifest",
+      run_id: runId,
+      role: "artifact_manifest",
+      filename: "artifact-manifest.json",
+      mime_type: "application/json",
+      size_bytes: 300,
+      sha256: "e".repeat(64),
+      status: "AVAILABLE",
+    },
   ];
 
   await page.route("https://control.example/**", async (route) => {
@@ -71,12 +91,39 @@ test("authenticated owner sees an artifact-first completed bundle", async ({ pag
         compiled_contract: null,
         result_locator: "private",
         safe_message: "Synthetic private run completed.",
+        current_stage: "completed",
+        progress_percentage: 100,
+        raw_idea_count: 60,
+        independent_idea_count: 18,
+        family_count: 6,
+        developed_proposal_count: 3,
+        literature_analyzed_count: 18,
+        cited_source_count: 12,
+        literature_counts: {
+          schema_version: "LiteratureCountReconciliationV1",
+          status: "COMPLETE",
+          discovered: 30,
+          title_abstract_screened: 24,
+          full_text_reviewed: 18,
+          deeply_read: 12,
+          analyzed_unique_total: 18,
+          load_bearing_sources: 6,
+          unique_cited_sources: 12,
+          final_reference_count: 12,
+          report_reference_count: 12,
+        },
+        elapsed_time_seconds: 300,
+        provider_cost_usd: 0,
+        runner_state: "ONLINE",
+        cancellation_state: "NOT_REQUESTED",
+        artifact_availability: {
+          available: true,
+          count: artifacts.length,
+          roles: artifacts.map((item) => item.role),
+        },
       });
     }
     if (url.pathname === `/api/runs/${runId}/events`) return json({ events: [] });
-    if (url.pathname === "/api/runners/scientific-core-vm") {
-      return json({ runner: "scientific-core-vm", online: true, fallback_runner: null });
-    }
     if (url.pathname === `/api/runs/${runId}/bundle`) {
       return json({
         manifest: {
@@ -104,13 +151,17 @@ test("authenticated owner sees an artifact-first completed bundle", async ({ pag
   });
 
   await page.goto(`/run-control/?run_id=${runId}&lang=ko`);
+  await page.getByRole("button", { name: "연결 확인" }).click();
   await expect(page.getByRole("heading", { name: "연구 계획과 실행 상태" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "연구 결과 파일" })).toBeVisible();
+  await expect(page.getByText("내 비공개 결과")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Synthetic final report" })).toBeVisible();
   await expect(page.getByRole("button", { name: "PDF 열기" })).toBeVisible();
   await expect(page.getByRole("link", { name: "PDF 다운로드" })).toHaveAttribute("href", /disposition=attachment/);
   await expect(page.getByRole("link", { name: /Markdown 다운로드/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /ZIP 다운로드/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /문헌 원장/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /산출물 목록/ })).toBeVisible();
   await expect(page.locator("body")).not.toContainText("API key");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

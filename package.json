@@ -19,6 +19,7 @@
     "test:content": "node scripts/run-python.mjs -m coscientist.site validate-content --portal-root .",
     "test:links": "node scripts/check-static-links.mjs",
     "test:basepath": "node scripts/check-basepath-export.mjs",
+    "test:production-api-base": "node scripts/check-production-api-base.mjs",
     "test:budget": "node scripts/check-asset-budget.mjs",
     "test:privacy": "node scripts/check-public-private-boundary.mjs",
     "test:tracked-boundary": "node scripts/audit-tracked-publication-boundary.mjs --public-out=out --output=.publication-staging/tracked-tree-publication-boundary-audit.json",

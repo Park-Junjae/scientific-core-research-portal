@@ -247,6 +247,15 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
 .run-request-actions { flex-wrap: wrap; gap: 9px; }
 .intake-message { display: grid; justify-items: start; gap: 10px; border-left: 3px solid var(--accent); background: var(--accent-softer); padding: 13px 15px; }
 .intake-message p { margin: 0; color: var(--ink-soft); }
+.access-connection { display: grid; max-width: 820px; gap: 16px; border-block: 1px solid var(--line-strong); padding: 22px 0; }
+.access-connection.compact { padding: 18px 0; }
+.access-connection-copy { display: grid; grid-template-columns: 24px minmax(0,1fr); gap: 13px; align-items: start; }
+.access-connection-copy h2 { margin: 0 0 5px; font-size: 19px; }
+.access-connection-copy p { margin: 0; color: var(--ink-soft); }
+.access-connection-actions { display: flex; flex-wrap: wrap; gap: 9px; padding-left: 37px; }
+.connection-message { margin: 0; padding-left: 37px; font-size: 13px; font-weight: 700; }
+.connection-message.success { color: var(--accent-dark); }
+.connection-message.error { color: #923b3b; }
 
 .run-control-layout { display: grid; gap: 34px; }
 .run-control-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; border-bottom: 1px solid var(--line-strong); padding-bottom: 24px; }
@@ -254,7 +263,7 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
 .runner-state { display: inline-flex; min-height: 38px; flex: 0 0 auto; align-items: center; gap: 8px; border: 1px solid var(--line-strong); padding: 0 12px; font-size: 13px; font-weight: 700; }
 .runner-state.online { border-color: var(--accent); color: var(--accent-dark); }
 .runner-state.offline { border-color: #d2a6a6; color: #8e3434; }
-.run-state-band { display: grid; grid-template-columns: .8fr 1.1fr .7fr 1fr 1fr; border-block: 1px solid var(--line-strong); }
+.run-state-band { display: grid; grid-template-columns: .7fr 1.1fr 1fr .8fr .8fr 1fr; border-block: 1px solid var(--line-strong); }
 .run-state-band > div { min-width: 0; padding: 15px 18px; border-right: 1px solid var(--line); }
 .run-state-band > div:last-child { border-right: 0; }
 .run-state-band span, .budget-strip span { display: block; color: var(--ink-faint); font-size: 11px; font-weight: 700; text-transform: uppercase; }
@@ -311,6 +320,24 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
 .control-error { color: #923b3b; font-weight: 700; }
 .control-loading { display: flex; align-items: center; gap: 8px; color: var(--ink-soft); }
 .private-result-reader { display: grid; gap: 18px; border-top: 1px solid var(--line-strong); padding-top: 28px; }
+.my-research-section { display: grid; gap: 20px; padding-top: 0; }
+.my-research-section .section-heading > span { display: inline-flex; align-items: center; gap: 6px; }
+.my-research-intro { max-width: 780px; margin: -7px 0 0; color: var(--ink-soft); line-height: 1.6; }
+.my-research-empty { display: grid; grid-template-columns: 24px minmax(0,1fr); gap: 13px; border-block: 1px solid var(--line); padding: 20px 0; }
+.my-research-empty h3, .my-research-empty p { margin: 0; }
+.my-research-empty p { margin-top: 4px; color: var(--ink-soft); }
+.my-research-list { display: grid; border-top: 1px solid var(--line-strong); }
+.my-research-list article { display: grid; grid-template-columns: minmax(0,1.7fr) minmax(420px,1fr); gap: 30px; align-items: center; border-bottom: 1px solid var(--line); padding: 20px 0; }
+.my-research-list h3 { margin: 5px 0; font-size: 18px; }
+.my-research-list h3 a { color: var(--ink); text-decoration: none; }
+.my-research-list h3 a:hover { color: var(--accent-dark); text-decoration: underline; }
+.my-research-list article > div > p:last-child { margin: 0; color: var(--ink-faint); font-size: 12px; }
+.my-research-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.my-research-meta span { border: 1px solid var(--line); padding: 3px 6px; color: var(--ink-soft); font-size: 11px; font-weight: 700; text-transform: capitalize; }
+.my-research-list dl { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); margin: 0; }
+.my-research-list dl > div { min-width: 0; border-left: 1px solid var(--line); padding-left: 13px; }
+.my-research-list dt { display: flex; align-items: center; gap: 4px; color: var(--ink-faint); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.my-research-list dd { margin: 5px 0 0; font-weight: 700; }
 .private-result-tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--line); }
 .private-result-tabs button { display: inline-flex; min-height: 42px; align-items: center; gap: 7px; flex: 0 0 auto; border: 0; border-bottom: 2px solid transparent; background: transparent; padding: 0 12px; color: var(--ink-soft); white-space: nowrap; }
 .private-result-tabs button.active { border-bottom-color: var(--accent); color: var(--ink); font-weight: 700; }
@@ -377,6 +404,8 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
   .document-list article { grid-template-columns: 1fr; }
   .run-control-header { align-items: flex-start; flex-direction: column; }
   .run-state-band { grid-template-columns: 1fr 1fr; }
+  .my-research-list article { grid-template-columns: 1fr; gap: 16px; }
+  .my-research-list dl > div:first-child { border-left: 0; padding-left: 0; }
   .run-state-band > div:nth-child(even) { border-right: 0; }
   .run-state-band > div:not(:last-child) { border-bottom: 1px solid var(--line); }
   .budget-strip { grid-template-columns: repeat(3,minmax(0,1fr)); }
@@ -418,6 +447,11 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
   .run-state-band, .contract-grid, .inference-list, .budget-strip, .budget-comparison { grid-template-columns: 1fr; }
   .run-state-band > div, .budget-strip > div, .budget-comparison > div { border-right: 0; border-bottom: 1px solid var(--line); }
   .run-state-band > div:last-child, .budget-strip > div:last-child, .budget-comparison > div:last-child { border-bottom: 0; }
+  .access-connection-actions, .connection-message { padding-left: 0; }
+  .access-connection-actions { display: grid; }
+  .my-research-list dl { grid-template-columns: 1fr 1fr; gap: 14px 0; }
+  .my-research-list dl > div:nth-child(odd) { border-left: 0; padding-left: 0; }
+  .my-research-list dl > div:nth-child(even) { padding-left: 12px; }
   .run-request-actions, .run-control-actions { display: grid; }
   .run-control-header h1 { font-size: 31px; }
   .run-control-layout .section-heading { align-items: flex-start; flex-direction: column; gap: 8px; }

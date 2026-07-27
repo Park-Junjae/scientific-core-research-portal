@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scientific-core.invalid/schemas/run-status-event-v2.schema.json",
+  "title": "Scientific Core Authenticated Status Event V2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "run_id", "event_id", "sequence", "nonce", "timestamp",
+    "stage", "status", "progress", "cumulative_usage", "message"
+  ],
+  "properties": {
+    "schema_version": {"const": "ScientificCoreRunStatusEventV2"},
+    "run_id": {"type": "string", "minLength": 8},
+    "event_id": {"type": "string", "minLength": 8},
+    "sequence": {"type": "integer", "minimum": 1},
+    "nonce": {"type": "string", "minLength": 16},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "stage": {
+      "enum": [
+        "runner_accepted", "source_preflight", "scientific_framing",
+        "mechanistic_decomposition", "blind_multi_lens_ideation",
+        "presearch_idea_freeze", "literature_retrieval",
+        "novelty_and_precedent_audit", "idea_generation",
+        "mechanism_family_grouping", "family_grouping",
+        "proposal_development", "scientific_development",
+        "skeptical_review", "revision", "dual_axis_portfolio",
+        "comparison", "synthesis", "report_generation",
+        "publication_packaging", "completed", "failed", "cancelled"
+      ]
+    },
+    "status": {"type": "string", "minLength": 1, "maxLength": 80},
+    "progress": {"type": "number", "minimum": 0, "maximum": 1},
+    "cumulative_usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["calls", "attempts", "input_tokens", "output_tokens", "cost_usd"],
+      "properties": {
+        "calls": {"type": "integer", "minimum": 0},
+        "attempts": {"type": "integer", "minimum": 0},
+        "input_tokens": {"type": "integer", "minimum": 0},
+        "output_tokens": {"type": "integer", "minimum": 0},
+        "cost_usd": {"type": "number", "minimum": 0}
+      }
+    },
+    "raw_idea_count": {"type": "integer", "minimum": 0},
+    "independent_idea_count": {"type": "integer", "minimum": 0},
+    "family_count": {"type": "integer", "minimum": 0},
+    "developed_proposal_count": {"type": "integer", "minimum": 0},
+    "message": {"type": "string", "minLength": 1, "maxLength": 500}
+  }
+}

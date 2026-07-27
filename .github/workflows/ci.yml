@@ -30,7 +30,8 @@ jobs:
       - run: pnpm test
       - run: python tests/run_all.py
       - run: pnpm test:content
-      - run: pnpm build
+      - run: NEXT_PUBLIC_RUN_CONTROL_API_BASE=https://api.aichoscientist.com pnpm build
+      - run: NEXT_PUBLIC_RUN_CONTROL_API_BASE=https://api.aichoscientist.com pnpm test:production-api-base
       - run: pnpm test:basepath -- --root
       - run: pnpm test:links
       - run: pnpm test:budget

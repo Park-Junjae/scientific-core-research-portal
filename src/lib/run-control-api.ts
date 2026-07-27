@@ -2,6 +2,24 @@ export const runControlApiBase = (
   process.env.NEXT_PUBLIC_RUN_CONTROL_API_BASE ?? ""
 ).replace(/\/+$/, "");
 
+export const PORTAL_SELECTABLE_RUN_MODES = [
+  "AUTO",
+  "FOCUSED_DECISION_RUN",
+  "DISCOVERY_PORTFOLIO_RUN",
+] as const;
+
+export type PortalSelectableRunMode = typeof PORTAL_SELECTABLE_RUN_MODES[number];
+
+export const RUN_STATUS_POLL_INTERVAL_MS = 10_000;
+export const BACKEND_RATE_LIMIT_PER_MINUTE = 30;
+export const DEFAULT_RATE_LIMIT_BACKOFF_MS = 60_000;
+
+export function sustainedStatusRequestsPerMinute(
+  intervalMs = RUN_STATUS_POLL_INTERVAL_MS,
+) {
+  return Math.ceil(60_000 / intervalMs);
+}
+
 export type RunControlStatus =
   | "QUEUED"
   | "RUNNER_OFFLINE"
@@ -94,6 +112,29 @@ export interface CompiledRunContract {
   };
 }
 
+export interface LiteratureCounts {
+  schema_version: string;
+  status: string;
+  discovered: number;
+  title_abstract_screened: number;
+  full_text_reviewed: number;
+  deeply_read: number;
+  analyzed_unique_total: number;
+  load_bearing_sources: number;
+  unique_cited_sources: number;
+  final_reference_count: number;
+  report_reference_count: number;
+  unique_source_count?: number;
+  deduplicated_records?: number;
+  source_ledger_schema?: string;
+}
+
+export interface ArtifactAvailability {
+  available: boolean;
+  count: number;
+  roles: string[];
+}
+
 export interface RunControlRecord {
   run_id: string;
   creator: string;
@@ -104,9 +145,24 @@ export interface RunControlRecord {
   budget_profile: string;
   runtime_ref: string;
   queue_expires_at: string;
+  queue_expiry?: string;
   compiled_contract: CompiledRunContract | null;
   result_locator: string | null;
   safe_message: string;
+  current_stage: string;
+  progress_percentage: number;
+  raw_idea_count: number;
+  independent_idea_count: number;
+  family_count: number;
+  developed_proposal_count: number;
+  literature_analyzed_count: number;
+  cited_source_count: number;
+  literature_counts: LiteratureCounts;
+  elapsed_time_seconds: number;
+  provider_cost_usd: number;
+  runner_state: "ONLINE" | "OFFLINE";
+  cancellation_state: "NOT_REQUESTED" | "REQUESTED" | "CANCELLED";
+  artifact_availability: ArtifactAvailability;
 }
 
 export interface RunControlEvent {
@@ -119,6 +175,10 @@ export interface RunControlEvent {
   status: string;
   timestamp: string;
   progress: number;
+  raw_idea_count?: number;
+  independent_idea_count?: number;
+  family_count?: number;
+  developed_proposal_count?: number;
   cumulative_usage: {
     calls: number;
     attempts: number;
@@ -126,16 +186,31 @@ export interface RunControlEvent {
     output_tokens: number;
     cost_usd: number;
   };
-  metrics?: {
-    raw_ideas?: number;
-    independent_ideas?: number;
-    families?: number;
-    developed_proposals?: number;
-    literature_analyzed?: number;
-    sources_cited?: number;
-    elapsed_seconds?: number;
-  };
   message: string;
+}
+
+export interface OwnerRunListItem {
+  run_id: string;
+  research_question: string;
+  created_at: string;
+  updated_at: string;
+  status: RunControlStatus;
+  current_stage: string;
+  progress_percentage: number;
+  creativity_profile: "STANDARD" | "BREAKTHROUGH_DISCOVERY";
+  budget_profile: string;
+  literature_analyzed_count: number;
+  cited_source_count: number;
+  literature_counts: LiteratureCounts;
+  provider_cost_usd: number;
+  artifact_availability: ArtifactAvailability;
+}
+
+export interface OwnerRunListResponse {
+  runs: OwnerRunListItem[];
+  limit: number;
+  offset: number;
+  next_offset: number | null;
 }
 
 export interface PrivateArtifact {
@@ -167,12 +242,27 @@ export interface PrivateRunBundle {
   artifacts: PrivateArtifact[];
 }
 
+export type RunControlApiErrorKind =
+  | "NOT_CONFIGURED"
+  | "ACCESS_CHALLENGE"
+  | "NETWORK"
+  | "BACKEND_UNAUTHENTICATED"
+  | "NOT_ALLOWLISTED"
+  | "FORBIDDEN"
+  | "RATE_LIMITED"
+  | "UNAVAILABLE"
+  | "INVALID_RESPONSE"
+  | "HTTP";
+
 export class RunControlApiError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    readonly kind: RunControlApiErrorKind = "HTTP",
+    readonly retryAfterMs = 0,
   ) {
     super(message);
+    this.name = "RunControlApiError";
   }
 }
 
@@ -180,7 +270,7 @@ export interface ControlledRunPayloadInput {
   researchQuestion: string;
   objectives: string[];
   constraints: string[];
-  requestedMode: string;
+  requestedMode: PortalSelectableRunMode;
   creativityProfile: "STANDARD" | "BREAKTHROUGH_DISCOVERY";
   includeLiteratureScope: boolean;
   reportLanguage: string;
@@ -207,39 +297,131 @@ export function buildControlledRunPayload(input: ControlledRunPayloadInput) {
   };
 }
 
+function retryAfterMilliseconds(response: Response) {
+  const value = response.headers?.get("retry-after") ?? "";
+  const seconds = Number(value);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1_000;
+  const date = Date.parse(value);
+  return Number.isFinite(date) ? Math.max(0, date - Date.now()) : DEFAULT_RATE_LIMIT_BACKOFF_MS;
+}
+
+async function responseBody(response: Response) {
+  let raw = "";
+  let parsed: unknown;
+  if (typeof response.text === "function") {
+    raw = await response.text();
+    if (raw) {
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        parsed = undefined;
+      }
+    }
+  } else if (typeof response.json === "function") {
+    try {
+      parsed = await response.json();
+    } catch {
+      parsed = undefined;
+    }
+  }
+  return { raw, parsed };
+}
+
+function detailFrom(parsed: unknown, fallback: string) {
+  if (
+    parsed
+    && typeof parsed === "object"
+    && "detail" in parsed
+    && typeof (parsed as { detail?: unknown }).detail === "string"
+  ) {
+    return (parsed as { detail: string }).detail;
+  }
+  return fallback;
+}
+
 async function request<T>(
   pathname: string,
   init: RequestInit = {},
 ): Promise<T> {
   if (!runControlApiBase) {
-    throw new RunControlApiError("Run Control API is not configured.", 503);
+    throw new RunControlApiError(
+      "Run Control API is not configured.",
+      503,
+      "NOT_CONFIGURED",
+    );
   }
-  const response = await fetch(`${runControlApiBase}${pathname}`, {
-    ...init,
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...init.headers,
-    },
-  });
-  if (!response.ok) {
-    let detail = response.statusText;
-    try {
-      detail = (await response.json()).detail ?? detail;
-    } catch {
-      // The status code remains the authoritative error signal.
-    }
-    throw new RunControlApiError(detail, response.status);
-  }
+
+  let response: Response;
   try {
-    return await response.json() as T;
+    response = await fetch(`${runControlApiBase}${pathname}`, {
+      ...init,
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...init.headers,
+      },
+    });
   } catch {
-    throw new RunControlApiError("Run Control API returned an invalid response.", 502);
+    throw new RunControlApiError(
+      "Unable to reach the Run Control API. Check the network and browser cross-origin access.",
+      0,
+      "NETWORK",
+    );
   }
+
+  const contentType = response.headers?.get("content-type")?.toLowerCase() ?? "";
+  const { raw, parsed } = await responseBody(response);
+  const html = contentType.includes("text/html")
+    || /^\s*(?:<!doctype\s+html|<html\b)/i.test(raw);
+  if (response.redirected || html) {
+    throw new RunControlApiError(
+      "Cloudflare Access requires a browser session.",
+      response.status || 302,
+      "ACCESS_CHALLENGE",
+    );
+  }
+
+  if (!response.ok) {
+    const detail = detailFrom(parsed, response.statusText || "Run Control request failed.");
+    if (response.status === 401) {
+      throw new RunControlApiError(detail, 401, "BACKEND_UNAUTHENTICATED");
+    }
+    if (response.status === 403) {
+      const kind = /allowlist/i.test(detail) ? "NOT_ALLOWLISTED" : "FORBIDDEN";
+      throw new RunControlApiError(detail, 403, kind);
+    }
+    if (response.status === 429) {
+      throw new RunControlApiError(
+        detail,
+        429,
+        "RATE_LIMITED",
+        retryAfterMilliseconds(response),
+      );
+    }
+    if (response.status >= 500) {
+      throw new RunControlApiError(detail, response.status, "UNAVAILABLE");
+    }
+    throw new RunControlApiError(detail, response.status, "HTTP");
+  }
+
+  if (parsed === undefined) {
+    throw new RunControlApiError(
+      "Run Control API returned an invalid non-JSON response.",
+      502,
+      "INVALID_RESPONSE",
+    );
+  }
+  return parsed as T;
 }
 
 export function getRunControlSession() {
   return request<RunControlSession>("/api/session");
+}
+
+export function getMyRuns(limit = 20, offset = 0) {
+  return request<OwnerRunListResponse>(
+    `/api/runs?limit=${encodeURIComponent(limit)}&offset=${encodeURIComponent(offset)}`,
+  );
 }
 
 export function createControlledRun(
@@ -262,12 +444,6 @@ export async function getControlledRunEvents(runId: string) {
     `/api/runs/${encodeURIComponent(runId)}/events`,
   );
   return result.events;
-}
-
-export function getScientificRunner() {
-  return request<{ runner: string; online: boolean; fallback_runner: null }>(
-    "/api/runners/scientific-core-vm",
-  );
 }
 
 export function approveControlledRun(runId: string, csrfToken: string) {
@@ -316,14 +492,31 @@ export async function readPrivateArtifact(
   disposition: "inline" | "attachment" = "inline",
 ) {
   if (!runControlApiBase) {
-    throw new RunControlApiError("Run Control API is not configured.", 503);
+    throw new RunControlApiError(
+      "Run Control API is not configured.",
+      503,
+      "NOT_CONFIGURED",
+    );
   }
-  const response = await fetch(
-    privateArtifactUrl(runId, artifactId, disposition),
-    { credentials: "include" },
-  );
+  let response: Response;
+  try {
+    response = await fetch(
+      privateArtifactUrl(runId, artifactId, disposition),
+      { credentials: "include" },
+    );
+  } catch {
+    throw new RunControlApiError(
+      "Unable to reach the private artifact reader.",
+      0,
+      "NETWORK",
+    );
+  }
   if (!response.ok) {
-    throw new RunControlApiError("Unable to read private artifact.", response.status);
+    throw new RunControlApiError(
+      "Unable to read private artifact.",
+      response.status,
+      response.status >= 500 ? "UNAVAILABLE" : "HTTP",
+    );
   }
   return response.blob();
 }

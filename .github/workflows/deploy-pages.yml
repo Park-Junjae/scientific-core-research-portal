@@ -46,7 +46,8 @@ jobs:
       - run: python -m coscientist.site validate-content --portal-root . --public-build
       # The production site is served from the custom-domain root
       # (https://app.aichoscientist.com), not from a repository subpath.
-      - run: NEXT_PUBLIC_BASE_PATH= pnpm build
+      - run: NEXT_PUBLIC_BASE_PATH= NEXT_PUBLIC_RUN_CONTROL_API_BASE=https://api.aichoscientist.com pnpm build
+      - run: NEXT_PUBLIC_RUN_CONTROL_API_BASE=https://api.aichoscientist.com pnpm test:production-api-base
       - run: pnpm test:basepath -- --root
       - run: pnpm test:links && pnpm test:budget && pnpm test:privacy && pnpm test:tracked-boundary
       - uses: actions/upload-pages-artifact@v3

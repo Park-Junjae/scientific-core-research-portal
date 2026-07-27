@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { LocaleProvider } from "@/lib/locale";
+import { runControlApiBase } from "@/lib/run-control-api";
 import { testReports, testRun, testSources } from "@/test/fixtures";
 import { KnowledgeReader } from "./knowledge-reader";
 import { LiteratureExplorer } from "./literature-explorer";
@@ -81,7 +82,11 @@ describe("reader contracts", () => {
     expect(container.querySelector(".advanced-fields")).not.toHaveAttribute("open");
     expect(screen.queryByRole("heading", { name: "Request preview" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Review research plan" })).toBeDisabled();
-    expect(screen.getByText("Research execution is being prepared.")).toBeInTheDocument();
+    if (runControlApiBase) {
+      expect(screen.getByRole("heading", { name: "Connect a lab account" })).toBeInTheDocument();
+    } else {
+      expect(screen.getByText("Research execution is being prepared.")).toBeInTheDocument();
+    }
 
     fireEvent.change(screen.getByRole("textbox", { name: /Research question/ }), {
       target: { value: "Why does product purity collapse at this locus?" },

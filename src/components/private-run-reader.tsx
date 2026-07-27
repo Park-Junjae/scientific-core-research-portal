@@ -23,11 +23,12 @@ import {
 import { useLocale } from "@/lib/locale";
 
 const supportingRoles = [
-  ["literature_ledger", "Source ledger", "문헌 원장", Library],
-  ["idea_manifest", "Idea manifest", "아이디어 목록", FlaskConical],
-  ["run_specification", "Run specification", "연구 실행 명세", FileJson],
-  ["integrity_audit", "Integrity audit", "무결성 점검", ShieldCheck],
-  ["cost_report", "Cost report", "비용 보고서", WalletCards],
+  [["source_ledger", "literature_ledger"], "Source ledger", "문헌 원장", Library],
+  [["artifact_manifest"], "Artifact manifest", "산출물 목록", FileJson],
+  [["idea_manifest"], "Idea manifest", "아이디어 목록", FlaskConical],
+  [["run_specification"], "Run specification", "연구 실행 명세", FileJson],
+  [["integrity_audit"], "Integrity audit", "무결성 점검", ShieldCheck],
+  [["cost_report"], "Cost report", "비용 보고서", WalletCards],
 ] as const;
 
 function mergeManifestMetadata(
@@ -109,7 +110,7 @@ export function PrivateRunReader({ runId }: { runId: string }) {
     <section className="private-result-reader artifact-center">
       <div className="section-heading">
         <div>
-          <p className="section-label">{ko ? "소유자 전용" : "Owner only"}</p>
+          <p className="section-label">{ko ? "내 비공개 결과" : "Private to your account"}</p>
           <h2>{ko ? "연구 결과 파일" : "Research result artifacts"}</h2>
         </div>
         <span>{artifacts.length}{ko ? "개 파일" : " files"}</span>
@@ -144,10 +145,10 @@ export function PrivateRunReader({ runId }: { runId: string }) {
       <div className="supporting-artifacts">
         <h3>{ko ? "근거와 실행 기록" : "Supporting artifacts"}</h3>
         <div>
-          {supportingRoles.map(([role, en, kr, Icon]) => {
-            const artifact = artifacts.find((item) => item.role === role);
+          {supportingRoles.map(([roles, en, kr, Icon]) => {
+            const artifact = artifacts.find((item) => roles.some((role) => role === item.role));
             return artifact ? (
-              <a key={role} href={privateArtifactUrl(runId, artifact.artifact_id, "attachment")}>
+              <a key={roles[0]} href={privateArtifactUrl(runId, artifact.artifact_id, "attachment")}>
                 <Icon size={17} /><span>{ko ? kr : en}</span><Download size={15} />
               </a>
             ) : null;

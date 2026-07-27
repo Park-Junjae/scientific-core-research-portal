@@ -7,11 +7,17 @@ import {
   CircleDot,
   Clock3,
   LoaderCircle,
-  LogIn,
   Server,
 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import { AccessConnectionPanel } from "@/components/access-connection-panel";
 import { PrivateRunReader } from "@/components/private-run-reader";
 import { useLocale } from "@/lib/locale";
 import {
@@ -19,9 +25,8 @@ import {
   cancelControlledRun,
   getControlledRun,
   getControlledRunEvents,
-  getRunControlSession,
-  getScientificRunner,
   redispatchControlledRun,
+  RUN_STATUS_POLL_INTERVAL_MS,
   runControlApiBase,
   RunControlApiError,
   type RunControlEvent,
@@ -31,19 +36,27 @@ import {
 
 const terminalStatuses = new Set(["COMPLETED", "FAILED", "CANCELLED", "QUEUE_EXPIRED"]);
 const executionStages = [
-  "scientific_framing",
-  "mechanistic_decomposition",
-  "idea_generation",
-  "presearch_idea_freeze",
-  "literature_retrieval",
-  "family_grouping",
-  "proposal_development",
-  "skeptical_review",
-  "revision",
-  "portfolio_synthesis",
-  "report_generation",
-  "completed",
-];
+  ["runner_accepted"],
+  ["source_preflight"],
+  ["scientific_framing"],
+  ["mechanistic_decomposition"],
+  ["blind_multi_lens_ideation"],
+  ["presearch_idea_freeze"],
+  ["literature_retrieval"],
+  ["novelty_and_precedent_audit"],
+  ["idea_generation"],
+  ["mechanism_family_grouping", "family_grouping"],
+  ["proposal_development"],
+  ["scientific_development"],
+  ["skeptical_review"],
+  ["revision"],
+  ["dual_axis_portfolio"],
+  ["comparison"],
+  ["synthesis"],
+  ["report_generation"],
+  ["publication_packaging"],
+  ["completed", "failed", "cancelled"],
+] as const;
 
 function hours(seconds: number) {
   return seconds < 3600 ? `${Math.round(seconds / 60)}m` : `${Math.round(seconds / 3600)}h`;
@@ -53,6 +66,20 @@ function formatValue(value: unknown, ko: boolean) {
   if (typeof value === "boolean") return value ? (ko ? "예" : "Yes") : (ko ? "아니요" : "No");
   if (value === null || value === undefined || value === "") return "—";
   return String(value);
+}
+
+function statusError(error: unknown, ko: boolean) {
+  if (error instanceof RunControlApiError && error.kind === "RATE_LIMITED") {
+    const seconds = Math.max(1, Math.ceil(error.retryAfterMs / 1000));
+    return ko
+      ? `요청 한도에 도달했습니다. ${seconds}초 동안 자동 새로고침을 멈춥니다.`
+      : `The request limit was reached. Automatic refresh is paused for ${seconds} seconds.`;
+  }
+  return error instanceof Error
+    ? error.message
+    : ko
+      ? "실행 상태를 불러올 수 없습니다."
+      : "Unable to read run status.";
 }
 
 export function RunControlPanel() {
@@ -66,85 +93,132 @@ export function RunControlPanel() {
   const [session, setSession] = useState<RunControlSession | null>(null);
   const [run, setRun] = useState<RunControlRecord | null>(null);
   const [events, setEvents] = useState<RunControlEvent[]>([]);
-  const [runnerOnline, setRunnerOnline] = useState<boolean | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [authRequired, setAuthRequired] = useState(false);
+  const stageRef = useRef("");
+  const backoffUntilRef = useRef(0);
 
-  const refresh = useCallback(async (id: string) => {
+  const refresh = useCallback(async (id: string, includeEvents = false) => {
+    if (!includeEvents && Date.now() < backoffUntilRef.current) return;
     try {
-      const [nextRun, nextEvents, runner] = await Promise.all([
-        getControlledRun(id),
-        getControlledRunEvents(id),
-        getScientificRunner(),
-      ]);
+      const nextRun = await getControlledRun(id);
+      const stageChanged = Boolean(stageRef.current)
+        && stageRef.current !== nextRun.current_stage;
       setRun(nextRun);
-      setEvents(nextEvents);
-      setRunnerOnline(runner.online);
+      if (includeEvents || stageChanged) {
+        setEvents(await getControlledRunEvents(id));
+      }
+      stageRef.current = nextRun.current_stage;
+      backoffUntilRef.current = 0;
       setError("");
     } catch (reason) {
-      if (reason instanceof RunControlApiError && [401, 403].includes(reason.status)) {
-        setAuthRequired(true);
-      } else {
-        setError(reason instanceof Error ? reason.message : "Unable to read run status.");
+      if (reason instanceof RunControlApiError && reason.kind === "RATE_LIMITED") {
+        backoffUntilRef.current = Date.now() + Math.max(
+          reason.retryAfterMs,
+          RUN_STATUS_POLL_INTERVAL_MS,
+        );
       }
+      if (
+        reason instanceof RunControlApiError
+        && ["ACCESS_CHALLENGE", "BACKEND_UNAUTHENTICATED", "NOT_ALLOWLISTED"].includes(
+          reason.kind,
+        )
+      ) {
+        setSession(null);
+      }
+      setError(statusError(reason, ko));
     }
-  }, []);
+  }, [ko]);
 
-  useEffect(() => {
-    if (!runId || !runControlApiBase) return;
-    getRunControlSession()
-      .then((value) => {
-        setSession(value);
-        setAuthRequired(false);
-        return refresh(runId);
-      })
-      .catch((reason) => {
-        if (reason instanceof RunControlApiError && [401, 403].includes(reason.status)) {
-          setAuthRequired(true);
-        } else {
-          setError(reason instanceof Error ? reason.message : "Unable to authenticate.");
-        }
-      });
-  }, [refresh, runId]);
+  async function connected(nextSession: RunControlSession) {
+    setSession(nextSession);
+    setError("");
+    if (runId) await refresh(runId, true);
+  }
 
   useEffect(() => {
     if (!runId || !session || terminalStatuses.has(run?.status ?? "")) return;
-    const interval = window.setInterval(() => refresh(runId), 5000);
+    const interval = window.setInterval(() => {
+      if (Date.now() >= backoffUntilRef.current) void refresh(runId);
+    }, RUN_STATUS_POLL_INTERVAL_MS);
     return () => window.clearInterval(interval);
   }, [refresh, run?.status, runId, session]);
 
   if (!runControlApiBase) {
-    return <section className="control-notice" role="status"><Server size={22} /><div><h2>{ko ? "연구 실행 기능은 준비 중입니다." : "Research execution is being prepared."}</h2><p>{ko ? "운영 백엔드 연결이 완료될 때까지 실행 요청을 보낼 수 없습니다." : "Run requests remain disabled until the production backend is connected."}</p></div></section>;
+    return (
+      <section className="control-notice" role="status">
+        <Server size={22} />
+        <div>
+          <h2>{ko ? "연구 실행 기능은 준비 중입니다." : "Research execution is being prepared."}</h2>
+          <p>{ko ? "운영 백엔드 연결이 완료될 때까지 실행 요청을 보낼 수 없습니다." : "Run requests remain disabled until the production backend is connected."}</p>
+        </div>
+      </section>
+    );
   }
-  if (authRequired) {
-    return <section className="control-notice"><LogIn size={22} /><div><h2>{ko ? "인증이 필요합니다." : "Authentication required"}</h2><p>{ko ? "허용된 Cloudflare Access 계정으로 인증하세요." : "Authenticate with an allowlisted Cloudflare Access account."}</p><a className="primary-button" href={`${runControlApiBase}/api/session`}><LogIn size={17} />Cloudflare Access</a></div></section>;
+  if (!runId) {
+    return <p className="control-error">{ko ? "실행 ID가 없습니다." : "Missing run ID."}</p>;
   }
-  if (!runId) return <p className="control-error">{ko ? "실행 ID가 없습니다." : "Missing run ID."}</p>;
+  if (!session) {
+    return (
+      <>
+        <AccessConnectionPanel onConnected={connected} />
+        {error && <p className="control-error" role="alert">{error}</p>}
+      </>
+    );
+  }
   if (!run) {
-    return <p className="control-loading" role="status"><LoaderCircle className="spin" size={18} />{error || (ko ? "실행 상태를 불러오는 중입니다." : "Loading run status.")}</p>;
+    return (
+      <p className="control-loading" role="status">
+        <LoaderCircle className="spin" size={18} />
+        {error || (ko ? "실행 상태를 불러오는 중입니다." : "Loading run status.")}
+      </p>
+    );
   }
+  const currentSession = session;
 
   const contract = run.compiled_contract;
   const budget = contract?.budget;
-  const canApprove = run.status === "AWAITING_APPROVAL" && Boolean(session);
-  const canCancel = ["QUEUED", "RUNNER_OFFLINE", "PREFLIGHT", "AWAITING_APPROVAL", "RUNNING", "GENERATING_REPORTS"].includes(run.status);
+  const canApprove = run.status === "AWAITING_APPROVAL";
+  const canCancel = [
+    "QUEUED",
+    "RUNNER_OFFLINE",
+    "PREFLIGHT",
+    "AWAITING_APPROVAL",
+    "RUNNING",
+    "GENERATING_REPORTS",
+  ].includes(run.status);
   const latest = events.at(-1);
-  const metrics = latest?.metrics;
+  const currentStageIndex = executionStages.findIndex((aliases) =>
+    aliases.some((stage) => stage === run.current_stage));
+  const queueExpiry = run.queue_expires_at || run.queue_expiry || "";
 
   async function act(action: "approve" | "cancel") {
-    if (!session) return;
     setBusy(true);
     setError("");
     try {
-      setRun(action === "approve"
-        ? await approveControlledRun(runId, session.csrf_token)
-        : await cancelControlledRun(runId, session.csrf_token));
+      if (action === "approve") {
+        await approveControlledRun(runId, currentSession.csrf_token);
+      } else {
+        await cancelControlledRun(runId, currentSession.csrf_token);
+      }
       setConfirmed(false);
-      await refresh(runId);
+      await refresh(runId, true);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "The request failed.");
+      setError(statusError(reason, ko));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function redispatch() {
+    setBusy(true);
+    setError("");
+    try {
+      await redispatchControlledRun(runId, currentSession.csrf_token);
+      await refresh(runId, true);
+    } catch (reason) {
+      setError(statusError(reason, ko));
     } finally {
       setBusy(false);
     }
@@ -159,20 +233,34 @@ export function RunControlPanel() {
       </div>
 
       <header className="run-control-header">
-        <div><p className="section-label">{ko ? "인증된 비공개 실행" : "Authenticated private run"}</p><h1>{ko ? "연구 계획과 실행 상태" : "Research plan and execution"}</h1><p className="page-lede">{run.safe_message}</p></div>
-        <div className={`runner-state ${runnerOnline ? "online" : "offline"}`}><Server size={17} />{runnerOnline === null ? (ko ? "Runner 확인 중" : "Checking runner") : runnerOnline ? (ko ? "VM runner 온라인" : "VM runner online") : (ko ? "VM runner 오프라인" : "VM runner offline")}</div>
+        <div>
+          <p className="section-label">{ko ? "인증된 비공개 실행" : "Authenticated private run"}</p>
+          <h1>{ko ? "연구 계획과 실행 상태" : "Research plan and execution"}</h1>
+          <p className="page-lede">{run.safe_message}</p>
+        </div>
+        <div className={`runner-state ${run.runner_state === "ONLINE" ? "online" : "offline"}`}>
+          <Server size={17} />
+          {run.runner_state === "ONLINE"
+            ? (ko ? "VM runner 온라인" : "VM runner online")
+            : (ko ? "VM runner 오프라인" : "VM runner offline")}
+        </div>
       </header>
 
       <section className="run-state-band">
         <div><span>{ko ? "현재 상태" : "Current status"}</span><strong>{run.status}</strong></div>
         <div><span>Run ID</span><strong>{run.run_id}</strong></div>
+        <div><span>{ko ? "현재 단계" : "Current stage"}</span><strong>{run.current_stage.replaceAll("_", " ")}</strong></div>
         <div><span>{ko ? "예산 프로필" : "Budget profile"}</span><strong>{run.budget_profile}</strong></div>
-        <div><span>{ko ? "대기 만료" : "Queue expiry"}</span><strong>{new Date(run.queue_expires_at).toLocaleString(locale)}</strong></div>
+        <div><span>{ko ? "취소 상태" : "Cancellation"}</span><strong>{run.cancellation_state}</strong></div>
+        <div><span>{ko ? "대기 만료" : "Queue expiry"}</span><strong>{queueExpiry ? new Date(queueExpiry).toLocaleString(locale) : "—"}</strong></div>
       </section>
 
       {contract && (
         <section className="compiled-contract">
-          <div className="section-heading"><div><p className="section-label">{ko ? "무비용 사전 검토" : "Zero-provider preflight"}</p><h2>{ko ? "컴파일된 연구 계획" : "Compiled research plan"}</h2></div><span>{contract.run_mode}</span></div>
+          <div className="section-heading">
+            <div><p className="section-label">{ko ? "무비용 사전 검토" : "Zero-provider preflight"}</p><h2>{ko ? "컴파일된 연구 계획" : "Compiled research plan"}</h2></div>
+            <span>{contract.run_mode}</span>
+          </div>
           <p className="approval-boundary-note">{ko ? "실행 승인을 누르기 전에는 provider 기반 연구가 시작되지 않습니다." : "Provider-backed research does not start until you approve execution."}</p>
 
           <dl className="contract-grid">
@@ -186,54 +274,119 @@ export function RunControlPanel() {
             <div><dt>{ko ? "사용자 확인 필요" : "User confirmation required"}</dt><dd>{formatValue(contract.requires_user_confirmation, ko)}</dd></div>
           </dl>
 
-          {contract.material_inferences.length > 0 && <div className="inference-list"><h3>{ko ? "추론·변경 사항" : "Inferred and changed fields"}</h3>{contract.material_inferences.map((item) => <div key={`${item.field}-${String(item.to)}`}><strong>{item.field}</strong><span>{formatValue(item.from, ko)} → {formatValue(item.to, ko)}</span><p>{item.reason}</p></div>)}</div>}
+          {contract.material_inferences.length > 0 && (
+            <div className="inference-list">
+              <h3>{ko ? "추론·변경 사항" : "Inferred and changed fields"}</h3>
+              {contract.material_inferences.map((item) => (
+                <div key={`${item.field}-${String(item.to)}`}>
+                  <strong>{item.field}</strong>
+                  <span>{formatValue(item.from, ko)} → {formatValue(item.to, ko)}</span>
+                  <p>{item.reason}</p>
+                </div>
+              ))}
+            </div>
+          )}
 
-          {budget && <div className="budget-comparison">
-            <div><span>{ko ? "호출" : "Calls"}</span><strong>{budget.expected_successful_calls}</strong><small>/ {budget.hard_cap_successful_calls} cap</small></div>
-            <div><span>{ko ? "입력 토큰" : "Input tokens"}</span><strong>{budget.expected_input_tokens.toLocaleString()}</strong><small>/ {budget.hard_cap_input_tokens.toLocaleString()}</small></div>
-            <div><span>{ko ? "출력 토큰" : "Output tokens"}</span><strong>{budget.expected_output_tokens.toLocaleString()}</strong><small>/ {budget.hard_cap_output_tokens.toLocaleString()}</small></div>
-            <div><span>{ko ? "비용" : "Cost"}</span><strong>${budget.expected_cost_usd.toFixed(2)}</strong><small>/ ${budget.hard_cap_cost_usd.toFixed(2)}</small></div>
-            <div><span>{ko ? "시간" : "Time"}</span><strong>{hours(budget.expected_wall_clock_seconds)}</strong><small>/ {hours(budget.hard_cap_wall_clock_seconds)}</small></div>
-          </div>}
+          {budget && (
+            <div className="budget-comparison">
+              <div><span>{ko ? "호출" : "Calls"}</span><strong>{budget.expected_successful_calls}</strong><small>/ {budget.hard_cap_successful_calls} cap</small></div>
+              <div><span>{ko ? "입력 토큰" : "Input tokens"}</span><strong>{budget.expected_input_tokens.toLocaleString()}</strong><small>/ {budget.hard_cap_input_tokens.toLocaleString()}</small></div>
+              <div><span>{ko ? "출력 토큰" : "Output tokens"}</span><strong>{budget.expected_output_tokens.toLocaleString()}</strong><small>/ {budget.hard_cap_output_tokens.toLocaleString()}</small></div>
+              <div><span>{ko ? "비용" : "Cost"}</span><strong>${budget.expected_cost_usd.toFixed(2)}</strong><small>/ ${budget.hard_cap_cost_usd.toFixed(2)}</small></div>
+              <div><span>{ko ? "시간" : "Time"}</span><strong>{hours(budget.expected_wall_clock_seconds)}</strong><small>/ {hours(budget.hard_cap_wall_clock_seconds)}</small></div>
+            </div>
+          )}
         </section>
       )}
 
-      {canApprove && <section className="approval-panel"><AlertTriangle size={21} /><div><h2>{ko ? "실행 승인" : "Approve execution"}</h2><p>{ko ? "연구 범위, 추론된 변경 사항, 호출·토큰·비용·시간 상한을 확인하세요." : "Review the scope, inferred changes, and call, token, cost, and time ceilings."}</p><label><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>{ko ? "컴파일된 계획과 예산 상한을 확인했습니다." : "I reviewed the compiled plan and budget ceilings."}</span></label><div className="approval-actions"><Link className="secondary-button" href="/new-run/">{ko ? "요청 수정" : "Edit request"}</Link><button className="primary-button" type="button" disabled={!confirmed || busy} onClick={() => act("approve")}><Check size={17} />{ko ? "실행 승인" : "Approve execution"}</button></div></div></section>}
+      {canApprove && (
+        <section className="approval-panel">
+          <AlertTriangle size={21} />
+          <div>
+            <h2>{ko ? "내 실행 승인" : "Approve my execution"}</h2>
+            <p>{ko ? "연구 범위, 추론된 변경 사항, 호출·토큰·비용·시간 상한을 확인하세요." : "Review the scope, inferred changes, and call, token, cost, and time ceilings."}</p>
+            <label>
+              <input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />
+              <span>{ko ? "컴파일된 계획과 예산 상한을 확인했습니다." : "I reviewed the compiled plan and budget ceilings."}</span>
+            </label>
+            <div className="approval-actions">
+              <Link className="secondary-button" href="/new-run/">{ko ? "요청 수정" : "Edit request"}</Link>
+              <button className="primary-button" type="button" disabled={!confirmed || busy} onClick={() => act("approve")}>
+                <Check size={17} />{ko ? "내 실행 승인" : "Approve my execution"}
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {(run.status === "RUNNING" || run.status === "GENERATING_REPORTS" || run.status === "COMPLETED") && (
         <section className="execution-progress">
-          <div className="section-heading"><div><p className="section-label">{ko ? "실행과 결과" : "Execution and results"}</p><h2>{ko ? "연구 진행 단계" : "Research stage progress"}</h2></div><span>{latest ? `${Math.round(latest.progress * 100)}%` : "0%"}</span></div>
-          <ol className="stage-progress-list">{executionStages.map((stage) => {
-            const event = [...events].reverse().find((item) => item.stage === stage);
-            const active = latest?.stage === stage;
-            return <li key={stage} className={active ? "active" : event ? "complete" : ""}>{event ? <Check size={15} /> : <CircleDot size={15} />}<span>{stage.replaceAll("_", " ")}</span></li>;
-          })}</ol>
-          {latest && <div className="live-run-metrics">
-            <div><span>{ko ? "초기 아이디어" : "Raw ideas"}</span><strong>{metrics?.raw_ideas ?? "—"}</strong></div>
-            <div><span>{ko ? "독립 아이디어" : "Independent ideas"}</span><strong>{metrics?.independent_ideas ?? "—"}</strong></div>
-            <div><span>{ko ? "기전 계열" : "Families"}</span><strong>{metrics?.families ?? "—"}</strong></div>
-            <div><span>{ko ? "발전 제안" : "Developed proposals"}</span><strong>{metrics?.developed_proposals ?? "—"}</strong></div>
-            <div><span>{ko ? "분석 문헌" : "Literature analyzed"}</span><strong>{metrics?.literature_analyzed ?? "—"}</strong></div>
-            <div><span>{ko ? "인용 출처" : "Sources cited"}</span><strong>{metrics?.sources_cited ?? "—"}</strong></div>
-            <div><span>{ko ? "Provider 비용" : "Provider cost"}</span><strong>${latest.cumulative_usage.cost_usd.toFixed(2)}</strong></div>
-            <div><span>{ko ? "경과 시간" : "Elapsed"}</span><strong>{metrics?.elapsed_seconds !== undefined ? hours(metrics.elapsed_seconds) : "—"}</strong></div>
-          </div>}
+          <div className="section-heading">
+            <div><p className="section-label">{ko ? "실행과 결과" : "Execution and results"}</p><h2>{ko ? "연구 진행 단계" : "Research stage progress"}</h2></div>
+            <span>{Math.round(run.progress_percentage)}%</span>
+          </div>
+          <ol className="stage-progress-list">
+            {executionStages.map((aliases, index) => {
+              const event = [...events].reverse().find((item) =>
+                aliases.some((stage) => stage === item.stage));
+              const active = aliases.some((stage) => stage === run.current_stage);
+              const complete = Boolean(event) || (currentStageIndex >= 0 && index < currentStageIndex);
+              return (
+                <li key={aliases[0]} className={active ? "active" : complete ? "complete" : ""}>
+                  {complete && !active ? <Check size={15} /> : <CircleDot size={15} />}
+                  <span>{aliases[0].replaceAll("_", " ")}</span>
+                </li>
+              );
+            })}
+          </ol>
+          <div className="live-run-metrics">
+            <div><span>{ko ? "초기 아이디어" : "Raw ideas"}</span><strong>{run.raw_idea_count}</strong></div>
+            <div><span>{ko ? "독립 아이디어" : "Independent ideas"}</span><strong>{run.independent_idea_count}</strong></div>
+            <div><span>{ko ? "기전 계열" : "Families"}</span><strong>{run.family_count}</strong></div>
+            <div><span>{ko ? "발전 제안" : "Developed proposals"}</span><strong>{run.developed_proposal_count}</strong></div>
+            <div><span>{ko ? "분석 문헌" : "Literature analyzed"}</span><strong>{run.literature_analyzed_count}</strong></div>
+            <div><span>{ko ? "인용 출처" : "Sources cited"}</span><strong>{run.cited_source_count}</strong></div>
+            <div><span>{ko ? "Provider 비용" : "Provider cost"}</span><strong>${run.provider_cost_usd.toFixed(2)}</strong></div>
+            <div><span>{ko ? "경과 시간" : "Elapsed"}</span><strong>{hours(run.elapsed_time_seconds)}</strong></div>
+          </div>
         </section>
       )}
 
       <section className="event-timeline">
-        <div className="section-heading"><div><p className="section-label">{ko ? "안전한 상태 기록" : "Safe status record"}</p><h2>{ko ? "이벤트" : "Events"}</h2></div><span>{events.length}</span></div>
-        {events.length === 0 ? <p className="muted-text">{ko ? "아직 수신된 이벤트가 없습니다." : "No events received yet."}</p> : events.map((event, index) => <div className="event-row" key={event.event_id}><span className="event-marker">{index === events.length - 1 ? <CircleDot size={17} /> : <Check size={15} />}</span><div><strong>{event.stage.replaceAll("_", " ")}</strong><p>{event.message}</p></div><span>{Math.round(event.progress * 100)}%</span></div>)}
+        <div className="section-heading">
+          <div><p className="section-label">{ko ? "안전한 상태 기록" : "Safe status record"}</p><h2>{ko ? "이벤트" : "Events"}</h2></div>
+          <span>{events.length}</span>
+        </div>
+        {events.length === 0
+          ? <p className="muted-text">{ko ? "아직 수신된 이벤트가 없습니다." : "No events received yet."}</p>
+          : events.map((event, index) => (
+              <div className="event-row" key={event.event_id}>
+                <span className="event-marker">{index === events.length - 1 ? <CircleDot size={17} /> : <Check size={15} />}</span>
+                <div><strong>{event.stage.replaceAll("_", " ")}</strong><p>{event.message}</p></div>
+                <span>{Math.round(event.progress * 100)}%</span>
+              </div>
+            ))}
       </section>
 
       {run.status === "COMPLETED" && <PrivateRunReader runId={runId} />}
 
       <div className="run-control-actions">
-        {run.status === "QUEUE_EXPIRED" && <button className="primary-button" type="button" disabled={busy} onClick={async () => { if (!session) return; setBusy(true); try { setRun(await redispatchControlledRun(runId, session.csrf_token)); } catch (reason) { setError(reason instanceof Error ? reason.message : "The request failed."); } finally { setBusy(false); } }}><Clock3 size={17} />{ko ? "만료된 실행 다시 전송" : "Re-dispatch expired run"}</button>}
-        {canCancel && <button className="secondary-button danger-action" type="button" disabled={busy} onClick={() => act("cancel")}><Ban size={17} />{ko ? "실행 취소" : "Cancel run"}</button>}
-        <button className="secondary-button" type="button" disabled={busy} onClick={() => refresh(runId)}><LoaderCircle size={17} />{ko ? "상태 새로고침" : "Refresh status"}</button>
+        {run.status === "QUEUE_EXPIRED" && (
+          <button className="primary-button" type="button" disabled={busy} onClick={redispatch}>
+            <Clock3 size={17} />{ko ? "만료된 실행 다시 전송" : "Re-dispatch expired run"}
+          </button>
+        )}
+        {canCancel && (
+          <button className="secondary-button danger-action" type="button" disabled={busy} onClick={() => act("cancel")}>
+            <Ban size={17} />{ko ? "실행 취소" : "Cancel run"}
+          </button>
+        )}
+        <button className="secondary-button" type="button" disabled={busy} onClick={() => refresh(runId, true)}>
+          <LoaderCircle size={17} />{ko ? "상태 새로고침" : "Refresh status"}
+        </button>
       </div>
       {error && <p className="control-error" role="alert">{error}</p>}
+      {latest && <span className="sr-only">{latest.stage}</span>}
     </div>
   );
 }
