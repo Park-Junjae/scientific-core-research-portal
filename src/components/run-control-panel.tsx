@@ -231,6 +231,12 @@ export function RunControlPanel() {
           )}
 
           <dl className="contract-grid">
+            {contract.creativity_profile && (
+              <div><dt>{ko ? "아이디어 탐색" : "Creativity profile"}</dt><dd>{contract.creativity_profile}</dd></div>
+            )}
+            {contract.raw_spark_target && (
+              <div><dt>{ko ? "원시 아이디어 목표" : "Raw spark target"}</dt><dd>{contract.raw_spark_target}</dd></div>
+            )}
             <div><dt>{ko ? "문헌 범위 포함" : "Literature scope"}</dt><dd>{formatValue(contract.include_literature_list_and_review_scope, ko)}</dd></div>
             <div><dt>{ko ? "초기 아이디어" : "Raw ideas"}</dt><dd>{contract.generation_plan.raw_idea_minimum} min / {contract.generation_plan.raw_idea_target} target</dd></div>
             <div><dt>{ko ? "기전 계열" : "Mechanism families"}</dt><dd>{contract.generation_plan.mechanism_family_target_range.join("–")}</dd></div>
@@ -242,6 +248,22 @@ export function RunControlPanel() {
             <div><dt>Runtime ref</dt><dd>{contract.runtime_ref}</dd></div>
             <div><dt>{ko ? "출력 루트 정책" : "Output root policy"}</dt><dd>{contract.output_root_policy}</dd></div>
           </dl>
+
+          {contract.stage_order && (
+            <div className="breakthrough-stage-flow">
+              <h3>{ko ? "돌파형 탐색 단계" : "Breakthrough stage order"}</h3>
+              <ol>
+                {contract.stage_order.map((stage) => (
+                  <li
+                    key={stage}
+                    className={stage === "presearch_idea_freeze" ? "freeze-stage" : ""}
+                  >
+                    {stage.replaceAll("_", " ")}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
 
           {budget && (
             <div className="budget-comparison" aria-label={ko ? "예상치와 상한" : "Expected use and hard caps"}>

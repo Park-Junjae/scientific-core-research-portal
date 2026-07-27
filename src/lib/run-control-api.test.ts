@@ -67,4 +67,33 @@ describe("run control browser client", () => {
       /authorization|api[_-]?key|github[_-]?token/i,
     );
   });
+
+  it("omits creativity metadata for Standard and binds it for Breakthrough", async () => {
+    const { buildControlledRunPayload } = await import("./run-control-api");
+    const common = {
+      researchQuestion: "Why does product purity vary?",
+      objectives: ["Preserve activity"],
+      constraints: ["No exact sequence design"],
+      requestedMode: "AUTO",
+    };
+    const standard = buildControlledRunPayload({
+      ...common,
+      creativityProfile: "STANDARD",
+    });
+    expect(standard).not.toHaveProperty("creativity_profile");
+    expect(standard.budget_profile).toBe("standard");
+    expect(standard.requested_mode).toBe("AUTO");
+
+    const breakthrough = buildControlledRunPayload({
+      ...common,
+      creativityProfile: "BREAKTHROUGH_DISCOVERY",
+    });
+    expect(breakthrough).toMatchObject({
+      creativity_profile: "BREAKTHROUGH_DISCOVERY",
+      creativity_profile_selection_reviewed: true,
+      raw_spark_target: 60,
+      budget_profile: "breakthrough_discovery",
+      requested_mode: "DISCOVERY_PORTFOLIO_RUN",
+    });
+  });
 });

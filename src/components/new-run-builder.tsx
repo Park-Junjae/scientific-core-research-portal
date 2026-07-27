@@ -13,6 +13,7 @@ import {
   type RunRequestDraft,
 } from "@/lib/run-request";
 import {
+  buildControlledRunPayload,
   createControlledRun,
   getRunControlSession,
   runControlApiBase,
@@ -189,26 +190,13 @@ export function NewRunBuilder() {
         ].filter(Boolean).join("\n"),
       );
       const run = await createControlledRun(
-        {
-          research_question: researchQuestion,
+        buildControlledRunPayload({
+          researchQuestion,
           objectives,
           constraints,
-          requested_mode: value.creativity_profile === "BREAKTHROUGH_DISCOVERY"
-            ? "DISCOVERY_PORTFOLIO_RUN"
-            : value.run_type || "AUTO",
-          include_literature_list_and_review_scope: true,
-          execution_mode: "PROVIDER_BACKED",
-          budget_profile: value.creativity_profile === "BREAKTHROUGH_DISCOVERY"
-            ? "breakthrough_discovery"
-            : "standard",
-          ...(value.creativity_profile === "BREAKTHROUGH_DISCOVERY"
-            ? {
-                creativity_profile: "BREAKTHROUGH_DISCOVERY",
-                creativity_profile_selection_reviewed: true,
-                raw_spark_target: 60,
-              }
-            : {}),
-        },
+          requestedMode: value.run_type || "AUTO",
+          creativityProfile: value.creativity_profile,
+        }),
         session.csrf_token,
       );
       window.location.assign(withBasePath(`/run-control/?run_id=${encodeURIComponent(run.run_id)}`));
@@ -429,8 +417,8 @@ export function NewRunBuilder() {
           </div>
           <small className="preview-footnote">
             {ko
-              ? "브라우저에는 API 키나 GitHub 토큰이 저장되지 않습니다."
-              : "No API key or GitHub token is stored in the browser."}
+              ? "브라우저에는 비밀 키나 인증 토큰이 저장되지 않습니다."
+              : "No secret key or authentication token is stored in the browser."}
           </small>
         </aside>
       )}

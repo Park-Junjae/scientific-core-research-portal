@@ -3,7 +3,7 @@
 This branch reconstructs the public-safe browser side of authenticated
 Scientific Core execution on top of the sanitized Portal main branch. It does
 not contain private development ancestry and does not contain or accept an
-OpenAI key, GitHub token, shell command, runtime ref, executable path, output
+provider key, Access assertion, GitHub App credential, shell command, runtime ref, executable path, output
 path, or arbitrary environment.
 
 ## Build Configuration
@@ -11,11 +11,11 @@ path, or arbitrary environment.
 Set one non-secret environment variable:
 
 ```text
-NEXT_PUBLIC_RUN_CONTROL_API_BASE=https://<approved-control-host>
+NEXT_PUBLIC_RUN_CONTROL_API_BASE=https://api.aichoscientist.com
 ```
 
-The backend must allow the exact Portal origin and provide GitHub OAuth,
-server-side sessions, CSRF, private request storage, V2 replay-protected status
+The backend must allow the exact Portal origin and use Cloudflare Access JWT
+identity with an explicit email allowlist. It provides CSRF, private request storage, V2 replay-protected status
 events, approval, cancellation, re-dispatch, and owner-authorized private
 artifact endpoints.
 
@@ -34,11 +34,12 @@ artifact endpoints.
 
 The frontend is deployable with the single public backend base URL above.
 Production acceptance still requires an independently deployed HTTPS backend,
-GitHub OAuth/App credentials entered directly in the hosting platform, an
-approved-user allowlist, same-site or reviewed cross-site session behavior,
+Cloudflare Access configuration and GitHub App machine credentials entered
+directly in the hosting platform, an approved-user allowlist, reviewed
+cross-site credential behavior,
 persistent database storage, and private encrypted object storage. None of
 those secrets belongs in this repository or in a browser bundle.
 
-This branch is based on sanitized merge commit
-`e1a367365e0c80db41c613167e1c5735f87e42bb`. The superseded draft PR must be
-closed rather than merged.
+This integration is reconstructed from production `main`; the historical
+direct-run and Breakthrough UI PRs are superseded only after this replacement
+passes release verification.

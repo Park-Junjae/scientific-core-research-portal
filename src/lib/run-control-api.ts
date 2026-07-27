@@ -82,6 +82,16 @@ export interface CompiledRunContract {
     reason: string;
   }>;
   requires_user_confirmation: boolean;
+  creativity_profile?: "BREAKTHROUGH_DISCOVERY";
+  raw_spark_target?: number;
+  stage_order?: string[];
+  budget_sufficiency?: {
+    sufficient: boolean;
+    required_profile: string;
+    reduced_target_requires_explicit_approval: boolean;
+    silent_truncation_allowed: false;
+    provider_price_source: string;
+  };
 }
 
 export interface RunControlRecord {
@@ -150,6 +160,34 @@ export class RunControlApiError extends Error {
   }
 }
 
+export interface ControlledRunPayloadInput {
+  researchQuestion: string;
+  objectives: string[];
+  constraints: string[];
+  requestedMode: string;
+  creativityProfile: "STANDARD" | "BREAKTHROUGH_DISCOVERY";
+}
+
+export function buildControlledRunPayload(input: ControlledRunPayloadInput) {
+  const breakthrough = input.creativityProfile === "BREAKTHROUGH_DISCOVERY";
+  return {
+    research_question: input.researchQuestion,
+    objectives: input.objectives,
+    constraints: input.constraints,
+    requested_mode: breakthrough ? "DISCOVERY_PORTFOLIO_RUN" : input.requestedMode,
+    include_literature_list_and_review_scope: true,
+    execution_mode: "PROVIDER_BACKED",
+    budget_profile: breakthrough ? "breakthrough_discovery" : "standard",
+    ...(breakthrough
+      ? {
+          creativity_profile: "BREAKTHROUGH_DISCOVERY",
+          creativity_profile_selection_reviewed: true,
+          raw_spark_target: 60,
+        }
+      : {}),
+  };
+}
+
 async function request<T>(
   pathname: string,
   init: RequestInit = {},
@@ -174,7 +212,11 @@ async function request<T>(
     }
     throw new RunControlApiError(detail, response.status);
   }
-  return response.json() as Promise<T>;
+  try {
+    return await response.json() as T;
+  } catch {
+    throw new RunControlApiError("Run Control API returned an invalid response.", 502);
+  }
 }
 
 export function getRunControlSession() {
