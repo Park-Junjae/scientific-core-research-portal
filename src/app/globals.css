@@ -1705,3 +1705,246 @@ h1, h2 { letter-spacing: -0.015em; }
   .metadata-list div:nth-child(2) { border-top: 1px solid var(--line); }
   .page-outline { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 0 0 18px; box-shadow: none; }
 }
+
+/* ============================================================
+   v6 — "Specimen Catalogue"
+   Conforms the UI to DESIGN.md. Reference: a research institute's
+   specimen catalogue — flat ink, hairline rules, one archival accent,
+   a monospace label voice for every recorded value.
+   This layer removes the generic-SaaS artifacts of v5 (gradients,
+   ambient glow, stacked shadows, oversized radii, hover lifts).
+   ============================================================ */
+:root {
+  /* Paper, sheet, ink */
+  --bg: #f4f6f4;
+  --surface: #ffffff;
+  --surface-muted: #edf1ee;
+  --sidebar: #ffffff;
+  --ink: #14201c;
+  --ink-soft: #47544f;
+  --ink-faint: #6b7772;
+  --line: #e1e7e3;
+  --line-strong: #c4d0ca;
+
+  /* One accent */
+  --accent: #0b6b4f;
+  --accent-dark: #07533d;
+  --accent-2: #0b6b4f;
+  --accent-soft: #e7f1eb;
+  --accent-softer: #eff6f2;
+  --accent-ring: rgba(11, 107, 79, 0.16);
+
+  /* Shapes: nothing exceeds 10px */
+  --radius-xs: 4px;
+  --radius-sm: 4px;
+  --radius-md: 7px;
+  --radius-lg: 10px;
+
+  /* Depth: only floating objects cast shadows */
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: 0 6px 18px -8px rgba(14, 32, 26, 0.22);
+  --shadow-lg: 0 14px 36px -14px rgba(14, 32, 26, 0.28);
+  --shadow-accent: none;
+
+  --grad-accent: none;
+  --grad-brand: none;
+  --grad-hero: none;
+
+  --font-label: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --motion-feedback: 120ms;
+  --motion-content: 200ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ---- No gradients, no glow ---- */
+.runs-page.home-page::before { content: none; }
+.product-mark {
+  border-radius: 9px;
+  background: var(--accent);
+  box-shadow: none;
+}
+
+/* ---- Flat, bordered surfaces ---- */
+.research-composer,
+.hero-glance,
+.run-table-wrap,
+.request-stage-guide,
+.advanced-fields,
+.spec-preview,
+.summary-priority-grid section,
+.portfolio-details,
+.document-list,
+.global-report-list,
+.source-list,
+.editorial-idea-list,
+.evaluation-details,
+.technical-details,
+.inline-pdf,
+.page-outline,
+.about-sections section,
+.settings-panel,
+.pdf-viewer,
+.primary-request-field textarea {
+  box-shadow: none;
+}
+.search-bar { box-shadow: none; }
+
+/* Only genuinely floating objects keep depth */
+.run-actions-menu > div,
+.more-menu > div { box-shadow: var(--shadow-md); }
+.citation-preview { box-shadow: var(--shadow-lg); }
+
+/* ---- Buttons: flat ink, no lift ---- */
+.primary-button {
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  box-shadow: none;
+  font-weight: 600;
+  transition: background-color var(--motion-feedback) var(--ease),
+              border-color var(--motion-feedback) var(--ease);
+}
+.primary-button:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  box-shadow: none;
+  transform: none;
+  filter: none;
+}
+.primary-button:active { transform: none; }
+
+.research-composer { transition: border-color var(--motion-content) var(--ease); }
+.research-composer:hover { transform: none; box-shadow: none; border-color: var(--line-strong); }
+.composer-cta {
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  padding: 12px 22px;
+  box-shadow: none;
+  transition: background-color var(--motion-feedback) var(--ease);
+}
+.research-composer:hover .composer-cta { transform: none; box-shadow: none; background: var(--accent-dark); }
+.composer-hint { border-style: solid; border-color: var(--line); background: var(--surface-muted); }
+
+/* ---- Shapes: pills only for the filter toggles ---- */
+.research-overview span,
+.product-context,
+.source-accounting span,
+.src-chips span { border-radius: var(--radius-sm); }
+.search-bar { border-radius: var(--radius-md); }
+.text-filters button { border-radius: var(--radius-pill); }
+
+/* ---- The monospace label voice ---- */
+.section-label,
+.glance-label,
+.document-role,
+.idea-role-line,
+.source-role,
+.sidebar-label,
+.product-context,
+.run-table th,
+.idea-list-head,
+.file-table-head,
+.evaluation-grid dt,
+.metadata-list dt {
+  font-family: var(--font-label);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.product-context {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  padding: 5px 10px;
+}
+
+/* Recorded values — metadata, counts, identifiers */
+.result-count,
+.breadcrumb,
+.run-metadata-line,
+.idea-meta-line,
+.document-meta,
+.source-citation,
+.literature-line,
+.plain-tags,
+.source-accounting span,
+.status-text,
+.run-mobile-meta,
+.literature-section-heading span,
+.save-status,
+.preview-footnote {
+  font-family: var(--font-label);
+  letter-spacing: 0;
+}
+.source-citation { font-size: 12.5px; }
+.status-text { font-size: 12.5px; font-weight: 500; }
+.breadcrumb { font-size: 11.5px; }
+
+/* Numerals align wherever they stack */
+.run-table td,
+.glance-stats b,
+.portfolio-table td,
+.scorecard strong,
+.file-table-row {
+  font-variant-numeric: tabular-nums;
+}
+.run-table td:nth-child(3),
+.run-table td:nth-child(4),
+.run-table td:nth-child(5) {
+  font-family: var(--font-label);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.glance-stats b { font-family: var(--font-label); font-weight: 600; letter-spacing: -0.01em; }
+.glance-stats span { font-size: 13px; }
+
+/* ---- Typography: restrain the display scale ---- */
+.research-entry h1 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 600; letter-spacing: -0.02em; }
+.new-run-heading .page-heading-row h1 { font-size: clamp(30px, 3.2vw, 40px); font-weight: 600; letter-spacing: -0.02em; }
+.page-heading-row h1,
+.run-header h1,
+.idea-reader-header h1,
+.literature-page > header h1,
+.source-detail h1,
+.report-reader > header h1 { font-weight: 600; letter-spacing: -0.015em; }
+.hero-lede { font-size: 17px; }
+.summary-conclusion .long-lede { font-size: 20px; font-weight: 450; }
+.primary-request-field > span { font-size: 17px; font-weight: 600; letter-spacing: 0; }
+
+/* ---- Status: a lamp beside a word, never a chip ---- */
+.status-text {
+  gap: 8px;
+  background: none;
+  padding: 0;
+  color: var(--ink-soft);
+  box-shadow: none;
+}
+
+/* ---- Stepper: flat, no gradient tile ---- */
+.request-stage-guide .current > span {
+  background: var(--accent);
+  box-shadow: none;
+}
+.request-stage-guide li.current { background: var(--accent-soft); }
+
+/* ---- Inputs ---- */
+.intake-form input,
+.intake-form textarea,
+.intake-form select,
+.settings-panel input,
+.settings-panel select { border-radius: var(--radius-md); box-shadow: none; }
+.primary-request-field textarea { border-radius: var(--radius-lg); }
+
+/* ---- Motion discipline ---- */
+.run-table tbody tr,
+.nav-item,
+.recent-run,
+.text-filters button,
+.source-row,
+.editorial-idea-row,
+.document-list article,
+.global-report-list article {
+  transition-duration: var(--motion-feedback);
+  transition-timing-function: var(--ease);
+}
