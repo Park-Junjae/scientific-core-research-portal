@@ -1,19 +1,22 @@
 ---
 version: alpha
-name: Specimen Catalogue
-description: The visual identity of the AI Cho-Scientist research portal — a digital specimen catalogue for scientific literature.
+name: Glasshouse
+description: The visual identity of the AI Cho-Scientist research portal — a daylit glasshouse laboratory.
 colors:
-  paper: "#F4F6F4"
+  canvas: "#F2F8F5"
   surface: "#FFFFFF"
-  surface-sunk: "#EDF1EE"
-  ink: "#14201C"
-  ink-soft: "#47544F"
-  ink-faint: "#6B7772"
-  rule: "#E1E7E3"
-  rule-strong: "#C4D0CA"
-  archival: "#0B6B4F"
-  archival-deep: "#07533D"
-  archival-wash: "#E7F1EB"
+  surface-muted: "#ECF3EF"
+  ink: "#10201B"
+  ink-soft: "#45544E"
+  ink-faint: "#69766F"
+  rule: "#E3EBE6"
+  rule-strong: "#C9D6CF"
+  green: "#0EA472"
+  green-deep: "#0A7350"
+  green-light: "#18B98A"
+  water: "#0AA29F"
+  green-wash: "#DFF5EC"
+  green-mist: "#EEFAF4"
   lamp-idle: "#9AA39E"
   lamp-active: "#2F8F66"
   lamp-running: "#4A76A8"
@@ -22,26 +25,32 @@ colors:
 typography:
   display:
     fontFamily: Noto Sans KR
-    fontSize: 44px
-    fontWeight: 600
-    lineHeight: 1.14
-    letterSpacing: -0.02em
+    fontSize: 60px
+    fontWeight: 660
+    lineHeight: 1.08
+    letterSpacing: -0.03em
   h1:
     fontFamily: Noto Sans KR
-    fontSize: 34px
-    fontWeight: 600
-    lineHeight: 1.18
-    letterSpacing: -0.015em
+    fontSize: 42px
+    fontWeight: 645
+    lineHeight: 1.12
+    letterSpacing: -0.025em
   h2:
     fontFamily: Noto Sans KR
-    fontSize: 22px
-    fontWeight: 600
-    lineHeight: 1.35
+    fontSize: 28px
+    fontWeight: 640
+    lineHeight: 1.3
+    letterSpacing: -0.015em
   h3:
     fontFamily: Noto Sans KR
     fontSize: 17px
     fontWeight: 600
     lineHeight: 1.45
+  lede:
+    fontFamily: Noto Sans KR
+    fontSize: 18px
+    fontWeight: 400
+    lineHeight: 1.7
   body:
     fontFamily: Noto Sans KR
     fontSize: 16px
@@ -52,246 +61,241 @@ typography:
     fontSize: 17px
     fontWeight: 400
     lineHeight: 1.76
+  stat:
+    fontFamily: Noto Sans KR
+    fontSize: 36px
+    fontWeight: 680
+    lineHeight: 1
+    letterSpacing: -0.02em
   label:
-    fontFamily: ui-monospace
+    fontFamily: Noto Sans KR
     fontSize: 11px
-    fontWeight: 600
-    letterSpacing: 0.08em
-  data:
-    fontFamily: ui-monospace
-    fontSize: 13px
-    fontWeight: 500
-    letterSpacing: 0
+    fontWeight: 700
+    letterSpacing: 0.06em
 rounded:
-  sm: 4px
-  md: 7px
-  lg: 10px
+  xs: 6px
+  sm: 9px
+  md: 13px
+  lg: 18px
+  pill: 999px
 spacing:
   xs: 6px
   sm: 10px
-  md: 16px
-  lg: 24px
-  xl: 40px
-  xxl: 64px
+  md: 18px
+  lg: 26px
+  xl: 42px
+  xxl: 72px
+elevation:
+  flat: "0 1px 2px rgba(11,40,30,.05)"
+  raised: "0 5px 14px -5px rgba(11,40,30,.12), 0 12px 30px -14px rgba(11,40,30,.14)"
+  floating: "0 20px 50px -18px rgba(11,40,30,.26)"
+  accent: "0 12px 30px -12px rgba(14,164,114,.45)"
+gradients:
+  action: "linear-gradient(135deg, #18B98A, #0EA472 48%, #0AA29F)"
+  brand: "linear-gradient(145deg, #1FC793, #0A8F62)"
+  daylight: "radial-gradient(120% 92% at -4% -18%, rgba(16,179,163,.20), transparent 55%), radial-gradient(90% 80% at 104% -8%, rgba(14,164,114,.16), transparent 52%)"
 motion:
   feedback: 120ms
-  content: 200ms
+  content: 180ms
   easing: "cubic-bezier(0.2, 0, 0, 1)"
 components:
   button-primary:
-    backgroundColor: "{colors.archival}"
+    backgroundColor: "{gradients.action}"
     textColor: "{colors.surface}"
     rounded: "{rounded.md}"
-    padding: 12px
     height: 44px
-  button-primary-hover:
-    backgroundColor: "{colors.archival-deep}"
+    padding: 18px
   card:
     backgroundColor: "{colors.surface}"
     rounded: "{rounded.lg}"
     padding: 24px
-  catalogue-row-hover:
-    backgroundColor: "{colors.archival-wash}"
+  composer:
+    backgroundColor: "{colors.surface}"
+    rounded: "{rounded.lg}"
+    padding: 24px
+  row-hover:
+    backgroundColor: "{colors.green-mist}"
   filter-chip:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink-soft}"
-    rounded: "{rounded.md}"
-    height: 34px
+    rounded: "{rounded.pill}"
+    height: 36px
   filter-chip-active:
-    backgroundColor: "{colors.archival}"
+    backgroundColor: "{colors.green}"
     textColor: "{colors.surface}"
-  specimen-label:
-    backgroundColor: "{colors.surface-sunk}"
-    textColor: "{colors.ink-soft}"
-    typography: "{typography.label}"
-    rounded: "{rounded.sm}"
   input:
     backgroundColor: "{colors.surface}"
     rounded: "{rounded.md}"
-    padding: 12px
-  input-focus:
-    backgroundColor: "{colors.surface}"
+    padding: 14px
 ---
 
 ## Overview
 
-**A research institute's specimen catalogue, rendered as software.**
+**A daylit glasshouse laboratory.**
 
-Not a lecture handout, not a marketing site, not a generic dashboard. The
-reference is the catalogue room of a working institute: every specimen is
-mounted on its own sheet, captioned, assigned an accession number, and filed
-with its provenance recorded on the label. The sheets are handsome because they
-are precise, not because they are decorated. Someone reads them for eight hours
-at a stretch and their eyes do not hurt.
+The reference is a modern research glasshouse: a white-framed building full of
+northern light, white staging benches, living green, and air. Everything in it
+is clean and cultivated, but nothing is sterile — light falls softly across the
+surfaces and the green is alive rather than institutional.
 
-This maps directly onto what the product actually is. A paper enters the system
-and becomes a catalogued specimen: labelled, tiered by provenance (T0–T5),
-cross-referenced to the figure and panel it came from. The interface is the
-catalogue drawer and the reading table.
+This is a working scientific instrument that a researcher opens every morning,
+and it should feel like a good place to start a day of thinking. Not a
+government form, not a lecture handout, not a dark-mode terminal. The register
+is **bright, calm, and generous** — white benches on a tinted-glass canvas, wide
+margins, and one living green that carries every action.
 
-The register is *quiet confidence*. Generous margins, hairline rules, one ink
-and one accent, data set in a monospace label voice. Nothing glows. Nothing is
-trying to sell the user anything — they already work here.
+The product turns literature into structured evidence, so the interface has two
+jobs: give the researcher one obvious place to ask a new question, and keep the
+existing collection legible at a glance. The home screen is built around exactly
+those two things.
 
-> This file supersedes `DESIGN_SYSTEM.md`, which described the pre-refresh
-> visual language. Where the two disagree, DESIGN.md is normative.
+> This file is the normative design source for the portal. `DESIGN_SYSTEM.md`
+> describes the earlier, austere visual language and is retained only for
+> history; it is **not** binding.
 
 ## Colors
 
-One ink, one accent, one paper. Everything else is a rule weight.
+A white-and-glass base with one living green, plus a cooler water-green that
+appears only inside gradients.
 
-- **Paper** {colors.paper} is the canvas — a cool, matte off-white with a faint
-  green bias so it sits under the accent without vibrating. Never pure white,
-  never cream.
-- **Surface** {colors.surface} is the mounted sheet. Content sits on white
-  sheets laid on the paper canvas; that one step of contrast is what separates
-  a record from its background. No third surface tone stacked on top.
-- **Ink** {colors.ink} carries all primary type. It is green-black, not pure
-  black. **Ink-soft** {colors.ink-soft} is prose and descriptions;
-  **ink-faint** {colors.ink-faint} is metadata and captions.
-- **Rule** {colors.rule} is the hairline that divides catalogue rows and
-  sections. **Rule-strong** {colors.rule-strong} is reserved for the edge of an
-  input the user is meant to type into. Rules do the work that shadows do
-  elsewhere.
-- **Archival** {colors.archival} is the single accent — the green of archival
-  folders and specimen tape. It marks exactly three things: the active
-  navigation item, the primary action, and a live link. It is never used as a
-  decorative fill, never as a gradient, never as a background wash behind a
-  headline. **Archival-wash** {colors.archival-wash} is its only tint, used for
-  row hover and the active nav item.
-- **Lamps** are the status colors: {colors.lamp-active},
-  {colors.lamp-running}, {colors.lamp-attention}, {colors.lamp-fault}, and
-  {colors.lamp-idle}. They are desaturated on purpose. They appear only as a
-  7px indicator dot beside a text label — never as a filled chip, never as
-  coloured text, never as a badge background.
+- **Canvas** {colors.canvas} is the ground — white passed through green glass.
+  Never pure white, never grey, never cream.
+- **Surface** {colors.surface} is the staging bench. All content sits on white
+  panels laid over the canvas. **Surface-muted** {colors.surface-muted} is a
+  recessed area *inside* a panel, such as the composer's prompt well.
+- **Ink** {colors.ink} is green-black and carries all primary type.
+  **Ink-soft** {colors.ink-soft} is prose; **ink-faint** {colors.ink-faint} is
+  metadata and captions.
+- **Rule** {colors.rule} divides rows and sections. **Rule-strong**
+  {colors.rule-strong} outlines something the user types into.
+- **Green** {colors.green} is the single accent identity. **Green-light**
+  {colors.green-light} and **water** {colors.water} exist *only* as the endpoints
+  of {gradients.action} and {gradients.brand} — never as flat fills in their own
+  right. **Green-wash** {colors.green-wash} tints the active navigation item;
+  **green-mist** {colors.green-mist} is row hover.
+- **Lamps** — {colors.lamp-active}, {colors.lamp-running},
+  {colors.lamp-attention}, {colors.lamp-fault}, {colors.lamp-idle} — are
+  deliberately desaturated and appear **only** as a 7px dot beside a text label.
+  Status is never a filled badge and never coloured text.
 
 ## Typography
 
-One family, two voices.
+One family, Noto Sans KR, bundled locally at 400/500/600 with restrained 700 and
+synthetic bold disabled. Korean and Latin share it so a bilingual page holds one
+texture.
 
-**Noto Sans KR** {typography.body} sets everything a human reads as language:
-headings, prose, descriptions, controls. It is bundled locally, 400/500/600
-with restrained 700, synthetic bold disabled. Korean and Latin share it, so a
-bilingual page holds one texture.
+The character comes from the **scale**, not from mixing faces. Display
+{typography.display} is genuinely large and tightly tracked, and it sits against
+{typography.body} with very little in between — that jump is what makes the page
+feel composed rather than uniformly grey.
 
-**A monospace label voice** {typography.label} sets everything that is a
-*record* rather than a sentence: accession-style metadata, DOIs, dates, counts,
-provenance tiers, figure and panel references, table numerals, section eyebrows.
-This is the single most characteristic move in the system — it is the printed
-label on the specimen sheet, and it is what makes a page of data read as a
-catalogue rather than as a web app. All numerals in tables and stat panels use
-`tabular-nums` so columns align.
-
-- **Display** {typography.display} is used once per page, on the page title.
-- **H2** {typography.h2} opens a section; **H3** {typography.h3} titles a record.
-- **Reading** {typography.reading} is for report and knowledge prose, capped at
+- **Display** appears once per page, on the page title, and may scale with the
+  viewport.
+- **Stat** {typography.stat} is for the standing counts in the overview panel,
+  always with `tabular-nums`.
+- **Label** {typography.label} is the uppercase eyebrow above a section or panel.
+- **Reading** {typography.reading} sets report and knowledge prose, capped near
   74 characters.
-- Korean text keeps `word-break: keep-all`, `overflow-wrap: break-word`, and
-  `line-break: strict`. Headings balance their wrap.
-
-Negative letter-spacing is applied only to Display and H1, and only slightly. Do
-not track body text.
+- Negative tracking belongs to Display, H1, and H2 only. Never track body text.
+- Korean keeps `word-break: keep-all`, `overflow-wrap: break-word`, and
+  `line-break: strict`; headings balance their wrap.
 
 ## Layout
 
-A fixed catalogue drawer on the left, a reading table on the right.
+A fixed 232px navigation drawer, and a wide working surface beside it.
 
-- The sidebar is a persistent 232px drawer. Content is capped at 1320px for
-  workspace pages and 980px for reading pages, with generous outer padding
-  ({spacing.xl} and up on desktop).
-- The home screen is **asymmetric**: the research-question composer occupies the
-  wide left column as the page's single subject, and a narrow right column holds
-  the standing count of the collection. This is the catalogue's front desk — one
-  place to file a new request, one summary of what is already filed.
-- Records — runs, sources, ideas, reports — are always **full-bleed rows inside
-  one bordered sheet**, never a grid of separate floating tiles. A catalogue is
-  a stack of sheets, not a mosaic.
-- Sections are separated by space and a single hairline, not by nested boxes.
-- Reading pages centre a single measure with the outline docked beside it.
+- **The home hero is asymmetric and this is the signature composition.** The
+  research-question composer takes the wide left column as the single subject of
+  the page; a narrow right column holds the standing counts. One place to ask,
+  one place to see what exists.
+- Records — runs, sources, ideas, reports — are full-bleed rows inside a single
+  bordered panel, never a mosaic of separate tiles.
+- Rows are generous: roughly {spacing.lg} of vertical padding. Density is not a
+  goal here; a researcher scanning six items should not feel they are reading a
+  spreadsheet.
+- Workspace pages cap at 1320px, reading pages at 980px, with {spacing.xl}+ of
+  outer padding on desktop.
+- Sections are separated by space and a hairline, not by nested boxes.
 
 ## Elevation & Depth
 
-**The design is flat by default.** Depth is expressed by the hairline and by the
-one step from paper to sheet. Shadows are not a styling device here; they mean
-"this object is temporarily floating above the page."
+Light in a glasshouse is diffuse, so shadows are **soft, wide, and low-contrast**
+— never a hard drop shadow.
 
-Exactly two things may cast a shadow: an open menu or popover, and the citation
-preview card. Everything else — cards, panels, tables, inputs, buttons — is
-defined by its border.
+- {elevation.flat} is the resting state for panels and chips.
+- {elevation.raised} lifts the composer and primary panels off the canvas.
+- {elevation.floating} belongs to genuinely floating objects: menus, popovers,
+  the citation preview.
+- {elevation.accent} is the green glow beneath the primary action, and it is the
+  only coloured shadow in the system.
 
-There is no glow, no gradient, no glass, no blur, no layered ambient light.
+{gradients.daylight} washes the top of the home screen. It is ambient daylight,
+not a hero banner: it must stay faint enough that no edge of it is visible.
 
 ## Shapes
 
-Modest, consistent radii: {rounded.sm} for small marks and labels,
-{rounded.md} for controls and inputs, {rounded.lg} for sheets and panels.
-Nothing exceeds {rounded.lg}.
-
-Fully-rounded pill shapes are used for exactly one component — the status filter
-chips — because they are a row of discrete toggles and the shape communicates
-that. Pills are not the house style; do not apply them to buttons, tags,
-metadata, or counts.
+Rounded and soft: {rounded.md} for controls and inputs, {rounded.lg} for panels
+and cards, {rounded.pill} for filter toggles and the primary call-to-action.
+Corners are a defining trait of this identity — do not flatten them.
 
 The product mark is a custom node-triangle: three nodes joined into a triangle
-with the apex enlarged — several sources resolving into one conclusion. It is
-drawn flat in {colors.surface} on an {colors.archival} tile. It has no
-gradient and no inner highlight.
+with the apex enlarged, meaning several sources resolving into one conclusion.
+It is drawn in white on a {gradients.brand} tile with a soft inner highlight.
+It must never be replaced with a stock beaker, flask, atom, microscope, or
+sparkle glyph.
 
 ## Components
 
-- **Primary button** {components.button-primary} — flat archival green, 44px
-  tall, {rounded.md}. On hover it darkens to {colors.archival-deep}. It does
-  not lift, scale, or glow.
-- **Sheet / card** {components.card} — white, {rounded.lg}, 1px {colors.rule}
-  border, no shadow.
-- **Catalogue row** — a record inside a sheet, separated from its neighbours by
-  a {colors.rule} hairline, hovering to {colors.archival-wash}. The last row
-  carries no divider.
-- **Specimen label** {components.specimen-label} — the small monospace tag used
-  for provenance tiers, figure references, assay notes, and counts. Sunk
-  background, no border colour of its own.
-- **Status lamp** — a 7px dot plus a text label in {typography.body} at 13px.
-  The dot takes a lamp colour; the label stays {colors.ink-soft}.
-- **Filter chip** {components.filter-chip} — pill, hairline border; active state
-  fills with {colors.archival}.
-- **Input** {components.input} — white, {colors.rule-strong} border,
-  {rounded.md}. Focus draws a 3px {colors.archival} ring at low opacity and
-  switches the border to {colors.archival}. Inputs never carry a shadow.
+- **Primary button** {components.button-primary} — {gradients.action} fill, 44px
+  tall, {elevation.accent} glow. Lifts 1px on hover.
+- **Composer** {components.composer} — the hero object. A white panel holding a
+  recessed prompt well and a pill call-to-action aligned to its right edge. The
+  whole panel is the link; hovering lifts it and brightens its border.
+- **Overview panel** — a white panel of stacked counts, each a {typography.stat}
+  numeral against a {typography.body} label, divided by hairlines.
+- **Card / panel** {components.card} — white, {rounded.lg}, hairline border,
+  {elevation.flat}.
+- **Record row** — separated by a {colors.rule} hairline, hovering to
+  {colors.green-mist}; the final row carries no divider.
+- **Status lamp** — a 7px dot plus a label at 13px in {colors.ink-soft}.
+- **Filter chip** {components.filter-chip} — pill with hairline border; the
+  active chip fills with {colors.green}.
+- **Input** {components.input} — white, {colors.rule-strong} border, focusing to
+  a {colors.green} border with a 4px translucent green ring.
 
 ## Motion
 
-Transitions are quick and mechanical — a drawer sliding, not a curtain falling.
+Quick and light. Things lift toward the light; nothing bounces.
 
-- Interactive feedback (hover, press, filter toggle): {motion.feedback} at
-  {motion.easing}.
-- Content transitions (panel, menu, page): {motion.content}, same curve.
-- Nothing animates longer than 250ms. Nothing bounces, overshoots, spins, or
-  pulses. Loading states do not shimmer.
+- Hover, press, toggle: {motion.feedback} at {motion.easing}.
+- Panels, menus, page transitions: {motion.content}, same curve.
+- Hover lift is at most 2px, and only on the composer and the primary button.
+- Nothing spins, pulses, shimmers, or overshoots. Loading states do not animate
+  decoratively.
 - `prefers-reduced-motion` collapses every duration.
 
 ## Do's and Don'ts
 
-- **Don't** use gradients. Not on the logo, not on buttons, not as an ambient
-  hero wash. A catalogue sheet is printed in flat ink.
-- **Don't** add a radial glow, halo, or coloured atmosphere behind the hero.
-- **Don't** put status in a coloured chip. Status is a lamp beside a word. A
-  filled green "완료" badge is the single fastest way to make this page look
-  like generic dashboard output.
-- **Don't** add decorative icons. Icons appear only where they are the control
-  itself: navigation items, search, the row overflow menu. No icon beside a
-  statistic, no icon inside a button that already has a verb, no icon as a
+- **Don't** put status in a coloured chip. A filled green "완료" badge is the
+  fastest way to make this look like generic dashboard output. Status is a quiet
+  lamp beside a word.
+- **Don't** add decorative icons. Icons appear only where they *are* the
+  control: navigation items, search, the row overflow menu. No icon beside a
+  statistic, no icon inside a button that already states its verb, no icon as a
   section ornament, no emoji.
-- **Don't** stack shadows on cards to create hierarchy. Use the hairline and
-  space.
-- **Don't** let a second accent colour in. Teal, blue, purple — the palette has
-  one accent, and its scarcity is what gives it authority.
-- **Don't** round everything to a pill. Pills mean "toggle" here.
-- **Do** set every record value — DOI, date, count, tier, figure reference — in
-  the monospace label voice. This is the system's signature.
-- **Do** align numerals with `tabular-nums` wherever they stack.
-- **Do** let sheets breathe. A catalogue row with 22px of vertical padding reads
-  as considered; the same row at 12px reads as a spreadsheet.
-- **Do** keep one display-size title per page and let the rest of the hierarchy
-  be carried by weight and space, not size.
-- **Do** trust the hairline. If a boundary needs more than 1px to be legible,
-  the spacing around it is wrong.
+- **Don't** let a third hue in. Blue, purple, amber, and red exist solely as
+  status lamps. Everything expressive is green.
+- **Don't** use the gradient as decoration. It belongs to the brand mark, the
+  primary action, and the ambient daylight wash — nowhere else. No gradient
+  text, no gradient borders, no gradient cards.
+- **Don't** harden the shadows. If a shadow reads as a distinct dark edge, it is
+  wrong; widen the blur and lower the opacity.
+- **Don't** compress the rows to fit more on screen.
+- **Don't** introduce a dark mode, glassmorphism, or a serif display face.
+- **Do** keep one display-size title per page and let space carry the rest of
+  the hierarchy.
+- **Do** use `tabular-nums` wherever numerals stack.
+- **Do** keep the asymmetric hero. If a future page needs a hero, it should echo
+  that composition rather than centre everything.
+- **Do** let the canvas show. Wide outer margins and visible gaps between panels
+  are the point, not wasted space.
