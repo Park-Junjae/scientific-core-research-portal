@@ -3,7 +3,7 @@ version: alpha
 name: Glasshouse
 description: The visual identity of the AI Cho-Scientist research portal — a daylit glasshouse laboratory.
 colors:
-  canvas: "#F2F8F5"
+  canvas: "#EFF5F1"
   surface: "#FFFFFF"
   surface-muted: "#ECF3EF"
   ink: "#10201B"
@@ -17,28 +17,28 @@ colors:
   water: "#0AA29F"
   green-wash: "#DFF5EC"
   green-mist: "#EEFAF4"
-  lamp-idle: "#9AA39E"
-  lamp-active: "#2F8F66"
-  lamp-running: "#4A76A8"
-  lamp-attention: "#B3812F"
-  lamp-fault: "#B0554A"
+  lamp-idle: "#99A49E"
+  lamp-active: "#2F9068"
+  lamp-running: "#4A7D9E"
+  lamp-attention: "#B07F31"
+  lamp-fault: "#B0574C"
 typography:
   display:
     fontFamily: Noto Sans KR
     fontSize: 60px
-    fontWeight: 660
+    fontWeight: 600
     lineHeight: 1.08
     letterSpacing: -0.03em
   h1:
     fontFamily: Noto Sans KR
     fontSize: 42px
-    fontWeight: 645
+    fontWeight: 600
     lineHeight: 1.12
     letterSpacing: -0.025em
   h2:
     fontFamily: Noto Sans KR
     fontSize: 28px
-    fontWeight: 640
+    fontWeight: 600
     lineHeight: 1.3
     letterSpacing: -0.015em
   h3:
@@ -64,7 +64,7 @@ typography:
   stat:
     fontFamily: Noto Sans KR
     fontSize: 36px
-    fontWeight: 680
+    fontWeight: 700
     lineHeight: 1
     letterSpacing: -0.02em
   label:
@@ -173,6 +173,8 @@ appears only inside gradients.
   of {gradients.action} and {gradients.brand} — never as flat fills in their own
   right. **Green-wash** {colors.green-wash} tints the active navigation item;
   **green-mist** {colors.green-mist} is row hover.
+- **Focus** uses {colors.green} at low opacity as a 3px outline. The focus ring
+  is part of the accent family, never a browser-default blue.
 - **Lamps** — {colors.lamp-active}, {colors.lamp-running},
   {colors.lamp-attention}, {colors.lamp-fault}, {colors.lamp-idle} — are
   deliberately desaturated and appear **only** as a 7px dot beside a text label.
@@ -180,9 +182,12 @@ appears only inside gradients.
 
 ## Typography
 
-One family, Noto Sans KR, bundled locally at 400/500/600 with restrained 700 and
-synthetic bold disabled. Korean and Latin share it so a bilingual page holds one
-texture.
+One family, Noto Sans KR, bundled locally at **400/500/600/700 only**, with
+`font-synthesis: none`. Because synthesis is off, any weight outside those four
+snaps to the nearest loaded face — a `font-weight: 650` renders as 700, not as
+something between. Never write an intermediate weight; the hierarchy must be
+built from the four real ones. Korean and Latin share the family, so a bilingual
+page holds one texture.
 
 The character comes from the **scale**, not from mixing faces. Display
 {typography.display} is genuinely large and tightly tracked, and it sits against
@@ -292,6 +297,9 @@ Quick and light. Things lift toward the light; nothing bounces.
   wrong; widen the blur and lower the opacity.
 - **Don't** compress the rows to fit more on screen.
 - **Don't** introduce a dark mode, glassmorphism, or a serif display face.
+- **Don't** write an intermediate font weight. 645, 650, 660, and 680 are not
+  loaded; they all resolve to 700 and quietly flatten the hierarchy you thought
+  you were building.
 - **Do** keep one display-size title per page and let space carry the rest of
   the hierarchy.
 - **Do** use `tabular-nums` wherever numerals stack.

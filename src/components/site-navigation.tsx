@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import {
   Beaker,
   BookOpen,
-  ChevronRight,
   FileText,
   Info,
   Menu,
@@ -117,7 +116,6 @@ function Sidebar({
             >
               <span className={`run-dot ${run.status.toLowerCase()}`} />
               <span>{title}</span>
-              <ChevronRight size={14} />
             </Link>
           );
         })}
