@@ -5,9 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Beaker,
   BookOpen,
-  ChevronRight,
   FileText,
-  FlaskConical,
   Info,
   Menu,
   Plus,
@@ -29,7 +27,12 @@ export type RecentRunLink = {
 function ProductMark() {
   return (
     <span className="product-mark" aria-hidden="true">
-      <FlaskConical size={18} strokeWidth={2.2} />
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
+        <path d="M12 6.2 6 17.4M12 6.2 18 17.4M6 17.4H18" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
+        <circle cx="12" cy="6.2" r="2.7" fill="#fff" />
+        <circle cx="6" cy="17.4" r="2.1" fill="#fff" />
+        <circle cx="18" cy="17.4" r="2.1" fill="#fff" />
+      </svg>
     </span>
   );
 }
@@ -113,7 +116,6 @@ function Sidebar({
             >
               <span className={`run-dot ${run.status.toLowerCase()}`} />
               <span>{title}</span>
-              <ChevronRight size={14} />
             </Link>
           );
         })}
