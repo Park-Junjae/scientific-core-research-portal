@@ -14,6 +14,13 @@ test("home is Korean-first and links to the research entry point", async ({ page
   await expect(page.getByRole("link", { name: /요청서 작성/ })).toHaveAttribute("href", "/new-run/");
 });
 
+test("composer call to action keeps a legible label", async ({ page }) => {
+  await page.goto("/?lang=ko");
+  const cta = page.locator(".composer-cta");
+  await expect(cta).toBeVisible();
+  expect(await cta.evaluate((node) => getComputedStyle(node).color)).toBe("rgb(255, 255, 255)");
+});
+
 test("desktop and mobile navigation expose the scientific workspace", async ({ page }) => {
   await page.goto("/?lang=ko");
   const desktop = page.locator(".desktop-sidebar");

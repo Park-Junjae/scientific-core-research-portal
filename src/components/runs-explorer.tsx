@@ -54,7 +54,7 @@ export function RunsExplorer({ runs, home = false }: { runs: RunWithIdeas[]; hom
       <header className="research-entry">
         <h1>{locale === "ko" ? "새 연구" : "New research"}</h1>
         <Link className="research-composer" href="/new-run/" prefetch={false}>
-          <span className="composer-hint">{locale === "ko" ? "연구 질문이나 해결하려는 문제를 적어주세요." : "Describe the research question or problem to solve."}</span>
+          <span className="composer-hint">Describe the research question or problem to solve.</span>
           <span className="composer-cta">{locale === "ko" ? "요청서 작성" : "Write the request"}</span>
         </Link>
       </header>

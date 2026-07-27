@@ -571,7 +571,11 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
   border-color: var(--accent);
 }
 
-.research-composer > span {
+/* Scoped to the prompt well specifically. As `.research-composer > span` this
+   also matched the call-to-action once the CTA became a span, and at (0,1,1)
+   it outranked `.composer-cta` (0,1,0) — so the button's white label was being
+   repainted in muted grey and read as invisible against the gradient. */
+.composer-hint {
   color: var(--ink-faint);
   font-size: 17px;
 }
@@ -2003,3 +2007,8 @@ input, textarea { caret-color: var(--accent); }
 }
 body { font-family: var(--font-ui), sans-serif; }
 .prose-article { font-family: var(--font-reading), sans-serif; }
+
+/* The CTA label sits on the accent gradient and must stay white. Written at
+   (0,2,0) so a descendant selector on .research-composer cannot outrank it —
+   which is exactly how it was silently repainted grey twice. */
+.research-composer .composer-cta { color: #fff; }
