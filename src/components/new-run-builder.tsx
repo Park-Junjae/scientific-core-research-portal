@@ -1,18 +1,27 @@
 "use client";
 
-import { Check, Download, FlaskConical, LoaderCircle, Upload } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Download,
+  FlaskConical,
+  LoaderCircle,
+  ShieldCheck,
+  Sparkles,
+  Upload,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { AccessConnectionPanel } from "@/components/access-connection-panel";
 import { useLocale } from "@/lib/locale";
 import { withBasePath } from "@/lib/paths";
 import {
   buildRunRequest,
-  deriveRequestTitle,
   initialRunRequest,
   normalizeImportedRequest,
   type RunRequestDraft,
 } from "@/lib/run-request";
 import {
+  BREAKTHROUGH_RUNTIME_REF,
   buildControlledRunPayload,
   createControlledRun,
   runControlApiBase,
@@ -40,19 +49,26 @@ const modes: Array<[RunRequestDraft["run_type"], { ko: string; en: string }]> = 
   ["DISCOVERY_PORTFOLIO_RUN", { ko: "탐색 포트폴리오", en: "Discovery portfolio" }],
 ];
 
-export function NewRunBuilder() {
+interface ResearchComposerProps {
+  session?: RunControlSession | null;
+  onConnected?: (session: RunControlSession) => void;
+}
+
+export function ResearchComposer({
+  session,
+  onConnected,
+}: ResearchComposerProps = {}) {
   const { locale } = useLocale();
   const ko = locale === "ko";
   const [value, setValue] = useState<RunRequestDraft>(initialRunRequest);
+  const [localSession, setLocalSession] = useState<RunControlSession | null>(null);
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const [session, setSession] = useState<RunControlSession | null>(null);
+  const activeSession = session === undefined ? localSession : session;
   const request = useMemo(() => buildRunRequest(value, locale), [locale, value]);
   const ready = Boolean(value.raw_research_request.trim());
-  const showPreview = ready
-    || Boolean(value.research_goal.trim())
-    || Boolean(value.experimental_constraints.trim());
+  const breakthrough = value.creativity_profile === "BREAKTHROUGH_DISCOVERY";
 
   const update = <K extends keyof RunRequestDraft>(key: K, next: RunRequestDraft[K]) => {
     setSaved(false);
@@ -60,9 +76,14 @@ export function NewRunBuilder() {
     setValue((current) => ({ ...current, [key]: next }));
   };
 
+  function connected(nextSession: RunControlSession) {
+    setLocalSession(nextSession);
+    onConnected?.(nextSession);
+  }
+
   async function prepareRun() {
     if (!ready || busy || !runControlApiBase) return;
-    if (!session) {
+    if (!activeSession) {
       setMessage(ko
         ? "먼저 랩 계정을 연결하고 연결 상태를 확인하세요."
         : "Connect the lab account and check the connection first.");
@@ -70,25 +91,46 @@ export function NewRunBuilder() {
     }
     setBusy(true);
     setMessage("");
+    const researchQuestion = value.research_question.trim()
+      || value.raw_research_request.trim();
+    const objectives = lines(value.research_goal || value.success_criteria);
+    const constraints = lines([
+      value.reference_material_or_constraints,
+      value.experimental_constraints,
+      value.failure_criteria,
+      value.non_goals,
+    ].filter(Boolean).join("\n"));
+    const reportLanguage = value.output_language || locale;
     try {
       const run = await createControlledRun(
         buildControlledRunPayload({
-          researchQuestion: value.research_question.trim() || value.raw_research_request.trim(),
-          objectives: lines(value.research_goal || value.success_criteria),
-          constraints: lines([
-            value.reference_material_or_constraints,
-            value.experimental_constraints,
-            value.failure_criteria,
-            value.non_goals,
-          ].filter(Boolean).join("\n")),
+          researchQuestion,
+          objectives,
+          constraints,
           requestedMode: (value.run_type || "AUTO") as PortalSelectableRunMode,
           creativityProfile: value.creativity_profile,
           includeLiteratureScope: value.literature_scope_enabled,
-          reportLanguage: value.output_language || locale,
+          reportLanguage,
         }),
-        session.csrf_token,
+        activeSession.csrf_token,
       );
-      window.location.assign(withBasePath(`/run-control/?run_id=${encodeURIComponent(run.run_id)}`));
+      window.sessionStorage.setItem(
+        `scientific-core-run-draft:${run.run_id}`,
+        JSON.stringify({
+          research_question: researchQuestion,
+          objectives,
+          constraints,
+          selected_mode: breakthrough ? "DISCOVERY_PORTFOLIO_RUN" : (value.run_type || "AUTO"),
+          creativity_profile: value.creativity_profile,
+          literature_scope: value.literature_scope_enabled,
+          report_language: reportLanguage,
+          runtime_ref: breakthrough ? BREAKTHROUGH_RUNTIME_REF : "Assigned by Backend preflight",
+        }),
+      );
+      setMessage(ko
+        ? "비공개 사전 검토를 만들었습니다. 컴파일된 연구 계획을 여는 중입니다."
+        : "Private preflight created. Opening the compiled research plan.");
+      window.location.assign(withBasePath(`/run-control/?run_id=${encodeURIComponent(run.run_id)}&lang=${locale}`));
     } catch (reason) {
       setMessage(reason instanceof Error ? reason.message : "Unable to prepare the run.");
     } finally {
@@ -111,35 +153,70 @@ export function NewRunBuilder() {
   );
 
   return (
-    <div className={`intake-layout${showPreview ? " has-preview" : ""}`}>
-      <form className="intake-form" onSubmit={(event) => { event.preventDefault(); prepareRun(); }}>
+    <section className="research-composer-shell" aria-labelledby="research-composer-heading">
+      <div className="composer-heading">
+        <div>
+          <p className="section-label">{ko ? "실제 비공개 연구 시작" : "Start a real private run"}</p>
+          <h2 id="research-composer-heading">{ko ? "무엇을 연구할까요?" : "What should we investigate?"}</h2>
+        </div>
+        <span><ShieldCheck size={15} />{ko ? "승인 전 provider 호출 0" : "0 provider calls before approval"}</span>
+      </div>
+
+      <form className="intake-form homepage-composer" onSubmit={(event) => { event.preventDefault(); void prepareRun(); }}>
         <div className="workflow-steps" aria-label={ko ? "연구 실행 단계" : "Research workflow"}>
-          <strong>1. {ko ? "요청" : "Request"}</strong>
-          <span>2. {ko ? "사전 검토" : "Preflight review"}</span>
-          <span>3. {ko ? "승인·실행·결과" : "Approval, execution, results"}</span>
+          <strong>1. {ko ? "질문과 모드" : "Question and mode"}</strong>
+          <span>2. {ko ? "무비용 사전 검토" : "Zero-provider preflight"}</span>
+          <span>3. {ko ? "직접 승인·실행·결과" : "Self-approval, execution, results"}</span>
         </div>
 
-        <label className="primary-request-field">
-          <span>{ko ? "연구 질문" : "Research question"}<b aria-hidden="true"> *</b></span>
-          <textarea
-            required
-            rows={7}
-            value={value.raw_research_request}
-            onChange={(event) => update("raw_research_request", event.target.value)}
-            placeholder={ko ? "무엇을 이해하거나 해결하려는지 적어주세요." : "Describe what you want to understand or solve."}
-          />
-          <small>{ko ? "현재 문제, 원하는 결과, 반드시 지켜야 할 조건을 함께 적어도 됩니다." : "You may include the current problem, desired outcome, and constraints."}</small>
-        </label>
+        <div className="composer-core-grid">
+          <label className="primary-request-field">
+            <span>{ko ? "연구 질문" : "Research question"}<b aria-hidden="true"> *</b></span>
+            <textarea
+              required
+              rows={8}
+              value={value.raw_research_request}
+              onChange={(event) => update("raw_research_request", event.target.value)}
+              placeholder={ko
+                ? "현재 문제, 원하는 결정, 성공 조건을 자연어로 적어주세요."
+                : "Describe the problem, decision, and success conditions in natural language."}
+            />
+            <small>{ko ? "질문은 비공개로 Backend에 저장되며 정적 공개 사이트에 포함되지 않습니다." : "The question is stored privately by the Backend and never added to the static public site."}</small>
+          </label>
+
+          <fieldset className="creativity-selector prominent">
+            <legend>{ko ? "연구 방식 선택" : "Choose the research mode"}</legend>
+            <div className="creativity-options">
+              <label className={breakthrough ? "" : "selected"}>
+                <input type="radio" name="creativity-profile" value="STANDARD" checked={!breakthrough} onChange={() => update("creativity_profile", "STANDARD")} />
+                <span>
+                  <strong>STANDARD</strong>
+                  <small>{ko ? "근거 중심 · 집중적 · 검증 가능" : "Evidence-led · focused · verifiable"}</small>
+                  <ul>
+                    <li>{ko ? "정상 생성 폭" : "Normal generation breadth"}</li>
+                    <li>{ko ? "명확한 결정과 검증 경계" : "Focused decision and verification boundary"}</li>
+                  </ul>
+                </span>
+              </label>
+              <label className={breakthrough ? "selected breakthrough" : "breakthrough"}>
+                <input type="radio" name="creativity-profile" value="BREAKTHROUGH_DISCOVERY" checked={breakthrough} onChange={() => update("creativity_profile", "BREAKTHROUGH_DISCOVERY")} />
+                <span>
+                  <strong><Sparkles size={15} />BREAKTHROUGH DISCOVERY</strong>
+                  <small>{ko ? "아이디어를 먼저 동결하고 선례를 나중에 감사합니다." : "Freeze ideas first; audit precedent afterward."}</small>
+                  <ul>
+                    <li>{ko ? "맹검 다중 렌즈 발상" : "Blind multi-lens ideation"}</li>
+                    <li>{ko ? "교차 분야 전이와 기전 계열화" : "Cross-domain transfer and mechanism families"}</li>
+                    <li>{ko ? "신규성 감사와 이중축 포트폴리오" : "Novelty audit and dual-axis portfolio"}</li>
+                  </ul>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
 
         <div className="request-direct-fields">
-          {textArea("research_goal", ko ? "연구 목표" : "Objectives")}
-          {textArea("experimental_constraints", ko ? "제약 조건" : "Constraints")}
-          <label>
-            <span>{ko ? "요청 모드" : "Requested mode"}</span>
-            <select value={value.run_type} onChange={(event) => update("run_type", event.target.value as RunRequestDraft["run_type"])}>
-              {modes.map(([id, labels]) => <option key={id} value={id}>{labels[locale]}</option>)}
-            </select>
-          </label>
+          {textArea("research_goal", ko ? "목표 (선택)" : "Objectives (optional)")}
+          {textArea("experimental_constraints", ko ? "실험 제약 (선택)" : "Experimental constraints (optional)")}
           <label>
             <span>{ko ? "보고서 언어" : "Report language"}</span>
             <select value={value.output_language} onChange={(event) => update("output_language", event.target.value as RunRequestDraft["output_language"])}>
@@ -151,35 +228,50 @@ export function NewRunBuilder() {
           </label>
         </div>
 
-        <fieldset className="creativity-selector">
-          <legend>{ko ? "창의성 프로필" : "Creativity profile"}</legend>
-          <div className="creativity-options">
-            <label className={value.creativity_profile === "STANDARD" ? "selected" : ""}>
-              <input type="radio" name="creativity-profile" value="STANDARD" checked={value.creativity_profile === "STANDARD"} onChange={() => update("creativity_profile", "STANDARD")} />
-              <span><strong>{ko ? "Standard" : "Standard"}</strong><small>{ko ? "근거 중심의 검증 가능한 연구 방향" : "Evidence-led, testable research directions."}</small></span>
-            </label>
-            <label className={value.creativity_profile === "BREAKTHROUGH_DISCOVERY" ? "selected" : ""}>
-              <input type="radio" name="creativity-profile" value="BREAKTHROUGH_DISCOVERY" checked={value.creativity_profile === "BREAKTHROUGH_DISCOVERY"} onChange={() => update("creativity_profile", "BREAKTHROUGH_DISCOVERY")} />
-              <span><strong>Breakthrough</strong><small>{ko ? "가정 전환과 교차 분야 기전을 먼저 탐색합니다. 별도 승인된 런타임에서만 실행됩니다." : "Explores assumption inversions and cross-domain mechanisms first. Execution requires an independently approved runtime."}</small></span>
-            </label>
-          </div>
-        </fieldset>
-
         <label className="literature-scope-toggle">
           <input type="checkbox" checked={value.literature_scope_enabled} onChange={(event) => update("literature_scope_enabled", event.target.checked)} />
-          <span>{ko ? "문헌 검토와 출처 원장 포함" : "Include literature review and source ledger"}</span>
+          <span>{ko ? "문헌 검토와 전체 출처 원장 포함" : "Include literature review and complete source ledger"}</span>
         </label>
 
-        <label className="reference-request-field">
-          <span>{ko ? "참고 문헌과 추가 제약" : "Reference material and additional constraints"}</span>
-          <textarea rows={4} value={value.reference_material_or_constraints} onChange={(event) => update("reference_material_or_constraints", event.target.value)} />
-          <small>{ko ? "핵심 논문, DOI, 기존 결과, 제외할 접근법을 적어주세요." : "Add key papers, DOI, prior results, or approaches to exclude."}</small>
-        </label>
+        <section className={`selected-profile-summary${breakthrough ? " breakthrough" : ""}`} data-profile={value.creativity_profile}>
+          <div>
+            {breakthrough ? <Sparkles size={19} /> : <FlaskConical size={19} />}
+            <div>
+              <p>{ko ? "선택 확인" : "Selected-state summary"}</p>
+              <h3>{breakthrough ? "Breakthrough Discovery" : "Standard"}</h3>
+            </div>
+          </div>
+          <dl>
+            <div><dt>{ko ? "실행 모드" : "Run mode"}</dt><dd>{breakthrough ? "DISCOVERY PORTFOLIO" : (value.run_type || "AUTO")}</dd></div>
+            <div><dt>{ko ? "예산 프로필" : "Budget profile"}</dt><dd>{breakthrough ? "breakthrough_discovery" : "standard"}</dd></div>
+            <div><dt>Runtime</dt><dd>{breakthrough ? BREAKTHROUGH_RUNTIME_REF : (ko ? "사전 검토에서 고정" : "Bound during preflight")}</dd></div>
+          </dl>
+          <p>
+            {breakthrough
+              ? (ko
+                  ? "사전 검색 아이디어 동결 → 교차 분야 전이 → 기전 계열화 → 신규성·선례 감사 → 발명/검증 이중축 포트폴리오"
+                  : "Pre-search idea freeze → cross-domain transfer → mechanism families → novelty and precedent audit → invention/validation portfolio")
+              : (ko
+                  ? "근거 중심의 집중적이고 검증 가능한 연구 계획을 생성합니다."
+                  : "Builds an evidence-led, focused, and verifiable research plan.")}
+          </p>
+        </section>
+
+        {runControlApiBase && <AccessConnectionPanel onConnected={connected} compact />}
 
         <details className="advanced-fields">
           <summary>{ko ? "고급 설정과 요청 파일" : "Advanced settings and request file"}</summary>
           <div>
-            <label><span>{ko ? "제목" : "Title"}</span><input value={value.title} onChange={(event) => update("title", event.target.value)} /></label>
+            <label>
+              <span>{ko ? "세부 실행 모드" : "Detailed run mode"}</span>
+              <select value={value.run_type} disabled={breakthrough} onChange={(event) => update("run_type", event.target.value as RunRequestDraft["run_type"])}>
+                {modes.map(([id, labels]) => <option key={id} value={id}>{labels[locale]}</option>)}
+              </select>
+            </label>
+            <label>
+              <span>{ko ? "참고 문헌과 추가 제약" : "Reference material and additional constraints"}</span>
+              <textarea rows={4} value={value.reference_material_or_constraints} onChange={(event) => update("reference_material_or_constraints", event.target.value)} />
+            </label>
             {textArea("research_question", ko ? "구조화된 연구 질문" : "Structured research question", 4)}
             {textArea("current_bottleneck", ko ? "현재 병목" : "Current bottleneck")}
             {textArea("success_criteria", ko ? "성공 기준" : "Success criteria")}
@@ -207,48 +299,27 @@ export function NewRunBuilder() {
           </div>
         </details>
 
-        {runControlApiBase && (
-          <AccessConnectionPanel onConnected={setSession} compact />
-        )}
-
         <div className="run-request-actions">
-          <button className="primary-button" type="submit" disabled={!ready || busy || !runControlApiBase || !session}>
-            {busy ? <LoaderCircle className="spin" size={18} /> : <FlaskConical size={18} />}
+          <button className="primary-button review-plan-button" type="submit" disabled={!ready || busy || !runControlApiBase || !activeSession}>
+            {busy ? <LoaderCircle className="spin" size={18} /> : <ArrowRight size={18} />}
             {ko ? "연구 계획 확인" : "Review research plan"}
           </button>
-          {!ready && (
+          {!activeSession && (
             <small className="run-request-hint">
-              {ko
-                ? "연구 질문을 입력하면 연구 계획을 검토할 수 있습니다."
-                : "Describe the research question to enable plan review."}
+              {ko ? "계정을 연결하고 확인하면 사전 검토를 시작할 수 있습니다." : "Connect and check the account to enable preflight."}
             </small>
           )}
         </div>
         <p className="research-entry-note">
-          {ko ? "이 단계에서는 외부 모델 호출이나 비용이 발생하지 않습니다." : "This stage does not call an external model or incur provider cost."}
+          {ko ? "사전 검토는 외부 모델을 호출하지 않으며 provider 비용은 USD 0입니다." : "Preflight calls no external model and keeps provider cost at USD 0."}
         </p>
         {!runControlApiBase && <div className="intake-message" role="status"><p>{ko ? "연구 실행 기능은 준비 중입니다." : "Research execution is being prepared."}</p></div>}
-        {message && (
-          <div className="intake-message" role="alert">
-            <p>{message}</p>
-          </div>
-        )}
+        {message && <div className="intake-message" role="alert"><p>{message}</p></div>}
       </form>
-
-      {showPreview && (
-        <aside className="spec-preview">
-          <p className="section-label">{ko ? "요청 미리보기" : "Request preview"}</p>
-          <h2>{value.title.trim() || deriveRequestTitle(value.raw_research_request) || (ko ? "연구 요청" : "Research request")}</h2>
-          <div className="rendered-brief">
-            <section><h3>{ko ? "질문" : "Question"}</h3><p>{value.raw_research_request}</p></section>
-            {value.research_goal && <section><h3>{ko ? "목표" : "Objectives"}</h3><p>{value.research_goal}</p></section>}
-            {value.experimental_constraints && <section><h3>{ko ? "제약" : "Constraints"}</h3><p>{value.experimental_constraints}</p></section>}
-            <section><h3>{ko ? "프로필" : "Profile"}</h3><p>{value.creativity_profile}</p></section>
-            <section><h3>{ko ? "문헌 범위" : "Literature scope"}</h3><p>{value.literature_scope_enabled ? (ko ? "포함" : "Included") : (ko ? "제외" : "Excluded")}</p></section>
-            <section><h3>{ko ? "실행 전 확인" : "Confirmation before execution"}</h3><p>{ko ? "무비용 사전 검토가 실행 모드와 예산 상한을 먼저 보여줍니다. 명시적으로 승인하기 전에는 provider 기반 연구가 시작되지 않습니다." : "A zero-provider preflight shows the run mode and budget ceilings first. Provider-backed research does not start before explicit approval."}</p></section>
-          </div>
-        </aside>
-      )}
-    </div>
+    </section>
   );
+}
+
+export function NewRunBuilder() {
+  return <ResearchComposer />;
 }

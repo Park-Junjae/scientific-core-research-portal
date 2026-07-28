@@ -22,9 +22,10 @@
     "test:production-api-base": "node scripts/check-production-api-base.mjs",
     "test:budget": "node scripts/check-asset-budget.mjs",
     "test:privacy": "node scripts/check-public-private-boundary.mjs",
+    "test:zero-demos": "node scripts/check-production-zero-demos.mjs",
     "test:tracked-boundary": "node scripts/audit-tracked-publication-boundary.mjs --public-out=out --output=.publication-staging/tracked-tree-publication-boundary-audit.json",
     "test:citations": "node scripts/audit-citation-resolution.mjs",
-    "verify": "pnpm test:python-env && pnpm lint && pnpm typecheck && pnpm test && pnpm test:python && pnpm test:content && pnpm build && pnpm test:links && pnpm test:budget && pnpm test:privacy && pnpm test:tracked-boundary"
+    "verify": "pnpm test:python-env && pnpm lint && pnpm typecheck && pnpm test && pnpm test:python && pnpm test:content && pnpm build && pnpm test:links && pnpm test:budget && pnpm test:privacy && pnpm test:zero-demos && pnpm test:tracked-boundary"
   },
   "dependencies": {
     "@fontsource/noto-sans-kr": "5.2.8",

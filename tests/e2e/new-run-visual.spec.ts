@@ -24,9 +24,10 @@ for (const item of cases) {
         ? "미토콘드리아 염기교정에서 표적 효율을 유지하면서 부산물 편집을 줄이는 기전을 찾고 싶습니다."
         : "Identify a mechanism that improves product purity without proportionally reducing on-target editing.";
       await page.locator(".primary-request-field textarea").fill(input);
-      await expect(page.locator(".spec-preview")).toBeVisible();
+      await expect(page.locator(".selected-profile-summary")).toHaveAttribute("data-profile", "STANDARD");
     } else {
-      await expect(page.locator(".spec-preview")).toHaveCount(0);
+      await expect(page.locator(".primary-request-field textarea")).toBeEmpty();
+      await expect(page.locator(".selected-profile-summary")).toHaveAttribute("data-profile", "STANDARD");
     }
     await page.evaluate(() => document.fonts.ready);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);

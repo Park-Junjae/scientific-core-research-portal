@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 const runId = "run-synthetic-private";
 
-test("authenticated owner sees an artifact-first completed bundle", async ({ page }) => {
+test("authenticated creator sees an artifact-first completed bundle", async ({ page }) => {
   const artifacts = [
     {
       artifact_id: "artifact-pdf",
@@ -151,7 +151,6 @@ test("authenticated owner sees an artifact-first completed bundle", async ({ pag
   });
 
   await page.goto(`/run-control/?run_id=${runId}&lang=ko`);
-  await page.getByRole("button", { name: "연결 확인" }).click();
   await expect(page.getByRole("heading", { name: "연구 계획과 실행 상태" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "연구 결과 파일" })).toBeVisible();
   await expect(page.getByText("내 비공개 결과")).toBeVisible();

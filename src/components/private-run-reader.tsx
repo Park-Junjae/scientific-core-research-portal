@@ -159,7 +159,7 @@ export function PrivateRunReader({ runId }: { runId: string }) {
       {previewUrl && <iframe title={canonicalPdf?.filename ?? "PDF report"} src={previewUrl} className="private-pdf-frame" />}
       {busy && <p className="control-loading"><LoaderCircle className="spin" size={18} />{ko ? "파일을 여는 중입니다." : "Opening file."}</p>}
       {error && <p className="control-error">{error}</p>}
-      <p className="privacy-note"><BookOpen size={15} />{ko ? "이 파일은 인증된 소유자에게만 제공되며 정적 공개 사이트에 포함되지 않습니다." : "These artifacts are available only to the authenticated owner and are not part of the static public build."}</p>
+      <p className="privacy-note"><BookOpen size={15} />{ko ? "이 파일은 인증된 생성 계정에게만 제공되며 정적 공개 사이트에 포함되지 않습니다." : "These artifacts are available only to the authenticated creator account and are not part of the static public build."}</p>
     </section>
   );
 }

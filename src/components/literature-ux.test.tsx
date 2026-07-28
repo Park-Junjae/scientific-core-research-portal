@@ -73,7 +73,7 @@ describe("reader contracts", () => {
     expect(screen.getByText(/IDEA REPORT/)).toBeInTheDocument();
   });
 
-  it("starts New Run with one required natural-language field and no empty preview", () => {
+  it("starts the composer with one required natural-language field and no synthetic preview", () => {
     const { container } = render(<LocaleProvider><NewRunBuilder /></LocaleProvider>);
     expect(container.querySelector("pre, code")).toBeNull();
     expect(screen.queryByText(/^# /)).not.toBeInTheDocument();
@@ -81,6 +81,8 @@ describe("reader contracts", () => {
     expect(container.querySelectorAll("[required]")).toHaveLength(1);
     expect(container.querySelector(".advanced-fields")).not.toHaveAttribute("open");
     expect(screen.queryByRole("heading", { name: "Request preview" })).not.toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /standard/i })).toBeChecked();
+    expect(screen.getByRole("radio", { name: /breakthrough discovery/i })).not.toBeChecked();
     expect(screen.getByRole("button", { name: "Review research plan" })).toBeDisabled();
     if (runControlApiBase) {
       expect(screen.getByRole("heading", { name: "Connect a lab account" })).toBeInTheDocument();
@@ -93,8 +95,9 @@ describe("reader contracts", () => {
     });
 
     expect(screen.getByRole("button", { name: "Review research plan" })).toBeDisabled();
-    expect(screen.getByText("Request preview")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Why does product purity collapse at this locus?" })).toBeInTheDocument();
-    expect(screen.getByText("Included")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Standard" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("radio", { name: /breakthrough discovery/i }));
+    expect(screen.getByText("743336b3419bf735caeaaec434074ed512eb0c22")).toBeInTheDocument();
   });
 });

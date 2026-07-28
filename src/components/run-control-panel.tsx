@@ -13,6 +13,7 @@ import Link from "next/link";
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -20,11 +21,13 @@ import {
 import { AccessConnectionPanel } from "@/components/access-connection-panel";
 import { PrivateRunReader } from "@/components/private-run-reader";
 import { useLocale } from "@/lib/locale";
+import { withBasePath } from "@/lib/paths";
 import {
   approveControlledRun,
   cancelControlledRun,
   getControlledRun,
   getControlledRunEvents,
+  getRunControlSession,
   redispatchControlledRun,
   RUN_STATUS_POLL_INTERVAL_MS,
   runControlApiBase,
@@ -35,6 +38,18 @@ import {
 } from "@/lib/run-control-api";
 
 const terminalStatuses = new Set(["COMPLETED", "FAILED", "CANCELLED", "QUEUE_EXPIRED"]);
+
+interface SubmittedRunSummary {
+  research_question: string;
+  objectives: string[];
+  constraints: string[];
+  selected_mode: string;
+  creativity_profile: string;
+  literature_scope: boolean;
+  report_language: string;
+  runtime_ref: string;
+}
+
 const executionStages = [
   ["runner_accepted"],
   ["source_preflight"],
@@ -93,6 +108,15 @@ export function RunControlPanel() {
   const [session, setSession] = useState<RunControlSession | null>(null);
   const [run, setRun] = useState<RunControlRecord | null>(null);
   const [events, setEvents] = useState<RunControlEvent[]>([]);
+  const submitted = useMemo(() => {
+    if (!runId || typeof window === "undefined") return null;
+    try {
+      const raw = window.sessionStorage.getItem(`scientific-core-run-draft:${runId}`);
+      return raw ? JSON.parse(raw) as SubmittedRunSummary : null;
+    } catch {
+      return null;
+    }
+  }, [runId]);
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -136,6 +160,22 @@ export function RunControlPanel() {
     setError("");
     if (runId) await refresh(runId, true);
   }
+
+  useEffect(() => {
+    let active = true;
+    if (!runId) return () => { active = false; };
+    void getRunControlSession()
+      .then(async (nextSession) => {
+        if (!active) return;
+        setSession(nextSession);
+        setError("");
+        await refresh(runId, true);
+      })
+      .catch((reason) => {
+        if (active) setError(statusError(reason, ko));
+      });
+    return () => { active = false; };
+  }, [ko, refresh, runId]);
 
   useEffect(() => {
     if (!runId || !session || terminalStatuses.has(run?.status ?? "")) return;
@@ -255,6 +295,42 @@ export function RunControlPanel() {
         <div><span>{ko ? "대기 만료" : "Queue expiry"}</span><strong>{queueExpiry ? new Date(queueExpiry).toLocaleString(locale) : "—"}</strong></div>
       </section>
 
+      {submitted && (
+        <section className="submitted-request-summary">
+          <div className="section-heading">
+            <div>
+              <p className="section-label">{ko ? "제출한 비공개 요청" : "Submitted private request"}</p>
+              <h2>{ko ? "연구 범위 확인" : "Research scope review"}</h2>
+            </div>
+            <span>{submitted.creativity_profile === "BREAKTHROUGH_DISCOVERY" ? "Breakthrough Discovery" : "Standard"}</span>
+          </div>
+          <dl className="contract-grid">
+            <div className="wide"><dt>{ko ? "정규화된 연구 질문" : "Normalized research question"}</dt><dd>{submitted.research_question}</dd></div>
+            <div><dt>{ko ? "선택 모드" : "Selected mode"}</dt><dd>{submitted.selected_mode}</dd></div>
+            <div><dt>{ko ? "보고서 언어" : "Report language"}</dt><dd>{submitted.report_language}</dd></div>
+            <div><dt>{ko ? "문헌 범위" : "Literature scope"}</dt><dd>{formatValue(submitted.literature_scope, ko)}</dd></div>
+            <div><dt>Runtime</dt><dd>{submitted.runtime_ref}</dd></div>
+          </dl>
+          <div className="submitted-request-lists">
+            <div><h3>{ko ? "목표" : "Objectives"}</h3><ul>{submitted.objectives.length ? submitted.objectives.map((item) => <li key={item}>{item}</li>) : <li>—</li>}</ul></div>
+            <div><h3>{ko ? "제약" : "Constraints"}</h3><ul>{submitted.constraints.length ? submitted.constraints.map((item) => <li key={item}>{item}</li>) : <li>—</li>}</ul></div>
+          </div>
+        </section>
+      )}
+
+      {["QUEUED", "RUNNER_OFFLINE", "PREFLIGHT"].includes(run.status) && (
+        <section className="preflight-progress">
+          <LoaderCircle className="spin" size={22} />
+          <div>
+            <p className="section-label">{ko ? "무비용 사전 검토 진행 중" : "Zero-provider preflight in progress"}</p>
+            <h2>{ko ? "계획을 컴파일하고 있습니다" : "Compiling the research plan"}</h2>
+            <p>{ko ? "질문, 모드, 문헌 범위, runtime과 예산 상한을 검증합니다. Provider 사용량은 0입니다." : "Validating the question, mode, literature scope, runtime, and budget ceilings. Provider usage remains zero."}</p>
+            <div className="preflight-progress-bar"><span style={{ width: `${Math.max(4, run.progress_percentage)}%` }} /></div>
+          </div>
+          <strong>0 calls · 0 tokens · USD 0</strong>
+        </section>
+      )}
+
       {contract && (
         <section className="compiled-contract">
           <div className="section-heading">
@@ -267,12 +343,20 @@ export function RunControlPanel() {
             <div><dt>{ko ? "연구 모드" : "Run mode"}</dt><dd>{contract.run_mode}</dd></div>
             <div><dt>{ko ? "창의성 프로필" : "Creativity profile"}</dt><dd>{contract.creativity_profile ?? "STANDARD"}</dd></div>
             <div><dt>{ko ? "문헌 검토" : "Literature scope"}</dt><dd>{formatValue(contract.include_literature_list_and_review_scope, ko)}</dd></div>
+            <div><dt>{ko ? "보고서 언어" : "Report language"}</dt><dd>{contract.reporting.language_priority}</dd></div>
             <div><dt>{ko ? "초기 아이디어 목표" : "Raw idea target"}</dt><dd>{contract.raw_spark_target ?? contract.generation_plan.raw_idea_target}</dd></div>
             <div><dt>{ko ? "기전 계열 목표" : "Mechanism family target"}</dt><dd>{contract.generation_plan.mechanism_family_target_range.join("–")}</dd></div>
             <div><dt>Runtime ref</dt><dd>{contract.runtime_ref}</dd></div>
             <div><dt>{ko ? "대상 runner" : "Target runner"}</dt><dd>{contract.target_runner}</dd></div>
             <div><dt>{ko ? "사용자 확인 필요" : "User confirmation required"}</dt><dd>{formatValue(contract.requires_user_confirmation, ko)}</dd></div>
           </dl>
+
+          {contract.stage_order && contract.stage_order.length > 0 && (
+            <div className="contract-stage-order">
+              <h3>{ko ? "승인된 단계 순서" : "Approved stage order"}</h3>
+              <ol>{contract.stage_order.map((stage) => <li key={stage}>{stage.replaceAll("_", " ")}</li>)}</ol>
+            </div>
+          )}
 
           {contract.material_inferences.length > 0 && (
             <div className="inference-list">
@@ -310,7 +394,7 @@ export function RunControlPanel() {
               <span>{ko ? "컴파일된 계획과 예산 상한을 확인했습니다." : "I reviewed the compiled plan and budget ceilings."}</span>
             </label>
             <div className="approval-actions">
-              <Link className="secondary-button" href="/new-run/">{ko ? "요청 수정" : "Edit request"}</Link>
+              <Link className="secondary-button" href={withBasePath(`/?lang=${locale}`)}>{ko ? "요청 수정" : "Edit request"}</Link>
               <button className="primary-button" type="button" disabled={!confirmed || busy} onClick={() => act("approve")}>
                 <Check size={17} />{ko ? "내 실행 승인" : "Approve my execution"}
               </button>

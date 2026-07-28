@@ -13,6 +13,7 @@ export type PortalSelectableRunMode = typeof PORTAL_SELECTABLE_RUN_MODES[number]
 export const RUN_STATUS_POLL_INTERVAL_MS = 10_000;
 export const BACKEND_RATE_LIMIT_PER_MINUTE = 30;
 export const DEFAULT_RATE_LIMIT_BACKOFF_MS = 60_000;
+export const BREAKTHROUGH_RUNTIME_REF = "743336b3419bf735caeaaec434074ed512eb0c22";
 
 export function sustainedStatusRequestsPerMinute(
   intervalMs = RUN_STATUS_POLL_INTERVAL_MS,
@@ -189,7 +190,7 @@ export interface RunControlEvent {
   message: string;
 }
 
-export interface OwnerRunListItem {
+export interface CreatorRunListItem {
   run_id: string;
   research_question: string;
   created_at: string;
@@ -206,8 +207,8 @@ export interface OwnerRunListItem {
   artifact_availability: ArtifactAvailability;
 }
 
-export interface OwnerRunListResponse {
-  runs: OwnerRunListItem[];
+export interface CreatorRunListResponse {
+  runs: CreatorRunListItem[];
   limit: number;
   offset: number;
   next_offset: number | null;
@@ -419,7 +420,7 @@ export function getRunControlSession() {
 }
 
 export function getMyRuns(limit = 20, offset = 0) {
-  return request<OwnerRunListResponse>(
+  return request<CreatorRunListResponse>(
     `/api/runs?limit=${encodeURIComponent(limit)}&offset=${encodeURIComponent(offset)}`,
   );
 }

@@ -7,18 +7,37 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
 });
 
-test("home is Korean-first and links to the research entry point", async ({ page }) => {
+test("home is Korean-first and contains the real research composer", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "ko");
-  await expect(page.getByRole("heading", { name: "새 연구", exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: /요청서 작성/ })).toHaveAttribute("href", "/new-run/");
+  await expect(page.getByRole("heading", { name: "무엇을 연구할까요?" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: /연구 질문/ })).toBeVisible();
+  await expect(page.getByRole("radio", { name: /STANDARD/ })).toBeChecked();
+  await expect(page.getByRole("radio", { name: /BREAKTHROUGH DISCOVERY/ })).toBeVisible();
+  await expect(page.locator(".run-table")).toHaveCount(0);
 });
 
 test("composer call to action keeps a legible label", async ({ page }) => {
   await page.goto("/?lang=ko");
-  const cta = page.locator(".composer-cta");
+  const cta = page.locator(".review-plan-button");
   await expect(cta).toBeVisible();
-  expect(await cta.evaluate((node) => getComputedStyle(node).color)).toBe("rgb(255, 255, 255)");
+  const contrast = await cta.evaluate((node) => {
+    const parse = (value: string) => value.match(/\d+/g)!.slice(0, 3).map(Number);
+    const luminance = (rgb: number[]) => {
+      const channels = rgb.map((value) => {
+        const normalized = value / 255;
+        return normalized <= 0.03928
+          ? normalized / 12.92
+          : ((normalized + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    const style = getComputedStyle(node);
+    const foreground = luminance(parse(style.color));
+    const background = luminance(parse(style.backgroundColor));
+    return (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05);
+  });
+  expect(contrast).toBeGreaterThanOrEqual(4.5);
 });
 
 test("desktop and mobile navigation expose the scientific workspace", async ({ page }) => {
@@ -101,16 +120,17 @@ test("New Research exposes Request, Preflight, and Approval workflow", async ({ 
   await expect(page.locator("pre, code")).toHaveCount(0);
   const request = page.getByRole("textbox", { name: /Research question/ });
   await request.fill("Why does product purity vary across otherwise similar conditions?");
-  await expect(page.getByRole("radio", { name: /Standard/ })).toBeChecked();
-  await page.getByRole("radio", { name: /Breakthrough/ }).check();
-  await expect(page.getByText(/independently approved runtime/)).toBeVisible();
+  await expect(page.getByRole("radio", { name: /standard/i })).toBeChecked();
+  await page.getByRole("radio", { name: /Breakthrough Discovery/i }).check();
+  await expect(page.getByText("743336b3419bf735caeaaec434074ed512eb0c22")).toBeVisible();
+  await expect(page.locator(".selected-profile-summary")).toHaveAttribute("data-profile", "BREAKTHROUGH_DISCOVERY");
   await expect(page.getByRole("button", { name: "Review research plan" })).toBeDisabled();
   await expect(page.getByRole("link", { name: "Connect lab account" })).toHaveAttribute(
     "target",
     "_blank",
   );
   await expect(page.getByRole("button", { name: "Check connection" })).toBeEnabled();
-  await expect(page.getByText(/does not call an external model/)).toBeVisible();
+  await expect(page.getByText(/calls no external model/)).toBeVisible();
   await page.locator(".advanced-fields").click();
   await expect(page.getByRole("button", { name: "Save request file" })).toBeEnabled();
 });
@@ -124,7 +144,7 @@ test("mobile primary pages do not overflow", async ({ page }) => {
 });
 
 test("primary public reader pages have no serious accessibility violations", async ({ page }) => {
-  for (const path of ["/runs/?lang=en", `${demoRun}/summary/?lang=en`, `${demoRun}/literature/?lang=en`, `${demoRun}/ideas/assembly-state-gate/?lang=en`, `${demoRun}/knowledge/?lang=en`, "/new-run/?lang=en"]) {
+  for (const path of ["/?lang=en", "/runs/?lang=en", `${demoRun}/summary/?lang=en`, `${demoRun}/literature/?lang=en`, `${demoRun}/ideas/assembly-state-gate/?lang=en`, `${demoRun}/knowledge/?lang=en`, "/new-run/?lang=en"]) {
     await page.goto(path);
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations.filter((item) => item.impact === "critical" || item.impact === "serious"), path).toEqual([]);

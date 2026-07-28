@@ -1,12 +1,5 @@
-import { MyResearch } from "@/components/my-research";
-import { RunsExplorer } from "@/components/runs-explorer";
-import { getRuns } from "@/lib/content";
+import { ResearchWorkspace } from "@/components/research-workspace";
 
 export default function HomePage() {
-  return (
-    <>
-      <RunsExplorer runs={getRuns()} home />
-      <MyResearch />
-    </>
-  );
+  return <ResearchWorkspace />;
 }
