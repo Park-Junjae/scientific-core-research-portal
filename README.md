@@ -4,11 +4,21 @@ A static, read-only research workspace for approved AI Cho-Scientist runs. It pu
 
 Public synthetic demonstration: [AI Cho-Scientist](https://app.aichoscientist.com/)
 
+<p align="center">
+  <img src="docs/assets/research-portal.png" alt="AI Cho-Scientist public research portal" width="1200">
+</p>
+
 ## Current mode
 
 `PUBLIC_SANITIZED`. Explicit approval covers only the three bundled synthetic demonstrations. No private scientific report, raw provider output, prompt, registry, or laboratory data is included.
 
 ## Local use
+
+Prerequisites:
+
+- Python 3.11 or newer;
+- Node.js with `pnpm`;
+- a browser for the static preview and end-to-end tests.
 
 ```bash
 pnpm install --frozen-lockfile
