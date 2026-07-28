@@ -25,6 +25,7 @@ describe("run control browser client", () => {
       expect.objectContaining({ credentials: "include" }),
     );
     const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(init.headers).toBeUndefined();
     expect(JSON.stringify(init)).not.toMatch(/authorization|api[_-]?key|github[_-]?token/i);
   });
 
@@ -43,11 +44,31 @@ describe("run control browser client", () => {
     );
 
     const init = fetchMock.mock.calls[0][1] as RequestInit;
-    expect(init.headers).toMatchObject({ "X-CSRF-Token": "csrf-only" });
+    const headers = new Headers(init.headers);
+    expect(headers.get("X-CSRF-Token")).toBe("csrf-only");
+    expect(headers.get("Content-Type")).toBe("application/json");
     expect(init.body).toBe(JSON.stringify({
       research_question: "Synthetic question",
       budget_profile: "standard",
     }));
+  });
+
+  it("preserves CSRF without adding Content-Type to a bodyless mutation", async () => {
+    vi.stubEnv("NEXT_PUBLIC_RUN_CONTROL_API_BASE", "https://control.example");
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ run_id: "run-safe" }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { approveControlledRun } = await import("./run-control-api");
+    await approveControlledRun("run-safe", "csrf-only");
+
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    const headers = new Headers(init.headers);
+    expect(headers.get("X-CSRF-Token")).toBe("csrf-only");
+    expect(headers.has("Content-Type")).toBe(false);
+    expect(init.body).toBeUndefined();
   });
 
   it("reads private artifacts through the authenticated session without a browser token", async () => {

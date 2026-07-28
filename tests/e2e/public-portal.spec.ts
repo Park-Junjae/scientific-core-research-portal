@@ -10,8 +10,9 @@ test.beforeEach(async ({ page }) => {
 test("home is Korean-first and contains the real research composer", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "ko");
-  await expect(page.getByRole("heading", { name: "무엇을 연구할까요?" })).toBeVisible();
-  await expect(page.getByRole("textbox", { name: /연구 질문/ })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Research goal" })).toBeVisible();
+  await expect(page.getByText("모든 연구 질문과 결과는 계정별 비공개로 처리됩니다.")).toBeVisible();
+  await expect(page.getByText("AI Cho-Scientist · Private research workspace")).toHaveCount(0);
   await expect(page.getByRole("radio", { name: /STANDARD/ })).toBeChecked();
   await expect(page.getByRole("radio", { name: /BREAKTHROUGH DISCOVERY/ })).toBeVisible();
   await expect(page.locator(".run-table")).toHaveCount(0);
@@ -118,21 +119,14 @@ test("New Research exposes Request, Preflight, and Approval workflow", async ({ 
   await expect(page.locator("[required]")).toHaveCount(1);
   await expect(page.locator(".advanced-fields")).not.toHaveAttribute("open", "");
   await expect(page.locator("pre, code")).toHaveCount(0);
-  const request = page.getByRole("textbox", { name: /Research question/ });
+  const request = page.getByRole("textbox", { name: "Research goal" });
   await request.fill("Why does product purity vary across otherwise similar conditions?");
   await expect(page.getByRole("radio", { name: /standard/i })).toBeChecked();
   await page.getByRole("radio", { name: /Breakthrough Discovery/i }).check();
-  await expect(page.getByText("743336b3419bf735caeaaec434074ed512eb0c22")).toBeVisible();
-  await expect(page.locator(".selected-profile-summary")).toHaveAttribute("data-profile", "BREAKTHROUGH_DISCOVERY");
-  await expect(page.getByRole("button", { name: "Review research plan" })).toBeDisabled();
-  await expect(page.getByRole("link", { name: "Connect lab account" })).toHaveAttribute(
-    "target",
-    "_blank",
-  );
-  await expect(page.getByRole("button", { name: "Check connection" })).toBeEnabled();
-  await expect(page.getByText(/calls no external model/)).toBeVisible();
-  await page.locator(".advanced-fields").click();
-  await expect(page.getByRole("button", { name: "Save request file" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Start preflight" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();
+  await page.getByText("Options", { exact: true }).click();
+  await expect(page.getByRole("button", { name: "Export JSON" })).toBeEnabled();
 });
 
 test("mobile primary pages do not overflow", async ({ page }) => {

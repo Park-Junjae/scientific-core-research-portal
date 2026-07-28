@@ -354,14 +354,18 @@ async function request<T>(
 
   let response: Response;
   try {
-    response = await fetch(`${runControlApiBase}${pathname}`, {
+    const requestInit: RequestInit = {
       ...init,
       credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        ...init.headers,
-      },
-    });
+    };
+    if (init.body !== undefined && init.body !== null) {
+      const headers = new Headers(init.headers);
+      if (!headers.has("Content-Type")) {
+        headers.set("Content-Type", "application/json");
+      }
+      requestInit.headers = headers;
+    }
+    response = await fetch(`${runControlApiBase}${pathname}`, requestInit);
   } catch {
     throw new RunControlApiError(
       "Unable to reach the Run Control API. Check the network and browser cross-origin access.",

@@ -31,14 +31,15 @@ async function fillComposer(page: Page, breakthrough = false) {
   await installPrivateWorkspaceRoutes(page);
   await page.goto("/?lang=en");
   const composer = page.locator(".research-composer-shell");
-  await composer.getByRole("button", { name: "Check connection" }).click();
-  await composer.getByRole("textbox", { name: /Research question/ }).fill(question);
-  await composer.getByRole("textbox", { name: /Objectives/ }).fill("Identify a discriminating mechanism\nPreserve product activity");
-  await composer.getByRole("textbox", { name: /Experimental constraints/ }).fill("Use fixture evidence only");
+  await expect(composer.getByText("creator@example.com", { exact: true })).toBeVisible();
+  await composer.getByRole("textbox", { name: "Research goal" }).fill(question);
+  await composer.getByText("Options", { exact: true }).click();
+  await composer.getByRole("textbox", { name: "Objectives" }).fill("Identify a discriminating mechanism\nPreserve product activity");
+  await composer.getByRole("textbox", { name: "Constraints", exact: true }).fill("Use fixture evidence only");
   if (breakthrough) {
     await composer.getByRole("radio", { name: /breakthrough discovery/i }).check();
   }
-  await expect(composer.getByText(breakthrough ? "Breakthrough Discovery" : "Standard").last()).toBeVisible();
+  await expect(composer.getByRole("radio", { name: breakthrough ? /breakthrough discovery/i : /standard/i })).toBeChecked();
   return composer;
 }
 
@@ -52,7 +53,7 @@ async function openRun(page: Page, status: "PREFLIGHT" | "AWAITING_APPROVAL" | "
 test("desktop 01 disconnected homepage", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/?lang=en");
-  await expect(page.getByRole("heading", { name: "What should we investigate?" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Research goal" })).toBeVisible();
   await capture(page, "desktop-01-disconnected-homepage");
 });
 
@@ -60,9 +61,8 @@ test("desktop 02 connected empty My Research", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await installPrivateWorkspaceRoutes(page, "AWAITING_APPROVAL", { list: "empty" });
   await page.goto("/?lang=en");
-  await page.locator(".research-composer-shell").getByRole("button", { name: "Check connection" }).click();
   const research = page.locator(".my-research-section");
-  await expect(research.getByRole("heading", { name: "No research for this account yet." })).toBeVisible();
+  await expect(research.getByText("No research runs yet.", { exact: true })).toBeVisible();
   await research.scrollIntoViewIfNeeded();
   await capture(page, "desktop-02-connected-empty");
 });
@@ -70,7 +70,7 @@ test("desktop 02 connected empty My Research", async ({ page }) => {
 test("desktop 03 Standard filled composer", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const composer = await fillComposer(page);
-  await composer.locator(".selected-profile-summary").scrollIntoViewIfNeeded();
+  await composer.locator(".primary-request-field").scrollIntoViewIfNeeded();
   await capture(page, "desktop-03-standard-filled");
 });
 
@@ -120,7 +120,7 @@ test("desktop 08 completed results", async ({ page }) => {
 test("mobile 01 disconnected homepage", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/?lang=en");
-  await expect(page.getByRole("heading", { name: "What should we investigate?" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Research goal" })).toBeVisible();
   await capture(page, "mobile-01-disconnected-homepage");
 });
 
@@ -143,7 +143,6 @@ test("mobile 04 My Research", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await installPrivateWorkspaceRoutes(page, "RUNNING", { list: "current" });
   await page.goto("/?lang=en");
-  await page.locator(".research-composer-shell").getByRole("button", { name: "Check connection" }).click();
   const research = page.locator(".my-research-section");
   await expect(research.getByRole("link", { name: question })).toBeVisible();
   await research.scrollIntoViewIfNeeded();

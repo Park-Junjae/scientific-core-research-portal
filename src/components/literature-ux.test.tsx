@@ -83,21 +83,20 @@ describe("reader contracts", () => {
     expect(screen.queryByRole("heading", { name: "Request preview" })).not.toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /standard/i })).toBeChecked();
     expect(screen.getByRole("radio", { name: /breakthrough discovery/i })).not.toBeChecked();
-    expect(screen.getByRole("button", { name: "Review research plan" })).toBeDisabled();
-    if (runControlApiBase) {
-      expect(screen.getByRole("heading", { name: "Connect a lab account" })).toBeInTheDocument();
-    } else {
+    expect(screen.getByRole("button", { name: "Start preflight" })).toBeDisabled();
+    if (!runControlApiBase) {
       expect(screen.getByText("Research execution is being prepared.")).toBeInTheDocument();
     }
 
-    fireEvent.change(screen.getByRole("textbox", { name: /Research question/ }), {
+    fireEvent.change(screen.getByRole("textbox", { name: "Research goal" }), {
       target: { value: "Why does product purity collapse at this locus?" },
     });
 
-    expect(screen.getByRole("button", { name: "Review research plan" })).toBeDisabled();
-    expect(screen.getByRole("heading", { name: "Standard" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Start preflight" })).toBeDisabled();
+    expect(screen.getByText("Evidence-first research")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("radio", { name: /breakthrough discovery/i }));
-    expect(screen.getByText("743336b3419bf735caeaaec434074ed512eb0c22")).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /breakthrough discovery/i })).toBeChecked();
+    expect(screen.getByText("Novelty and feasibility assessed separately")).toBeInTheDocument();
   });
 });

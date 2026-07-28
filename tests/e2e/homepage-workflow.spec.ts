@@ -1,7 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
   fixtureRunId,
-  fixtureRuntimeRef,
   installPrivateWorkspaceRoutes,
   seedSubmittedSummary,
 } from "./fixtures/private-workspace";
@@ -11,10 +10,11 @@ const question = "Which controllable state preserves product purity without sacr
 async function connectAndFill(page: Page) {
   await page.goto("/?lang=en");
   const composer = page.locator(".research-composer-shell");
-  await composer.getByRole("button", { name: "Check connection" }).click();
-  await composer.getByRole("textbox", { name: /Research question/ }).fill(question);
-  await composer.getByRole("textbox", { name: /Objectives/ }).fill("Identify a discriminating mechanism\nPreserve product activity");
-  await composer.getByRole("textbox", { name: /Experimental constraints/ }).fill("Use fixture evidence only\nKeep provider usage at zero");
+  await expect(composer.getByText("creator@example.com", { exact: true })).toBeVisible();
+  await composer.getByRole("textbox", { name: /Research goal/ }).fill(question);
+  await composer.getByText("Options", { exact: true }).click();
+  await composer.getByRole("textbox", { name: "Objectives" }).fill("Identify a discriminating mechanism\nPreserve product activity");
+  await composer.getByRole("textbox", { name: "Constraints", exact: true }).fill("Use fixture evidence only\nKeep provider usage at zero");
   return composer;
 }
 
@@ -22,7 +22,7 @@ test("homepage Standard request preserves the lean production payload", async ({
   const api = await installPrivateWorkspaceRoutes(page);
   const composer = await connectAndFill(page);
 
-  await composer.getByRole("button", { name: "Review research plan" }).click();
+  await composer.getByRole("button", { name: "Start preflight" }).click();
   await expect(page).toHaveURL(new RegExp(`/run-control/\\?run_id=${fixtureRunId}`));
   await expect(page.getByRole("heading", { name: "Compiled research plan" })).toBeVisible();
 
@@ -45,8 +45,8 @@ test("homepage Breakthrough request sends the reviewed discovery contract", asyn
   const composer = await connectAndFill(page);
 
   await composer.getByRole("radio", { name: /breakthrough discovery/i }).check();
-  await expect(composer.getByText(fixtureRuntimeRef)).toBeVisible();
-  await composer.getByRole("button", { name: "Review research plan" }).click();
+  await expect(composer.getByRole("radio", { name: /breakthrough discovery/i })).toBeChecked();
+  await composer.getByRole("button", { name: "Start preflight" }).click();
   await expect(page).toHaveURL(new RegExp(`/run-control/\\?run_id=${fixtureRunId}`));
 
   expect(api.submittedBody).toMatchObject({
@@ -101,7 +101,6 @@ test("creator can self-approve, refresh, re-enter, and cancel the same private r
 test("My Research renders only the authenticated creator projection", async ({ page }) => {
   const api = await installPrivateWorkspaceRoutes(page, "RUNNING", { list: "current" });
   await page.goto("/?lang=en");
-  await page.locator(".research-composer-shell").getByRole("button", { name: "Check connection" }).click();
 
   const research = page.locator(".my-research-section");
   await expect(research.getByRole("link", { name: question })).toBeVisible();

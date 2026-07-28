@@ -1,7 +1,7 @@
 "use client";
 
-import { CheckCircle2, ExternalLink, LoaderCircle, LogIn, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { CheckCircle2, LoaderCircle, LogIn } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocale } from "@/lib/locale";
 import {
   getRunControlSession,
@@ -17,20 +17,20 @@ function connectionFailureMessage(error: unknown, ko: boolean) {
   switch (error.kind) {
     case "ACCESS_CHALLENGE":
       return ko
-        ? "Cloudflare Access 로그인이 필요합니다. 새 탭에서 랩 계정을 연결한 뒤 다시 확인하세요."
-        : "Cloudflare Access sign-in is required. Connect the lab account in the new tab, then check again.";
+        ? "Google로 계속하여 Cloudflare Access 로그인을 완료하세요."
+        : "Continue with Google to complete Cloudflare Access sign-in.";
     case "NETWORK":
       return ko
         ? "브라우저가 API에 연결하지 못했습니다. 네트워크 또는 CORS 상태를 확인하세요."
         : "The browser could not reach the API. Check the network or CORS state.";
     case "BACKEND_UNAUTHENTICATED":
       return ko
-        ? "Cloudflare 세션이 Backend에서 인증되지 않았습니다. 랩 계정을 다시 연결하세요."
-        : "The Cloudflare session was not authenticated by the Backend. Reconnect the lab account.";
+        ? "Cloudflare 세션이 Backend에서 인증되지 않았습니다."
+        : "The Cloudflare session was not authenticated by the Backend.";
     case "NOT_ALLOWLISTED":
       return ko
-        ? "이 계정은 허용된 랩 계정 목록에 없습니다."
-        : "This account is not on the lab allowlist.";
+        ? "이 계정은 허용된 계정 목록에 없습니다."
+        : "This account is not on the allowlist.";
     case "FORBIDDEN":
       return ko
         ? "Backend가 이 요청을 허용하지 않았습니다."
@@ -38,7 +38,7 @@ function connectionFailureMessage(error: unknown, ko: boolean) {
     case "RATE_LIMITED":
       return ko
         ? "요청 한도에 도달했습니다. 잠시 기다린 뒤 다시 확인하세요."
-        : "The request limit was reached. Wait before checking again.";
+        : "The request limit was reached. Wait before trying again.";
     case "UNAVAILABLE":
       return ko
         ? "Run Control Backend를 현재 사용할 수 없습니다."
@@ -57,84 +57,87 @@ function connectionFailureMessage(error: unknown, ko: boolean) {
 }
 
 export function AccessConnectionPanel({
-  onConnected,
+  onSessionChange,
   compact = false,
 }: {
-  onConnected: (session: RunControlSession) => void;
+  onSessionChange: (session: RunControlSession | null) => void;
   compact?: boolean;
 }) {
   const { locale } = useLocale();
   const ko = locale === "ko";
-  const [checking, setChecking] = useState(false);
+  const [checking, setChecking] = useState(true);
   const [connectedEmail, setConnectedEmail] = useState("");
   const [message, setMessage] = useState("");
   const [failed, setFailed] = useState(false);
 
-  async function checkConnection() {
+  const checkConnection = useCallback(async () => {
     setChecking(true);
     setFailed(false);
     setMessage("");
     try {
       const session = await getRunControlSession();
       setConnectedEmail(session.email);
-      setMessage(ko ? "랩 계정 연결을 확인했습니다." : "Lab account connection confirmed.");
-      onConnected(session);
+      onSessionChange(session);
     } catch (error) {
       setConnectedEmail("");
       setFailed(true);
       setMessage(connectionFailureMessage(error, ko));
+      onSessionChange(null);
     } finally {
       setChecking(false);
     }
-  }
+  }, [ko, onSessionChange]);
+
+  useEffect(() => {
+    const initialCheck = window.setTimeout(() => { void checkConnection(); }, 0);
+    const recheckOnFocus = () => { void checkConnection(); };
+    const recheckWhenVisible = () => {
+      if (document.visibilityState === "visible") void checkConnection();
+    };
+    window.addEventListener("focus", recheckOnFocus);
+    document.addEventListener("visibilitychange", recheckWhenVisible);
+    return () => {
+      window.clearTimeout(initialCheck);
+      window.removeEventListener("focus", recheckOnFocus);
+      document.removeEventListener("visibilitychange", recheckWhenVisible);
+    };
+  }, [checkConnection]);
 
   return (
     <section
       className={`access-connection${compact ? " compact" : ""}`}
-      aria-label={ko ? "랩 계정 연결" : "Lab account connection"}
+      aria-label="Account connection"
     >
-      <div className="access-connection-copy">
-        <LogIn size={20} aria-hidden="true" />
-        <div>
-          <h2>{ko ? "랩 계정 연결" : "Connect a lab account"}</h2>
-          <p>
-            {ko
-              ? "비공개 연구를 불러오기 전에 Cloudflare Access 세션을 연결하고 확인하세요."
-              : "Connect and verify a Cloudflare Access session before loading private research."}
-          </p>
-        </div>
-      </div>
-      <div className="access-connection-actions">
-        <a
-          className="secondary-button"
-          href={`${runControlApiBase}/api/session`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <ExternalLink size={16} />
-          {ko ? "랩 계정으로 연결" : "Connect lab account"}
-        </a>
+      {connectedEmail ? (
+        <p className="connected-email" role="status">
+          <CheckCircle2 size={17} aria-hidden="true" />
+          <span>{connectedEmail}</span>
+          {checking && <LoaderCircle className="spin" size={15} aria-label="Checking session" />}
+        </p>
+      ) : checking ? (
+        <p className="connection-checking" role="status">
+          <LoaderCircle className="spin" size={16} aria-hidden="true" />
+          {ko ? "계정 확인 중" : "Checking account"}
+        </p>
+      ) : (
         <button
-          className="primary-button"
+          className="primary-button continue-with-google"
           type="button"
-          disabled={checking}
-          onClick={checkConnection}
+          onClick={() => {
+            window.open(
+              `${runControlApiBase}/api/session`,
+              "_blank",
+              "noopener,noreferrer",
+            );
+          }}
         >
-          {checking
-            ? <LoaderCircle className="spin" size={16} />
-            : connectedEmail
-              ? <CheckCircle2 size={16} />
-              : <RefreshCw size={16} />}
-          {ko ? "연결 확인" : "Check connection"}
+          <LogIn size={16} aria-hidden="true" />
+          Continue with Google
         </button>
-      </div>
-      {message && (
-        <p
-          className={failed ? "connection-message error" : "connection-message success"}
-          role={failed ? "alert" : "status"}
-        >
+      )}
+      {failed && message && (
+        <p className="connection-message error" role="alert">
           {message}
-          {connectedEmail ? ` · ${connectedEmail}` : ""}
         </p>
       )}
     </section>
