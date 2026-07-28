@@ -2,10 +2,8 @@
 
 import {
   Clock3,
-  FlaskConical,
   Library,
   LoaderCircle,
-  LockKeyhole,
   PackageCheck,
 } from "lucide-react";
 import Link from "next/link";
@@ -78,27 +76,11 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
 
   return (
     <section className="my-research-section" aria-labelledby="my-research-heading">
-      <div className="section-heading">
-        <div>
-          <p className="section-label">{ko ? "비공개 실행 작업공간" : "Private execution workspace"}</p>
-          <h2 id="my-research-heading">{ko ? "내 연구" : "My Research"}</h2>
-        </div>
-        <span><LockKeyhole size={14} />{ko ? "현재 계정 전용" : "Private to this account"}</span>
-      </div>
-      <p className="my-research-intro">
-        {ko
-          ? "인증된 계정이 실제로 생성한 실행만 표시합니다. 공개 예시나 합성 연구는 섞이지 않습니다."
-          : "Only real runs created by the authenticated account appear here. Public examples and synthetic research are never mixed in."}
-      </p>
-
+      <h2 id="my-research-heading">My Research</h2>
       {!session && (
-        <div className="my-research-empty not-connected">
-          <LockKeyhole size={20} />
-          <div>
-            <h3>{ko ? "랩 계정을 연결하세요." : "Connect the lab account."}</h3>
-            <p>{ko ? "위의 composer에서 연결을 확인하면 이 계정의 연구가 표시됩니다." : "Check the connection in the composer above to load this creator's research."}</p>
-          </div>
-        </div>
+        <p className="my-research-empty">
+          {ko ? "아직 실행한 연구가 없습니다." : "No research runs yet."}
+        </p>
       )}
       {loading && (
         <p className="control-loading" role="status">
@@ -108,13 +90,9 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
       )}
       {session && error && <p className="control-error" role="alert">{error}</p>}
       {session && loaded && runs.length === 0 && (
-        <div className="my-research-empty">
-          <FlaskConical size={20} />
-          <div>
-            <h3>{ko ? "이 계정으로 생성한 연구가 없습니다." : "No research for this account yet."}</h3>
-            <p>{ko ? "위에서 첫 연구 계획을 검토하면 여기에 표시됩니다." : "Review the first research plan above and it will appear here."}</p>
-          </div>
-        </div>
+        <p className="my-research-empty">
+          {ko ? "아직 실행한 연구가 없습니다." : "No research runs yet."}
+        </p>
       )}
       {session && runs.length > 0 && (
         <div className="my-research-list">

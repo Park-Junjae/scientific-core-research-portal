@@ -155,11 +155,15 @@ export function RunControlPanel() {
     }
   }, [ko]);
 
-  async function connected(nextSession: RunControlSession) {
+  const connected = useCallback(async (nextSession: RunControlSession | null) => {
+    if (!nextSession) {
+      setSession(null);
+      return;
+    }
     setSession(nextSession);
     setError("");
     if (runId) await refresh(runId, true);
-  }
+  }, [refresh, runId]);
 
   useEffect(() => {
     let active = true;
@@ -202,7 +206,7 @@ export function RunControlPanel() {
   if (!session) {
     return (
       <>
-        <AccessConnectionPanel onConnected={connected} />
+        <AccessConnectionPanel onSessionChange={connected} />
         {error && <p className="control-error" role="alert">{error}</p>}
       </>
     );

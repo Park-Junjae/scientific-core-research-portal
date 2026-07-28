@@ -22,7 +22,7 @@ for (const item of [
     await page.evaluate(() => document.fonts.ready);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
     if ("kind" in item && item.kind === "home") {
-      await expect(page.getByRole("heading", { name: "무엇을 연구할까요?", exact: true })).toBeVisible();
+      await expect(page.getByRole("textbox", { name: "Research goal" })).toBeVisible();
     } else if ("kind" in item && item.kind === "run") {
       await expect(page.getByText("현재 결론", { exact: true })).toBeVisible();
     } else if (item.route.includes("literature")) {
