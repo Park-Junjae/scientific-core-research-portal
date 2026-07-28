@@ -30,11 +30,17 @@ jobs:
       - run: pnpm test
       - run: python tests/run_all.py
       - run: pnpm test:content
-      - run: pnpm build
+      - run: NEXT_PUBLIC_RUN_CONTROL_API_BASE=https://api.aichoscientist.com pnpm build
+      - run: NEXT_PUBLIC_RUN_CONTROL_API_BASE=https://api.aichoscientist.com pnpm test:production-api-base
       - run: pnpm test:basepath -- --root
       - run: pnpm test:links
       - run: pnpm test:budget
+      - run: pnpm test:privacy
+      - run: pnpm test:zero-demos
+      - run: pnpm test:tracked-boundary
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Build credentialed-session E2E variant
+        run: SCIENTIFIC_CORE_TEST_ONLY_DEMO_FIXTURES=1 NEXT_PUBLIC_RUN_CONTROL_API_BASE=https://control.example pnpm build
       - run: pnpm test:e2e
       - run: NEXT_PUBLIC_BASE_PATH=/scientific-core-research-portal pnpm build
       - run: pnpm test:basepath -- /scientific-core-research-portal

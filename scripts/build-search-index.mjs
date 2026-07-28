@@ -3,7 +3,9 @@ import { join } from "node:path";
 
 const roots = [join(process.cwd(), "content", "runs")];
 const localRoot = join(process.cwd(), ".local-preview", "content", "runs");
+const demoRoot = join(process.cwd(), "tests", "fixtures", "demo-content", "runs");
 if (process.env.SCIENTIFIC_CORE_INCLUDE_LOCAL_PREVIEW === "1" && existsSync(localRoot)) roots.push(localRoot);
+if (process.env.SCIENTIFIC_CORE_TEST_ONLY_DEMO_FIXTURES === "1" && existsSync(demoRoot)) roots.push(demoRoot);
 const read = (path) => JSON.parse(readFileSync(path, "utf8"));
 const records = [];
 const seenRunIds = new Set();
@@ -14,6 +16,11 @@ for (const root of roots) {
   for (const slug of read(indexPath).runs) {
     const runRoot = join(root, slug);
     const run = read(join(runRoot, "run.json"));
+    const demoFixtures = process.env.SCIENTIFIC_CORE_TEST_ONLY_DEMO_FIXTURES === "1";
+    const localPreview = process.env.SCIENTIFIC_CORE_INCLUDE_LOCAL_PREVIEW === "1";
+    const productionVisible = run.publication_status === "APPROVED"
+      && run.source_type !== "SYNTHETIC_DEMO";
+    if (!demoFixtures && !localPreview && !productionVisible) continue;
     if (seenRunIds.has(run.run_id)) continue;
     seenRunIds.add(run.run_id);
     const all = (value) => Object.values(value ?? {}).join(" ");
@@ -22,7 +29,14 @@ for (const root of roots) {
       const idea = read(join(runRoot, "ideas", `${ideaSlug}.json`));
       records.push({ type: "idea", id: idea.idea_id, run_slug: slug, slug: idea.slug, title: idea.title, summary: idea.abstract, text: [all(idea.category), idea.idea_type, idea.lifecycle_status, all(idea.strongest_reason), ...idea.tags.map(all)].join(" "), href: `/runs/${slug}/ideas/${idea.slug}/` });
     }
-    for (const report of run.reports) records.push({ type: report.role === "KNOWLEDGE_BACKGROUND" ? "knowledge" : "report", id: report.report_id, run_slug: slug, slug: report.report_id, title: report.localized_title, summary: report.localized_description, text: [report.role, report.language].join(" "), href: `/runs/${slug}/reports/${report.report_id}/` });
+    for (const report of run.reports) {
+      if (
+        report.report_status !== "APPROVED"
+        || typeof report.path !== "string"
+        || !/\.(?:pdf|md|markdown)(?:[?#].*)?$/i.test(report.path)
+      ) continue;
+      records.push({ type: report.role === "KNOWLEDGE_BACKGROUND" ? "knowledge" : "report", id: report.report_id, run_slug: slug, slug: report.report_id, title: report.localized_title, summary: report.localized_description, text: [report.role, report.language].join(" "), href: `/runs/${slug}/reports/${report.report_id}/` });
+    }
     const sourceIndexPath = join(runRoot, "literature", "index.json");
     if (existsSync(sourceIndexPath)) {
       for (const source of read(sourceIndexPath).sources ?? []) {

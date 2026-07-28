@@ -7,18 +7,37 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
 });
 
-test("home is Korean-first and links to the research entry point", async ({ page }) => {
+test("home is Korean-first and contains the real research composer", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "ko");
-  await expect(page.getByRole("heading", { name: "새 연구", exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: /요청서 작성/ })).toHaveAttribute("href", "/new-run/");
+  await expect(page.getByRole("heading", { name: "무엇을 연구할까요?" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: /연구 질문/ })).toBeVisible();
+  await expect(page.getByRole("radio", { name: /STANDARD/ })).toBeChecked();
+  await expect(page.getByRole("radio", { name: /BREAKTHROUGH DISCOVERY/ })).toBeVisible();
+  await expect(page.locator(".run-table")).toHaveCount(0);
 });
 
 test("composer call to action keeps a legible label", async ({ page }) => {
   await page.goto("/?lang=ko");
-  const cta = page.locator(".composer-cta");
+  const cta = page.locator(".review-plan-button");
   await expect(cta).toBeVisible();
-  expect(await cta.evaluate((node) => getComputedStyle(node).color)).toBe("rgb(255, 255, 255)");
+  const contrast = await cta.evaluate((node) => {
+    const parse = (value: string) => value.match(/\d+/g)!.slice(0, 3).map(Number);
+    const luminance = (rgb: number[]) => {
+      const channels = rgb.map((value) => {
+        const normalized = value / 255;
+        return normalized <= 0.03928
+          ? normalized / 12.92
+          : ((normalized + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    const style = getComputedStyle(node);
+    const foreground = luminance(parse(style.color));
+    const background = luminance(parse(style.backgroundColor));
+    return (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05);
+  });
+  expect(contrast).toBeGreaterThanOrEqual(4.5);
 });
 
 test("desktop and mobile navigation expose the scientific workspace", async ({ page }) => {
@@ -38,7 +57,10 @@ test("desktop and mobile navigation expose the scientific workspace", async ({ p
 test("Runs remains a compact list with one literature column", async ({ page }) => {
   await page.goto("/runs/?lang=en");
   await expect(page.getByRole("heading", { name: "Research runs" })).toBeVisible();
-  await expect(page.getByRole("columnheader", { name: "Literature analyzed" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Literature evidence" })).toBeVisible();
+  await expect(page.locator(".run-literature-counts").first()).toContainText("analyzed");
+  await expect(page.locator(".run-literature-counts").first()).toContainText("cited");
+  await expect(page.locator(".run-literature-counts").first()).toContainText("load-bearing");
   await expect(page.locator(".run-table")).toBeVisible();
   await expect(page.locator(".run-grid")).toHaveCount(0);
   await expect(page.getByText(/report refs|deep-read|full-text/i)).toHaveCount(0);
@@ -46,18 +68,19 @@ test("Runs remains a compact list with one literature column", async ({ page }) 
 
 test("Runs search covers public demo title and DOI", async ({ page }) => {
   await page.goto("/runs/?lang=en");
-  const search = page.getByPlaceholder("Search titles, questions, ideas, authors, papers, or DOI");
+  const search = page.getByPlaceholder("Search titles, questions, ideas, papers, or DOI");
   await search.fill("xrRNA-guided Prime Assembly");
   await expect(page.getByRole("link", { name: "xrRNA-guided Prime Assembly" })).toBeVisible();
   await search.fill("10.1038/s41586-019-1711-4");
   await expect(page.getByRole("link", { name: "xrRNA-guided Prime Assembly" })).toBeVisible();
 });
 
-test("run root opens Overview and keeps six scientific tabs", async ({ page }) => {
+test("run root hides Reports when no approved report artifact exists", async ({ page }) => {
   await page.goto(`${demoRun}/?lang=en`);
   await expect(page.getByText("Research question", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Overview", exact: true })).toHaveAttribute("aria-current", "page");
-  await expect(page.locator(".run-tabs > a")).toHaveCount(6);
+  await expect(page.locator(".run-tabs > a")).toHaveCount(5);
+  await expect(page.locator(".run-tabs").getByRole("link", { name: "Reports", exact: true })).toHaveCount(0);
   await expect(page.getByText("Current conclusion", { exact: true })).toBeVisible();
 });
 
@@ -90,13 +113,25 @@ test("public Literature exposes a sanitized source detail", async ({ page }) => 
   await expect(page.getByText("10.1038/s41586-019-1711-4")).toBeVisible();
 });
 
-test("New Run remains a simple one-field intake", async ({ page }) => {
+test("New Research exposes Request, Preflight, and Approval workflow", async ({ page }) => {
   await page.goto("/new-run/?lang=en");
   await expect(page.locator("[required]")).toHaveCount(1);
   await expect(page.locator(".advanced-fields")).not.toHaveAttribute("open", "");
   await expect(page.locator("pre, code")).toHaveCount(0);
-  const request = page.getByRole("textbox", { name: /What would you like to research/ });
+  const request = page.getByRole("textbox", { name: /Research question/ });
   await request.fill("Why does product purity vary across otherwise similar conditions?");
+  await expect(page.getByRole("radio", { name: /standard/i })).toBeChecked();
+  await page.getByRole("radio", { name: /Breakthrough Discovery/i }).check();
+  await expect(page.getByText("743336b3419bf735caeaaec434074ed512eb0c22")).toBeVisible();
+  await expect(page.locator(".selected-profile-summary")).toHaveAttribute("data-profile", "BREAKTHROUGH_DISCOVERY");
+  await expect(page.getByRole("button", { name: "Review research plan" })).toBeDisabled();
+  await expect(page.getByRole("link", { name: "Connect lab account" })).toHaveAttribute(
+    "target",
+    "_blank",
+  );
+  await expect(page.getByRole("button", { name: "Check connection" })).toBeEnabled();
+  await expect(page.getByText(/calls no external model/)).toBeVisible();
+  await page.locator(".advanced-fields").click();
   await expect(page.getByRole("button", { name: "Save request file" })).toBeEnabled();
 });
 
@@ -109,20 +144,20 @@ test("mobile primary pages do not overflow", async ({ page }) => {
 });
 
 test("primary public reader pages have no serious accessibility violations", async ({ page }) => {
-  for (const path of ["/runs/?lang=en", `${demoRun}/summary/?lang=en`, `${demoRun}/literature/?lang=en`, `${demoRun}/ideas/assembly-state-gate/?lang=en`, `${demoRun}/knowledge/?lang=en`, "/new-run/?lang=en"]) {
+  for (const path of ["/?lang=en", "/runs/?lang=en", `${demoRun}/summary/?lang=en`, `${demoRun}/literature/?lang=en`, `${demoRun}/ideas/assembly-state-gate/?lang=en`, `${demoRun}/knowledge/?lang=en`, "/new-run/?lang=en"]) {
     await page.goto(path);
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations.filter((item) => item.impact === "critical" || item.impact === "serious"), path).toEqual([]);
   }
 });
 
-test("global literature and reports routes preserve research provenance", async ({ page }) => {
+test("global literature preserves provenance and demo summaries are not reports", async ({ page }) => {
   await page.goto("/literature/?lang=en");
   await expect(page.getByRole("heading", { name: "Literature", exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: /Search-and-replace genome editing/ })).toBeVisible();
   await page.goto("/reports/?lang=en");
   await expect(page.getByRole("heading", { name: "Reports", exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Read", exact: true }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Read", exact: true })).toHaveCount(0);
 });
 
 test("bundled Korean font and heading scale remain stable", async ({ page }) => {

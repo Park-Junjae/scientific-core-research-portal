@@ -1,9 +1,5 @@
 {
   "schema_version": "ResearchRunIndexV1",
-  "generated_at": "2026-07-21T10:00:00Z",
-  "runs": [
-    "xrrna-prime-assembly-demo",
-    "prame-logic-first-demo",
-    "taled-historical-demo"
-  ]
+  "generated_at": "2026-07-27T00:00:00Z",
+  "runs": []
 }

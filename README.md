@@ -1,19 +1,20 @@
-# AI Cho-Scientist Public Research Portal
+# AI Cho-Scientist Research Workspace
 
-A static, read-only research workspace for approved AI Cho-Scientist runs. It publishes a validated `ResearchRunBundleV1` into a readable Next.js site that remains available without the scientific VM.
+An operational, creator-scoped research workspace for AI Cho-Scientist. The homepage carries a private question from Standard or Breakthrough selection through zero-provider preflight, self-approval, execution, and artifact-first results.
 
-Public synthetic demonstration: [AI Cho-Scientist](https://app.aichoscientist.com/)
+[AI Cho-Scientist](https://app.aichoscientist.com/)
 
 ## Current mode
 
-`PUBLIC_SANITIZED`. Explicit approval covers only the three bundled synthetic demonstrations. No private scientific report, raw provider output, prompt, registry, or laboratory data is included.
+Production publishes zero historical demonstration runs, artifacts, search records, or routes. Historical synthetic content is isolated under `tests/fixtures/` and can only be enabled by the explicit fixture-only test build.
+
+Private run requests and results remain in the run-control API. No private scientific report, raw provider output, prompt, registry, request body, or laboratory data is serialized into the static deployment.
 
 ## Local use
 
 ```bash
 pnpm install --frozen-lockfile
 python -m pip install -e .
-python scripts/generate_demo_pdfs.py
 python -m coscientist.site validate-content --portal-root .
 pnpm build
 python -m coscientist.site preview-site --portal-root . --port 4173
@@ -32,6 +33,7 @@ pnpm test:content
 pnpm build
 pnpm test:links
 pnpm test:budget
+pnpm test:zero-demos
 pnpm test:e2e
 ```
 
@@ -49,12 +51,12 @@ Publication is allowlist-only, rejects unsafe paths and secret patterns, generat
 ## Architecture
 
 - Next.js App Router + TypeScript
-- static export with trailing-slash routes
+- static export shell with trailing-slash routes and a private run-control API
 - client-side search, filters, preferences, and intake downloads
 - run-mode-aware portfolio funnels, idea lifecycle filters, score vectors, and summary-only idea pages
 - PDF.js browser renderer with native open/download fallback
 - deterministic Python publication CLI
-- GitHub Pages workflow gated by explicit visibility approval
+- production output audit requiring zero historical demo routes, records, and artifacts
 
 The scientific runtime is outside this repository and remains unchanged. Source-run locations are supplied to the publication CLI at execution time and are never serialized into published content.
 

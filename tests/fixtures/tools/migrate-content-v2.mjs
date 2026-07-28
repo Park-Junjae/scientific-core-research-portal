@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, readdirSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
-const root = join(process.cwd(), "content", "runs");
+const root = join(process.cwd(), "tests", "fixtures", "demo-content", "runs");
 const text = (en, ko) => ({ en, ko });
 
 const runs = {

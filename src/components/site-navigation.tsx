@@ -106,9 +106,10 @@ function Sidebar({
           </Link>
         ))}
       </nav>
-      <div className="recent-runs">
-        <div className="sidebar-label">{locale === "ko" ? "최근 연구" : "Recent runs"}</div>
-        {recentRuns.map((run) => {
+      {recentRuns.length > 0 && (
+        <div className="recent-runs">
+          <div className="sidebar-label">{locale === "ko" ? "최근 연구" : "Recent runs"}</div>
+          {recentRuns.map((run) => {
           const title = localized(run.short_title, locale) ?? t("noTranslation");
           return (
             <Link
@@ -123,8 +124,9 @@ function Sidebar({
               <span>{title}</span>
             </Link>
           );
-        })}
-      </div>
+          })}
+        </div>
+      )}
       <div className="sidebar-bottom">
         <Link
           href="/about/"

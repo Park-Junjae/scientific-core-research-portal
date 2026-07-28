@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scientific-core.invalid/schemas/run-request-v1.schema.json",
+  "title": "Scientific Core Private Run Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "metadata", "request"],
+  "properties": {
+    "schema_version": {"const": "ScientificCoreRunRequestV1"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id", "creator", "created_at", "visibility", "lifecycle_status",
+        "budget_ceiling_profile", "approved_runtime_ref", "request_sha256"
+      ],
+      "properties": {
+        "run_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{7,63}$"},
+        "creator": {"type": "string", "minLength": 1, "maxLength": 80},
+        "created_at": {"type": "string", "format": "date-time"},
+        "visibility": {"enum": ["PRIVATE"]},
+        "lifecycle_status": {
+          "enum": [
+            "DRAFT", "QUEUED", "RUNNER_OFFLINE", "PREFLIGHT",
+            "AWAITING_APPROVAL", "RUNNING", "GENERATING_REPORTS",
+            "COMPLETED", "FAILED", "CANCELLED", "QUEUE_EXPIRED"
+          ]
+        },
+        "budget_ceiling_profile": {
+          "enum": ["synthetic", "canonical_preflight", "standard", "breakthrough_discovery"]
+        },
+        "approved_runtime_ref": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "request_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "approved_at": {"type": ["string", "null"], "format": "date-time"},
+        "approved_by": {"type": ["string", "null"], "maxLength": 80}
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["research_question"],
+      "properties": {
+        "research_question": {"type": "string", "minLength": 10, "maxLength": 20000},
+        "objectives": {
+          "type": "array",
+          "maxItems": 30,
+          "items": {"type": "string", "minLength": 1, "maxLength": 1000}
+        },
+        "constraints": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {"type": "string", "minLength": 1, "maxLength": 1000}
+        },
+        "requested_mode": {
+          "enum": ["AUTO", "DISCOVERY_PORTFOLIO_RUN", "FOCUSED_DECISION_RUN"]
+        },
+        "creativity_profile": {
+          "enum": ["STANDARD", "BREAKTHROUGH_DISCOVERY"]
+        },
+        "creativity_profile_selection_reviewed": {"type": "boolean"},
+        "raw_spark_target": {"type": "integer", "minimum": 48, "maximum": 84},
+        "include_literature_list_and_review_scope": {"type": "boolean"},
+        "report_language": {"enum": ["en", "ko", "bilingual"]},
+        "execution_mode": {"enum": ["SYNTHETIC", "NO_PROVIDER_PREFLIGHT", "PROVIDER_BACKED"]}
+      }
+    }
+  }
+}
+

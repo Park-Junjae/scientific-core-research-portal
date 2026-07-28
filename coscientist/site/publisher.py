@@ -152,6 +152,18 @@ def derive_analyzed_unique_total_from_ledger(
     return len(keys) if keys else None
 
 
+def _unique_ledger_count(
+    sources: list[dict[str, Any]], field: str
+) -> int:
+    keys = {
+        key
+        for source in sources
+        if source.get(field) is True
+        and (key := _analyzed_source_key(source)) is not None
+    }
+    return len(keys)
+
+
 def _load_json(path: Path) -> dict[str, Any]:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
@@ -425,6 +437,7 @@ def validate_content(portal_root: Path, public_build: bool | None = None) -> dic
     errors: list[str] = []
     warnings: list[str] = []
     findings: list[dict[str, str]] = []
+    reconciliations: list[dict[str, Any]] = []
     if not content_root.exists():
         return {
             "status": "FAIL",
@@ -675,8 +688,33 @@ def validate_content(portal_root: Path, public_build: bool | None = None) -> dic
                 derived_analyzed_total = derive_analyzed_unique_total_from_ledger(
                     source_ledger_records
                 )
+                derived_unique_cited = _unique_ledger_count(
+                    source_ledger_records, "final_report_cited"
+                )
+                derived_load_bearing = _unique_ledger_count(
+                    source_ledger_records, "load_bearing"
+                )
             else:
                 derived_analyzed_total = derive_analyzed_unique_total(source_records)
+                derived_unique_cited = cited_source_count
+                derived_load_bearing = sum(
+                    1 for source in source_records if source.get("load_bearing") is True
+                )
+
+            literature_scope_enabled = run.get("literature_scope_enabled", True)
+            completed_real_run = (
+                run.get("status") == "DONE"
+                and run.get("publication_status") == "APPROVED"
+                and run.get("source_type") != "SYNTHETIC_DEMO"
+            )
+            if completed_real_run and literature_scope_enabled and not source_ledger_records:
+                errors.append(
+                    f"{slug}: completed literature-enabled run requires RunSourceLedgerV1"
+                )
+            if completed_real_run and literature_scope_enabled and analyzed_unique_total is None:
+                errors.append(
+                    f"{slug}: completed literature-enabled run requires analyzed_unique_total"
+                )
             if analyzed_unique_total is not None and derived_analyzed_total is None:
                 errors.append(
                     f"{slug}: analyzed_unique_total requires a complete staged source ledger"
@@ -717,6 +755,55 @@ def validate_content(portal_root: Path, public_build: bool | None = None) -> dic
                 errors.append(
                     f"{slug}: report_reference_count does not match citation map entries"
                 )
+            if (
+                source_ledger_records
+                and unique_cited is not None
+                and unique_cited != derived_unique_cited
+            ):
+                errors.append(
+                    f"{slug}: unique_cited_sources does not match RunSourceLedgerV1"
+                )
+            if (
+                source_ledger_records
+                and declared_load_bearing is not None
+                and declared_load_bearing != derived_load_bearing
+            ):
+                errors.append(
+                    f"{slug}: load_bearing_sources does not match RunSourceLedgerV1"
+                )
+            reconciliations.append(
+                {
+                    "run_id": run.get("run_id"),
+                    "slug": slug,
+                    "literature_scope_enabled": literature_scope_enabled,
+                    "status": run.get("status"),
+                    "ledger_present": bool(source_ledger_records),
+                    "declared": {
+                        "analyzed_unique_total": analyzed_unique_total,
+                        "unique_cited_sources": unique_cited,
+                        "load_bearing_sources": declared_load_bearing,
+                        "report_reference_count": declared_report_references,
+                    },
+                    "derived": {
+                        "analyzed_unique_total": derived_analyzed_total,
+                        "unique_cited_sources": derived_unique_cited,
+                        "load_bearing_sources": derived_load_bearing,
+                        "report_reference_count": report_reference_count,
+                    },
+                    "reconciled": (
+                        analyzed_unique_total == derived_analyzed_total
+                        and (unique_cited is None or unique_cited == derived_unique_cited)
+                        and (
+                            declared_load_bearing is None
+                            or declared_load_bearing == derived_load_bearing
+                        )
+                        and (
+                            declared_report_references is None
+                            or declared_report_references == report_reference_count
+                        )
+                    ),
+                }
+            )
             report_ids = {report.get("report_id") for report in run.get("reports", [])}
             idea_ids = {idea.get("idea_id") for idea in idea_records}
             citation_map: dict[str, set[int]] = {}
@@ -811,6 +898,14 @@ def validate_content(portal_root: Path, public_build: bool | None = None) -> dic
         errors.append(
             f"Sanitization finding [{finding['category']}] in {finding['file']}: redacted"
         )
+    _write_json(
+        portal_root / ".publication-staging" / "literature_count_reconciliation.json",
+        {
+            "schema_version": "LiteratureCountReconciliationV1",
+            "status": "PASS" if not errors else "FAIL",
+            "runs": reconciliations,
+        },
+    )
     return {
         "status": "PASS" if not errors else "FAIL",
         "run_count": len(slugs),

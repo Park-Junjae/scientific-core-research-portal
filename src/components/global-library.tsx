@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { localized, useLocale } from "@/lib/locale";
+import { isVisiblePublicReport } from "@/lib/report-visibility";
 import type { RunWithIdeas } from "@/lib/types";
 import { SourceList } from "./source-list";
 
@@ -48,7 +49,7 @@ export function GlobalLiterature({ runs }: { runs: RunWithIdeas[] }) {
 export function GlobalReports({ runs }: { runs: RunWithIdeas[] }) {
   const { locale } = useLocale();
   const reportCount = runs.reduce(
-    (total, run) => total + run.reports.filter((report) => report.language === locale).length,
+    (total, run) => total + run.reports.filter((report) => report.language === locale && isVisiblePublicReport(report)).length,
     0,
   );
   return (
@@ -65,7 +66,7 @@ export function GlobalReports({ runs }: { runs: RunWithIdeas[] }) {
       </header>
       {runs.map((run) => {
         const reports = run.reports
-          .filter((report) => report.language === locale)
+          .filter((report) => report.language === locale && isVisiblePublicReport(report))
           .sort((a, b) => a.display_order - b.display_order);
         if (reports.length === 0) return null;
         return (

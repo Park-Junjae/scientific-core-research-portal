@@ -1,6 +1,7 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { LocaleProvider } from "@/lib/locale";
+import { runControlApiBase } from "@/lib/run-control-api";
 import { testReports, testRun, testSources } from "@/test/fixtures";
 import { KnowledgeReader } from "./knowledge-reader";
 import { LiteratureExplorer } from "./literature-explorer";
@@ -27,13 +28,14 @@ describe("literature reading UX", () => {
   });
 
   it("retains the complete detailed literature funnel", () => {
-    render(<LocaleProvider><LiteratureExplorer run={testRun} /></LocaleProvider>);
-    expect(screen.getByText(/30 records discovered/)).toBeInTheDocument();
-    expect(screen.getByText(/8 full texts reviewed/)).toBeInTheDocument();
-    expect(screen.getByText(/5 papers deeply read/)).toBeInTheDocument();
-    expect(screen.getByText(/3 load-bearing sources/)).toBeInTheDocument();
-    expect(screen.getByText(/1 sources cited/)).toBeInTheDocument();
-    expect(screen.getByText(/4 report references/)).toBeInTheDocument();
+    const { container } = render(<LocaleProvider><LiteratureExplorer run={testRun} /></LocaleProvider>);
+    const funnel = container.querySelector<HTMLElement>(".literature-funnel-grid")!;
+    expect(within(funnel).getByText("Discovered").nextSibling).toHaveTextContent("30");
+    expect(within(funnel).getByText("Full text").nextSibling).toHaveTextContent("8");
+    expect(within(funnel).getByText("Deeply read").nextSibling).toHaveTextContent("5");
+    expect(within(funnel).getByText("Load-bearing").nextSibling).toHaveTextContent("3");
+    expect(within(funnel).getByText("Cited in report").nextSibling).toHaveTextContent("1");
+    expect(screen.getByText(/Report reference entries/).parentElement).toHaveTextContent("4");
   });
 
   it("resolves a numbered report citation and restores focus after Escape", async () => {
@@ -71,23 +73,31 @@ describe("reader contracts", () => {
     expect(screen.getByText(/IDEA REPORT/)).toBeInTheDocument();
   });
 
-  it("starts New Run with one required natural-language field and no empty preview", () => {
+  it("starts the composer with one required natural-language field and no synthetic preview", () => {
     const { container } = render(<LocaleProvider><NewRunBuilder /></LocaleProvider>);
     expect(container.querySelector("pre, code")).toBeNull();
     expect(screen.queryByText(/^# /)).not.toBeInTheDocument();
     expect(screen.queryByText("FOCUSED_DECISION_RUN")).not.toBeInTheDocument();
     expect(container.querySelectorAll("[required]")).toHaveLength(1);
     expect(container.querySelector(".advanced-fields")).not.toHaveAttribute("open");
-    expect(screen.queryByRole("heading", { name: "Research Request" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Save request file" })).toBeDisabled();
+    expect(screen.queryByRole("heading", { name: "Request preview" })).not.toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /standard/i })).toBeChecked();
+    expect(screen.getByRole("radio", { name: /breakthrough discovery/i })).not.toBeChecked();
+    expect(screen.getByRole("button", { name: "Review research plan" })).toBeDisabled();
+    if (runControlApiBase) {
+      expect(screen.getByRole("heading", { name: "Connect a lab account" })).toBeInTheDocument();
+    } else {
+      expect(screen.getByText("Research execution is being prepared.")).toBeInTheDocument();
+    }
 
-    fireEvent.change(screen.getByRole("textbox", { name: /What would you like to research/ }), {
+    fireEvent.change(screen.getByRole("textbox", { name: /Research question/ }), {
       target: { value: "Why does product purity collapse at this locus?" },
     });
 
-    expect(screen.getByRole("button", { name: "Save request file" })).toBeEnabled();
-    expect(screen.getByRole("heading", { name: "Research Request" })).toBeInTheDocument();
-    expect(screen.getByText("Complete literature list and review scope")).toBeInTheDocument();
-    expect(screen.getByText("Final PDF report")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Review research plan" })).toBeDisabled();
+    expect(screen.getByRole("heading", { name: "Standard" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("radio", { name: /breakthrough discovery/i }));
+    expect(screen.getByText("743336b3419bf735caeaaec434074ed512eb0c22")).toBeInTheDocument();
   });
 });
