@@ -35,4 +35,4 @@ The acceptance pass also covered stored preference application, grouped static s
 
 No provider or scientific call was made. Direct scientific provider calls: **0**.
 
-The verified public synthetic release is `9aff71050fdda6d717efe7afc541ea87f8da73c6` at `https://best916116-crypto.github.io/scientific-core-research-portal/`. CI run `29841267323` and Pages run `29841267120` both completed successfully.
+The verified public synthetic release is `9aff71050fdda6d717efe7afc541ea87f8da73c6` at `https://park-junjae.github.io/scientific-core-research-portal/`, which resolves to the custom domain `https://app.aichoscientist.com/`. CI run `29841267323` and Pages run `29841267120` both completed successfully.
