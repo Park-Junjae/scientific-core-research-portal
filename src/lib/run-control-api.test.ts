@@ -109,7 +109,17 @@ describe("run control browser client", () => {
     });
     expect(standard).not.toHaveProperty("creativity_profile");
     expect(standard.budget_profile).toBe("standard");
-    expect(standard.requested_mode).toBe("FOCUSED_DECISION_RUN");
+    expect(standard.requested_mode).toBe("AUTO");
+    for (const forbidden of [
+      "runtime_ref",
+      "provider_policy_version",
+      "provider",
+      "model",
+      "model_id",
+      "model_roles",
+    ]) {
+      expect(standard).not.toHaveProperty(forbidden);
+    }
 
     const breakthrough = buildControlledRunPayload({
       ...common,
@@ -251,12 +261,17 @@ describe("run control browser client", () => {
   it("keeps deterministic sustained status polling below the Backend rate limit", async () => {
     const {
       BACKEND_RATE_LIMIT_PER_MINUTE,
-      RUN_STATUS_POLL_INTERVAL_MS,
+      RUN_STATUS_POLL_INTERVALS_MS,
       sustainedStatusRequestsPerMinute,
     } = await import("./run-control-api");
-    expect(RUN_STATUS_POLL_INTERVAL_MS).toBe(10_000);
-    expect(sustainedStatusRequestsPerMinute()).toBe(6);
-    expect(sustainedStatusRequestsPerMinute()).toBeLessThan(
+    expect(RUN_STATUS_POLL_INTERVALS_MS).toEqual({
+      STARTING: 2_000,
+      QUEUED: 3_000,
+      RUNNING: 5_000,
+      GENERATING_REPORTS: 5_000,
+    });
+    expect(sustainedStatusRequestsPerMinute()).toBe(30);
+    expect(sustainedStatusRequestsPerMinute()).toBeLessThanOrEqual(
       BACKEND_RATE_LIMIT_PER_MINUTE,
     );
   });

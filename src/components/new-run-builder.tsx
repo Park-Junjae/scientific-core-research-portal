@@ -109,7 +109,7 @@ export function ResearchComposer({
           requestedMode: (
             breakthrough
               ? "DISCOVERY_PORTFOLIO_RUN"
-              : "FOCUSED_DECISION_RUN"
+              : "AUTO"
           ) as PortalSelectableRunMode,
           creativityProfile: value.creativity_profile,
           includeLiteratureScope: value.literature_scope_enabled,
@@ -126,7 +126,7 @@ export function ResearchComposer({
           constraints,
           selected_mode: breakthrough
             ? "DISCOVERY_PORTFOLIO_RUN"
-            : "FOCUSED_DECISION_RUN",
+            : "AUTO",
           creativity_profile: value.creativity_profile,
           literature_scope: value.literature_scope_enabled,
           report_language: reportLanguage,

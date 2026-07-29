@@ -52,7 +52,7 @@ test("Start research submits Standard directly and opens its status page", async
       "Use fixture evidence only",
       "Keep provider usage at zero",
     ],
-    requested_mode: "FOCUSED_DECISION_RUN",
+    requested_mode: "AUTO",
     execution_mode: "PROVIDER_BACKED",
     budget_profile: "standard",
   });
@@ -92,19 +92,35 @@ test("Start research submits the reviewed Breakthrough contract directly", async
 test("provider gate disabled is shown after local validation without approval UX", async ({
   page,
 }) => {
-  const api = await installPrivateWorkspaceRoutes(page, "QUEUED");
+  const api = await installPrivateWorkspaceRoutes(
+    page,
+    "EXECUTION_DISABLED",
+    { list: "current" },
+  );
   await seedSubmittedSummary(page);
   await page.goto(`/run-control/?run_id=${fixtureRunId}&lang=en`);
 
   await expect(
     page.locator(".run-control-header").getByText(
-      "Research execution is temporarily disabled.",
+      "Research is ready, but execution is intentionally disabled.",
     ),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Queued" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Execution disabled" }),
+  ).toBeVisible();
+  await expect(page.locator(".execution-disabled-state .spin")).toHaveCount(0);
+  await expect(page.getByText("Automatic updates complete")).toBeVisible();
+  await expect(page.getByText(/queue|waiting|expires/i)).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Approve/i })).toHaveCount(0);
   await expect(page.getByText(/preflight/i)).toHaveCount(0);
   expect(api.runnerApiCalls).toBe(0);
+  await page.goto("/?lang=en");
+  await expect(
+    page.locator(".my-research-section").getByText(
+      "Execution disabled",
+      { exact: true },
+    ),
+  ).toBeVisible();
 });
 
 test("status automatically advances and creator can cancel without manual refresh", async ({
@@ -115,13 +131,18 @@ test("status automatically advances and creator can cancel without manual refres
   await page.goto(`/run-control/?run_id=${fixtureRunId}&lang=en`);
 
   await expect(page.getByText("Starting", { exact: true }).first()).toBeVisible();
+  expect(api.eventApiCalls).toBe(1);
   api.setStatus("RUNNING");
   await expect(page.getByText("Running", { exact: true }).first())
-    .toBeVisible({ timeout: 12_000 });
+    .toBeVisible({ timeout: 4_500 });
   await expect(page.getByRole("heading", { name: "Research progress" }))
     .toBeVisible();
+  await expect(page.getByText("Automatic updates on")).toBeVisible();
+  await expect(page.getByText(/Last checked/)).toBeVisible();
+  await expect(page.getByText(/Last state change/)).toBeVisible();
   await expect(page.getByRole("button", { name: /Refresh status/i }))
     .toHaveCount(0);
+  expect(api.eventApiCalls).toBe(2);
 
   await expect(page.getByText("Private research is running.")).toBeVisible();
   await page.getByRole("button", { name: "Cancel research" }).click();
@@ -129,6 +150,23 @@ test("status automatically advances and creator can cancel without manual refres
     .toBeVisible();
   expect(api.status).toBe("CANCELLED");
   expect(api.runnerApiCalls).toBe(0);
+});
+
+test("status refreshes immediately on focus and visibility restoration", async ({
+  page,
+}) => {
+  const api = await installPrivateWorkspaceRoutes(page, "RUNNING");
+  await page.goto(`/run-control/?run_id=${fixtureRunId}&lang=en`);
+  const initialCalls = api.statusApiCalls;
+
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await expect.poll(() => api.statusApiCalls).toBeGreaterThan(initialCalls);
+  const afterFocus = api.statusApiCalls;
+
+  await page.evaluate(() => {
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect.poll(() => api.statusApiCalls).toBeGreaterThan(afterFocus);
 });
 
 test("My Research renders only the authenticated creator projection", async ({

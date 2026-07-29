@@ -27,16 +27,13 @@ function profileLabel(run: CreatorRunListItem) {
 function statusLabel(status: CreatorRunListItem["status"], ko: boolean) {
   const labels: Record<string, [string, string]> = {
     STARTING: ["시작 중", "Starting"],
+    EXECUTION_DISABLED: ["실행 비활성화", "Execution disabled"],
     QUEUED: ["대기 중", "Queued"],
-    RUNNER_OFFLINE: ["대기 중", "Queued"],
-    PREFLIGHT: ["시작 중", "Starting"],
-    AWAITING_APPROVAL: ["대기 중", "Queued"],
     RUNNING: ["실행 중", "Running"],
     GENERATING_REPORTS: ["결과 작성 중", "Generating results"],
     COMPLETED: ["완료", "Completed"],
     FAILED: ["실패", "Failed"],
     CANCELLED: ["취소됨", "Cancelled"],
-    QUEUE_EXPIRED: ["대기 만료", "Queue expired"],
   };
   const value = labels[status] ?? [status, status];
   return ko ? value[0] : value[1];

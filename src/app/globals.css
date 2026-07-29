@@ -2844,6 +2844,24 @@ body { font-family: var(--font-ui), sans-serif; }
 }
 .homepage-composer .access-connection { max-width: none; }
 .run-request-hint { align-self: center; }
+.automatic-update-indicator {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+.automatic-update-indicator > span:first-of-type {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+.execution-disabled-state {
+  border-left: 4px solid var(--ink-faint);
+}
+.execution-disabled-state .section-heading > svg {
+  color: var(--ink-faint);
+}
 
 @media (max-width: 1050px) {
   .homepage-composer .advanced-fields .request-direct-fields {

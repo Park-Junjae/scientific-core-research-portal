@@ -13,6 +13,7 @@ export const legacyLongResearchQuestion = [
 
 export type FixtureRunStatus =
   | "STARTING"
+  | "EXECUTION_DISABLED"
   | "QUEUED"
   | "RUNNING"
   | "GENERATING_REPORTS"
@@ -187,7 +188,7 @@ export function makeRun(
 ) {
   const running = status === "RUNNING";
   const completed = status === "COMPLETED";
-  const pending = status === "STARTING" || status === "QUEUED";
+  const pending = status === "STARTING";
   const compiledContract = profile === "BREAKTHROUGH_DISCOVERY"
     ? fixtureContract
     : {
@@ -215,13 +216,17 @@ export function makeRun(
     request_sha256: "f".repeat(64),
     budget_profile: profile === "BREAKTHROUGH_DISCOVERY" ? "breakthrough_discovery" : "standard",
     runtime_ref: fixtureRuntimeRef,
-    queue_expires_at: "2026-07-29T00:00:00Z",
+    queue_expires_at: status === "QUEUED"
+      ? "2026-07-29T00:00:00Z"
+      : null,
     compiled_contract: pending ? null : compiledContract,
     result_locator: completed ? "private" : null,
     safe_message: status === "STARTING"
       ? "Validating the private research launch."
+      : status === "EXECUTION_DISABLED"
+        ? "Research is ready, but execution is intentionally disabled."
       : status === "QUEUED"
-        ? "Research execution is temporarily disabled."
+        ? "Research execution is queued."
       : completed
         ? "Private research completed and artifacts are ready."
         : running
@@ -235,6 +240,8 @@ export function makeRun(
         ? "blind_multi_lens_ideation"
         : status === "STARTING"
           ? "starting"
+          : status === "EXECUTION_DISABLED"
+            ? "execution_disabled"
           : status === "QUEUED"
             ? "queued"
             : status === "GENERATING_REPORTS"
@@ -242,7 +249,16 @@ export function makeRun(
           : status === "CANCELLED"
             ? "cancelled"
             : "running",
-    progress_percentage: completed ? 100 : running ? 42 : pending ? 4 : 82,
+    progress_percentage: completed
+      ? 100
+      : running
+        ? 42
+        : status === "EXECUTION_DISABLED"
+          ? 10
+          : pending
+            ? 4
+            : 82,
+    last_event_sequence: running || completed ? 1 : 0,
     raw_idea_count: completed ? 60 : running ? 24 : 0,
     independent_idea_count: completed ? 18 : running ? 7 : 0,
     family_count: completed ? 6 : running ? 2 : 0,
@@ -328,6 +344,8 @@ export async function installPrivateWorkspaceRoutes(
   let artifactDownloads = 0;
   let postCount = 0;
   let postFailed = false;
+  let eventApiCalls = 0;
+  let statusApiCalls = 0;
 
   await page.route("https://control.example/**", async (route) => {
     const request = route.request();
@@ -371,11 +389,18 @@ export async function installPrivateWorkspaceRoutes(
       return fulfillJson(route, makeRun(status, profile));
     }
     if (url.pathname === `/api/runs/${fixtureRunId}`) {
+      statusApiCalls += 1;
       return fulfillJson(route, makeRun(status, profile));
     }
     if (url.pathname === `/api/runs/${fixtureRunId}/events`) {
+      eventApiCalls += 1;
+      const afterSequence = Number(
+        url.searchParams.get("after_sequence") ?? "0",
+      );
+      const hasEvent = (status === "RUNNING" || status === "COMPLETED")
+        && afterSequence < 1;
       return fulfillJson(route, {
-        events: status === "RUNNING" || status === "COMPLETED"
+        events: hasEvent
           ? [{
               schema_version: "ScientificCoreRunStatusEventV2",
               run_id: fixtureRunId,
@@ -436,5 +461,7 @@ export async function installPrivateWorkspaceRoutes(
     get runnerApiCalls() { return runnerApiCalls; },
     get artifactDownloads() { return artifactDownloads; },
     get postCount() { return postCount; },
+    get eventApiCalls() { return eventApiCalls; },
+    get statusApiCalls() { return statusApiCalls; },
   };
 }

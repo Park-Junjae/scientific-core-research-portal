@@ -26,7 +26,7 @@ import {
   getControlledRun,
   getControlledRunEvents,
   getRunControlSession,
-  RUN_STATUS_POLL_INTERVAL_MS,
+  RUN_STATUS_POLL_INTERVALS_MS,
   runControlApiBase,
   RunControlApiError,
   type RunControlEvent,
@@ -36,11 +36,17 @@ import {
 } from "@/lib/run-control-api";
 
 const terminalStatuses = new Set<RunControlStatus>([
+  "EXECUTION_DISABLED",
   "COMPLETED",
   "FAILED",
   "CANCELLED",
-  "QUEUE_EXPIRED",
 ]);
+
+function pollingInterval(status: RunControlStatus) {
+  return RUN_STATUS_POLL_INTERVALS_MS[
+    status as keyof typeof RUN_STATUS_POLL_INTERVALS_MS
+  ];
+}
 
 interface SubmittedRunSummary {
   research_question: string;
@@ -81,13 +87,13 @@ function hours(seconds: number) {
 function statusLabel(status: RunControlStatus, ko: boolean) {
   const labels: Partial<Record<RunControlStatus, [string, string]>> = {
     STARTING: ["시작 중", "Starting"],
+    EXECUTION_DISABLED: ["실행 비활성화", "Execution disabled"],
     QUEUED: ["대기 중", "Queued"],
     RUNNING: ["연구 진행 중", "Running"],
     GENERATING_REPORTS: ["결과 작성 중", "Generating reports"],
     COMPLETED: ["완료", "Completed"],
     FAILED: ["실패", "Failed"],
     CANCELLED: ["취소됨", "Cancelled"],
-    QUEUE_EXPIRED: ["대기 만료", "Queue expired"],
   };
   const value = labels[status] ?? [status, status];
   return ko ? value[0] : value[1];
@@ -126,7 +132,13 @@ export function RunControlPanel() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [createdNotice, setCreatedNotice] = useState(false);
-  const stageRef = useRef("");
+  const [lastSuccessfulCheck, setLastSuccessfulCheck] = useState<Date | null>(
+    null,
+  );
+  const [lastStateChange, setLastStateChange] = useState<Date | null>(null);
+  const [pollCycle, setPollCycle] = useState(0);
+  const eventSequenceRef = useRef(0);
+  const statusRef = useRef<RunControlStatus | "">("");
   const backoffUntilRef = useRef(0);
 
   const submitted = useMemo(() => {
@@ -142,23 +154,41 @@ export function RunControlPanel() {
   }, [runId]);
 
   const refresh = useCallback(async (id: string, includeEvents = false) => {
-    if (!includeEvents && Date.now() < backoffUntilRef.current) return;
+    if (Date.now() < backoffUntilRef.current) return;
     try {
       const nextRun = await getControlledRun(id);
-      const stageChanged = Boolean(stageRef.current)
-        && stageRef.current !== nextRun.current_stage;
-      setRun(nextRun);
-      if (includeEvents || stageChanged) {
-        setEvents(await getControlledRunEvents(id));
+      const previousStatus = statusRef.current;
+      const nextSequence = nextRun.last_event_sequence ?? 0;
+      if (previousStatus && previousStatus !== nextRun.status) {
+        setLastStateChange(new Date());
+      } else if (!previousStatus) {
+        setLastStateChange(new Date(nextRun.updated_at));
       }
-      stageRef.current = nextRun.current_stage;
+      setRun(nextRun);
+      if (includeEvents) {
+        const initialEvents = await getControlledRunEvents(id, 0);
+        setEvents(initialEvents);
+        eventSequenceRef.current = initialEvents.reduce(
+          (maximum, event) => Math.max(maximum, event.sequence),
+          nextSequence,
+        );
+      } else if (nextSequence > eventSequenceRef.current) {
+        const delta = await getControlledRunEvents(
+          id,
+          eventSequenceRef.current,
+        );
+        setEvents((current) => [...current, ...delta]);
+        eventSequenceRef.current = nextSequence;
+      }
+      statusRef.current = nextRun.status;
       backoffUntilRef.current = 0;
+      setLastSuccessfulCheck(new Date());
       setError("");
     } catch (reason) {
       if (reason instanceof RunControlApiError && reason.kind === "RATE_LIMITED") {
         backoffUntilRef.current = Date.now() + Math.max(
           reason.retryAfterMs,
-          RUN_STATUS_POLL_INTERVAL_MS,
+          RUN_STATUS_POLL_INTERVALS_MS.STARTING,
         );
       }
       if (
@@ -170,6 +200,8 @@ export function RunControlPanel() {
         setSession(null);
       }
       setError(statusError(reason, ko));
+    } finally {
+      setPollCycle((value) => value + 1);
     }
   }, [ko]);
 
@@ -208,14 +240,36 @@ export function RunControlPanel() {
   }, [ko, refresh, runId]);
 
   useEffect(() => {
-    if (!runId || !session || terminalStatuses.has(run?.status ?? "STARTING")) {
+    if (!runId || !session || !run || terminalStatuses.has(run.status)) {
       return;
     }
-    const interval = window.setInterval(() => {
-      if (Date.now() >= backoffUntilRef.current) void refresh(runId);
-    }, RUN_STATUS_POLL_INTERVAL_MS);
-    return () => window.clearInterval(interval);
-  }, [refresh, run?.status, runId, session]);
+    const interval = pollingInterval(run.status);
+    if (!interval) return;
+    const delay = Math.max(
+      interval,
+      backoffUntilRef.current - Date.now(),
+    );
+    const timeout = window.setTimeout(() => {
+      void refresh(runId);
+    }, delay);
+    return () => window.clearTimeout(timeout);
+  }, [pollCycle, refresh, run, runId, session]);
+
+  useEffect(() => {
+    if (!runId || !session) return;
+    const refreshOnFocus = () => {
+      void refresh(runId);
+    };
+    const refreshOnVisible = () => {
+      if (document.visibilityState === "visible") void refresh(runId);
+    };
+    window.addEventListener("focus", refreshOnFocus);
+    document.addEventListener("visibilitychange", refreshOnVisible);
+    return () => {
+      window.removeEventListener("focus", refreshOnFocus);
+      document.removeEventListener("visibilitychange", refreshOnVisible);
+    };
+  }, [refresh, runId, session]);
 
   if (!runControlApiBase) {
     return (
@@ -263,6 +317,7 @@ export function RunControlPanel() {
   ].includes(run.status);
   const currentStageIndex = executionStages.findIndex((aliases) =>
     aliases.some((stage) => stage === run.current_stage));
+  const automaticUpdatesActive = Boolean(pollingInterval(run.status));
 
   async function cancel() {
     setBusy(true);
@@ -279,7 +334,7 @@ export function RunControlPanel() {
 
   return (
     <div className="run-control-layout">
-      {createdNotice && (
+      {createdNotice && !terminalStatuses.has(run.status) && (
         <div className="created-run-notice" role="status" aria-live="polite">
           <LoaderCircle className="spin" size={18} />
           <span>{ko ? "연구를 시작하고 있습니다." : "Starting research."}</span>
@@ -319,6 +374,27 @@ export function RunControlPanel() {
         </div>
       </section>
 
+      <div className="automatic-update-indicator" role="status">
+        <CircleDot size={15} />
+        <span>
+          {automaticUpdatesActive
+            ? ko ? "자동 업데이트 중" : "Automatic updates on"
+            : ko ? "자동 업데이트 완료" : "Automatic updates complete"}
+        </span>
+        {lastSuccessfulCheck && (
+          <span>
+            {ko ? "마지막 확인" : "Last checked"}{" "}
+            {lastSuccessfulCheck.toLocaleTimeString(locale)}
+          </span>
+        )}
+        {lastStateChange && (
+          <span>
+            {ko ? "마지막 상태 변경" : "Last state change"}{" "}
+            {lastStateChange.toLocaleTimeString(locale)}
+          </span>
+        )}
+      </div>
+
       {fullResearchGoal && (
         <section
           className="research-goal-section"
@@ -339,6 +415,28 @@ export function RunControlPanel() {
             <LoaderCircle className="spin" size={22} />
           </div>
           <p>{run.safe_message}</p>
+        </section>
+      )}
+
+      {run.status === "EXECUTION_DISABLED" && (
+        <section
+          className="execution-progress execution-disabled-state"
+          role="status"
+        >
+          <div className="section-heading">
+            <div>
+              <p className="section-label">
+                {ko ? "연구 실행" : "Research execution"}
+              </p>
+              <h2>{statusLabel(run.status, ko)}</h2>
+            </div>
+            <Ban size={22} />
+          </div>
+          <p>
+            {ko
+              ? "연구 계약은 준비되었지만 실행은 의도적으로 비활성화되어 있습니다."
+              : "The research contract is ready, but execution is intentionally disabled."}
+          </p>
         </section>
       )}
 

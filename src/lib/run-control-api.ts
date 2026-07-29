@@ -10,22 +10,24 @@ export const PORTAL_SELECTABLE_RUN_MODES = [
 
 export type PortalSelectableRunMode = typeof PORTAL_SELECTABLE_RUN_MODES[number];
 
-export const RUN_STATUS_POLL_INTERVAL_MS = 10_000;
+export const RUN_STATUS_POLL_INTERVALS_MS = {
+  STARTING: 2_000,
+  QUEUED: 3_000,
+  RUNNING: 5_000,
+  GENERATING_REPORTS: 5_000,
+} as const;
 export const BACKEND_RATE_LIMIT_PER_MINUTE = 30;
 export const DEFAULT_RATE_LIMIT_BACKOFF_MS = 60_000;
 export function sustainedStatusRequestsPerMinute(
-  intervalMs = RUN_STATUS_POLL_INTERVAL_MS,
+  intervalMs = RUN_STATUS_POLL_INTERVALS_MS.STARTING,
 ) {
   return Math.ceil(60_000 / intervalMs);
 }
 
 export type RunControlStatus =
   | "STARTING"
+  | "EXECUTION_DISABLED"
   | "QUEUED"
-  | "RUNNER_OFFLINE"
-  | "QUEUE_EXPIRED"
-  | "PREFLIGHT"
-  | "AWAITING_APPROVAL"
   | "RUNNING"
   | "GENERATING_REPORTS"
   | "COMPLETED"
@@ -147,12 +149,13 @@ export interface RunControlRecord {
   request_sha256: string;
   budget_profile: string;
   runtime_ref: string;
-  queue_expires_at: string;
-  queue_expiry?: string;
+  queue_expires_at: string | null;
+  queue_expiry?: string | null;
   compiled_contract: CompiledRunContract | null;
   result_locator: string | null;
   safe_message: string;
   current_stage: string;
+  last_event_sequence: number;
   progress_percentage: number;
   raw_idea_count: number;
   independent_idea_count: number;
@@ -288,7 +291,7 @@ export function buildControlledRunPayload(input: ControlledRunPayloadInput) {
     constraints: input.constraints,
     requested_mode: breakthrough
       ? "DISCOVERY_PORTFOLIO_RUN"
-      : "FOCUSED_DECISION_RUN",
+      : "AUTO",
     include_literature_list_and_review_scope: input.includeLiteratureScope,
     execution_mode: "PROVIDER_BACKED",
     budget_profile: breakthrough ? "breakthrough_discovery" : "standard",
@@ -453,9 +456,12 @@ export function getControlledRun(runId: string) {
   return request<RunControlRecord>(`/api/runs/${encodeURIComponent(runId)}`);
 }
 
-export async function getControlledRunEvents(runId: string) {
+export async function getControlledRunEvents(
+  runId: string,
+  afterSequence = 0,
+) {
   const result = await request<{ events: RunControlEvent[] }>(
-    `/api/runs/${encodeURIComponent(runId)}/events`,
+    `/api/runs/${encodeURIComponent(runId)}/events?after_sequence=${encodeURIComponent(afterSequence)}`,
   );
   return result.events;
 }

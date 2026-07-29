@@ -44,7 +44,10 @@ async function fillComposer(page: Page, breakthrough = false) {
   return composer;
 }
 
-async function openRun(page: Page, status: "STARTING" | "QUEUED" | "RUNNING" | "COMPLETED") {
+async function openRun(
+  page: Page,
+  status: "STARTING" | "EXECUTION_DISABLED" | "RUNNING" | "COMPLETED",
+) {
   await installPrivateWorkspaceRoutes(page, status);
   await seedSubmittedSummary(page);
   await page.goto(`/run-control/?run_id=${fixtureRunId}&lang=en`);
@@ -93,9 +96,12 @@ test("desktop 05 direct research starting", async ({ page }) => {
 
 test("desktop 06 execution temporarily disabled", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await openRun(page, "QUEUED");
-  const launch = page.locator(".launch-progress");
-  await expect(launch.getByText("Research execution is temporarily disabled.")).toBeVisible();
+  await openRun(page, "EXECUTION_DISABLED");
+  const launch = page.locator(".execution-disabled-state");
+  await expect(
+    launch.getByRole("heading", { name: "Execution disabled" }),
+  ).toBeVisible();
+  await expect(launch.locator(".spin")).toHaveCount(0);
   await launch.scrollIntoViewIfNeeded();
   await capture(page, "desktop-06-execution-disabled");
 });

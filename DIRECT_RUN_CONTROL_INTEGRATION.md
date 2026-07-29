@@ -22,16 +22,22 @@ artifact endpoints.
 ## User Flow
 
 1. `Start research` creates a private request and records the authenticated
-   creator's submission as execution approval.
+   creator's submission as execution approval. Standard submits `AUTO` for
+   server-side policy resolution; Breakthrough Discovery submits
+   `DISCOVERY_PORTFOLIO_RUN`.
 2. The browser navigates to `/run-control/?run_id=<opaque-id>`.
 3. A persistent local Backend worker validates the launch before execution.
-4. The page polls the direct lifecycle automatically:
-   `STARTING`, `QUEUED`, `RUNNING`, `GENERATING_REPORTS`, then a terminal
-   result.
-5. Technical diagnostics remain collapsed and there is no second approval or
+4. The page polls the direct lifecycle automatically at 2 seconds for
+   `STARTING`, 3 seconds for `QUEUED`, and 5 seconds for `RUNNING` or
+   `GENERATING_REPORTS`. Focus and visibility restoration refresh
+   immediately; event history is fetched only when its sequence advances.
+5. `EXECUTION_DISABLED` honestly stops polling when the validated contract is
+   ready but the provider execution gate is intentionally off. It has no
+   spinner, queue waiting language, or queue expiry.
+6. Technical diagnostics remain collapsed and there is no second approval or
    normal manual refresh step.
-6. Cancellation remains explicit.
-7. A completed run opens its private Summary, Ideas, Literature, Knowledge
+7. Cancellation remains explicit.
+8. A completed run opens its private Summary, Ideas, Literature, Knowledge
    Background, Run Specification, and PDF without public publication.
 
 ## Deployment Gate
