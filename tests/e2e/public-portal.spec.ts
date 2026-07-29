@@ -114,7 +114,7 @@ test("public Literature exposes a sanitized source detail", async ({ page }) => 
   await expect(page.getByText("10.1038/s41586-019-1711-4")).toBeVisible();
 });
 
-test("New Research exposes Request, Preflight, and Approval workflow", async ({ page }) => {
+test("New Research exposes the direct-start workflow", async ({ page }) => {
   await page.goto("/new-run/?lang=en");
   await expect(page.locator("[required]")).toHaveCount(1);
   await expect(page.locator(".advanced-fields")).not.toHaveAttribute("open", "");
@@ -123,7 +123,7 @@ test("New Research exposes Request, Preflight, and Approval workflow", async ({ 
   await request.fill("Why does product purity vary across otherwise similar conditions?");
   await expect(page.getByRole("radio", { name: /standard/i })).toBeChecked();
   await page.getByRole("radio", { name: /Breakthrough Discovery/i }).check();
-  await expect(page.getByRole("button", { name: "Start preflight" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Start research" })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();
   await page.getByText("Options", { exact: true }).click();
   await expect(page.getByRole("button", { name: "Export JSON" })).toBeEnabled();

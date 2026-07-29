@@ -13,8 +13,6 @@ export type PortalSelectableRunMode = typeof PORTAL_SELECTABLE_RUN_MODES[number]
 export const RUN_STATUS_POLL_INTERVAL_MS = 10_000;
 export const BACKEND_RATE_LIMIT_PER_MINUTE = 30;
 export const DEFAULT_RATE_LIMIT_BACKOFF_MS = 60_000;
-export const BREAKTHROUGH_RUNTIME_REF = "743336b3419bf735caeaaec434074ed512eb0c22";
-
 export function sustainedStatusRequestsPerMinute(
   intervalMs = RUN_STATUS_POLL_INTERVAL_MS,
 ) {
@@ -22,6 +20,7 @@ export function sustainedStatusRequestsPerMinute(
 }
 
 export type RunControlStatus =
+  | "STARTING"
   | "QUEUED"
   | "RUNNER_OFFLINE"
   | "QUEUE_EXPIRED"
@@ -164,7 +163,7 @@ export interface RunControlRecord {
   literature_counts: LiteratureCounts;
   elapsed_time_seconds: number;
   provider_cost_usd: number;
-  runner_state: "ONLINE" | "OFFLINE";
+  runner_state: "ONLINE" | "OFFLINE" | "UNKNOWN";
   cancellation_state: "NOT_REQUESTED" | "REQUESTED" | "CANCELLED";
   artifact_availability: ArtifactAvailability;
 }
@@ -287,7 +286,9 @@ export function buildControlledRunPayload(input: ControlledRunPayloadInput) {
     research_question: input.researchQuestion,
     objectives: input.objectives,
     constraints: input.constraints,
-    requested_mode: breakthrough ? "DISCOVERY_PORTFOLIO_RUN" : input.requestedMode,
+    requested_mode: breakthrough
+      ? "DISCOVERY_PORTFOLIO_RUN"
+      : "FOCUSED_DECISION_RUN",
     include_literature_list_and_review_scope: input.includeLiteratureScope,
     execution_mode: "PROVIDER_BACKED",
     budget_profile: breakthrough ? "breakthrough_discovery" : "standard",
@@ -459,23 +460,9 @@ export async function getControlledRunEvents(runId: string) {
   return result.events;
 }
 
-export function approveControlledRun(runId: string, csrfToken: string) {
-  return request<RunControlRecord>(
-    `/api/runs/${encodeURIComponent(runId)}/approve`,
-    { method: "POST", headers: { "X-CSRF-Token": csrfToken } },
-  );
-}
-
 export function cancelControlledRun(runId: string, csrfToken: string) {
   return request<RunControlRecord>(
     `/api/runs/${encodeURIComponent(runId)}/cancel`,
-    { method: "POST", headers: { "X-CSRF-Token": csrfToken } },
-  );
-}
-
-export function redispatchControlledRun(runId: string, csrfToken: string) {
-  return request<RunControlRecord>(
-    `/api/runs/${encodeURIComponent(runId)}/redispatch`,
     { method: "POST", headers: { "X-CSRF-Token": csrfToken } },
   );
 }

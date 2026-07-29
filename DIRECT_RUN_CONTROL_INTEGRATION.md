@@ -16,17 +16,21 @@ NEXT_PUBLIC_RUN_CONTROL_API_BASE=https://api.aichoscientist.com
 
 The backend must allow the exact Portal origin and use Cloudflare Access JWT
 identity with an explicit email allowlist. It provides CSRF, private request storage, V2 replay-protected status
-events, approval, cancellation, re-dispatch, and owner-authorized private
+events, creator-submission approval, cancellation, and creator-authorized private
 artifact endpoints.
 
 ## User Flow
 
-1. `Prepare research run` authenticates the user and creates a private request.
+1. `Start research` creates a private request and records the authenticated
+   creator's submission as execution approval.
 2. The browser navigates to `/run-control/?run_id=<opaque-id>`.
-3. The page polls safe status and event history.
-4. Preflight displays material inferences and hard ceilings.
-5. `Approve and run` remains disabled until the user confirms review.
-6. Cancellation and expired-queue re-dispatch are explicit actions.
+3. A persistent local Backend worker validates the launch before execution.
+4. The page polls the direct lifecycle automatically:
+   `STARTING`, `QUEUED`, `RUNNING`, `GENERATING_REPORTS`, then a terminal
+   result.
+5. Technical diagnostics remain collapsed and there is no second approval or
+   normal manual refresh step.
+6. Cancellation remains explicit.
 7. A completed run opens its private Summary, Ideas, Literature, Knowledge
    Background, Run Specification, and PDF without public publication.
 

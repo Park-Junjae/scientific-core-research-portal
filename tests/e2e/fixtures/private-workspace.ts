@@ -12,10 +12,10 @@ export const legacyLongResearchQuestion = [
 ].join("\n");
 
 export type FixtureRunStatus =
+  | "STARTING"
   | "QUEUED"
-  | "PREFLIGHT"
-  | "AWAITING_APPROVAL"
   | "RUNNING"
+  | "GENERATING_REPORTS"
   | "COMPLETED"
   | "CANCELLED";
 
@@ -187,12 +187,12 @@ export function makeRun(
 ) {
   const running = status === "RUNNING";
   const completed = status === "COMPLETED";
-  const preflight = status === "QUEUED" || status === "PREFLIGHT";
+  const pending = status === "STARTING" || status === "QUEUED";
   const compiledContract = profile === "BREAKTHROUGH_DISCOVERY"
     ? fixtureContract
     : {
         ...fixtureContract,
-        run_mode: "AUTO",
+        run_mode: "FOCUSED_DECISION_RUN",
         creativity_profile: undefined,
         raw_spark_target: undefined,
         generation_plan: {
@@ -216,27 +216,33 @@ export function makeRun(
     budget_profile: profile === "BREAKTHROUGH_DISCOVERY" ? "breakthrough_discovery" : "standard",
     runtime_ref: fixtureRuntimeRef,
     queue_expires_at: "2026-07-29T00:00:00Z",
-    compiled_contract: preflight ? null : compiledContract,
+    compiled_contract: pending ? null : compiledContract,
     result_locator: completed ? "private" : null,
-    safe_message: preflight
-      ? "Compiling a private research plan without provider calls."
+    safe_message: status === "STARTING"
+      ? "Validating the private research launch."
+      : status === "QUEUED"
+        ? "Research execution is temporarily disabled."
       : completed
         ? "Private research completed and artifacts are ready."
         : running
-          ? "Approved research is running."
+          ? "Private research is running."
           : status === "CANCELLED"
             ? "This private run was cancelled."
-            : "The compiled research plan is ready for your approval.",
+            : "Generating private research reports.",
     current_stage: completed
       ? "completed"
       : running
         ? "blind_multi_lens_ideation"
-        : preflight
-          ? "preflight"
+        : status === "STARTING"
+          ? "starting"
+          : status === "QUEUED"
+            ? "queued"
+            : status === "GENERATING_REPORTS"
+              ? "report_generation"
           : status === "CANCELLED"
             ? "cancelled"
-            : "awaiting_approval",
-    progress_percentage: completed ? 100 : running ? 42 : preflight ? 18 : 25,
+            : "running",
+    progress_percentage: completed ? 100 : running ? 42 : pending ? 4 : 82,
     raw_idea_count: completed ? 60 : running ? 24 : 0,
     independent_idea_count: completed ? 18 : running ? 7 : 0,
     family_count: completed ? 6 : running ? 2 : 0,
@@ -246,7 +252,7 @@ export function makeRun(
     literature_counts: literatureCounts,
     elapsed_time_seconds: completed ? 7200 : running ? 1800 : 0,
     provider_cost_usd: 0,
-    runner_state: "ONLINE",
+    runner_state: "UNKNOWN",
     cancellation_state: status === "CANCELLED" ? "CANCELLED" : "NOT_REQUESTED",
     artifact_availability: {
       available: completed,
@@ -292,7 +298,7 @@ function fulfillJson(route: Route, value: unknown, status = 200) {
 }
 
 export async function seedSubmittedSummary(page: Page) {
-  await page.addInitScript(({ runId, runtimeRef }) => {
+  await page.addInitScript(({ runId }) => {
     window.sessionStorage.setItem(`scientific-core-run-draft:${runId}`, JSON.stringify({
       research_question: "Which controllable state preserves product purity without sacrificing activity?",
       objectives: ["Identify a discriminating mechanism", "Preserve product activity"],
@@ -301,14 +307,13 @@ export async function seedSubmittedSummary(page: Page) {
       creativity_profile: "BREAKTHROUGH_DISCOVERY",
       literature_scope: true,
       report_language: "en",
-      runtime_ref: runtimeRef,
     }));
-  }, { runId: fixtureRunId, runtimeRef: fixtureRuntimeRef });
+  }, { runId: fixtureRunId });
 }
 
 export async function installPrivateWorkspaceRoutes(
   page: Page,
-  initialStatus: FixtureRunStatus = "AWAITING_APPROVAL",
+  initialStatus: FixtureRunStatus = "STARTING",
   options: {
     list?: "empty" | "current" | "legacy-long";
     captureDownloads?: boolean;
@@ -362,7 +367,7 @@ export async function installPrivateWorkspaceRoutes(
       profile = submittedBody.creativity_profile === "BREAKTHROUGH_DISCOVERY"
         ? "BREAKTHROUGH_DISCOVERY"
         : "STANDARD";
-      status = "AWAITING_APPROVAL";
+      status = "STARTING";
       return fulfillJson(route, makeRun(status, profile));
     }
     if (url.pathname === `/api/runs/${fixtureRunId}`) {
@@ -392,10 +397,6 @@ export async function installPrivateWorkspaceRoutes(
             }]
           : [],
       });
-    }
-    if (url.pathname === `/api/runs/${fixtureRunId}/approve` && method === "POST") {
-      status = "RUNNING";
-      return fulfillJson(route, makeRun(status, profile));
     }
     if (url.pathname === `/api/runs/${fixtureRunId}/cancel` && method === "POST") {
       status = "CANCELLED";

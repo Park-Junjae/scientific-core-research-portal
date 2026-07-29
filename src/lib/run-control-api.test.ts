@@ -63,8 +63,8 @@ describe("run control browser client", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
 
-    const { approveControlledRun } = await import("./run-control-api");
-    await approveControlledRun("run-safe", "csrf-only");
+    const { cancelControlledRun } = await import("./run-control-api");
+    await cancelControlledRun("run-safe", "csrf-only");
 
     const init = fetchMock.mock.calls[0][1] as RequestInit;
     const headers = new Headers(init.headers);
@@ -109,7 +109,7 @@ describe("run control browser client", () => {
     });
     expect(standard).not.toHaveProperty("creativity_profile");
     expect(standard.budget_profile).toBe("standard");
-    expect(standard.requested_mode).toBe("AUTO");
+    expect(standard.requested_mode).toBe("FOCUSED_DECISION_RUN");
 
     const breakthrough = buildControlledRunPayload({
       ...common,

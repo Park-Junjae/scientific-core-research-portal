@@ -26,10 +26,11 @@ function profileLabel(run: CreatorRunListItem) {
 
 function statusLabel(status: CreatorRunListItem["status"], ko: boolean) {
   const labels: Record<string, [string, string]> = {
-    QUEUED: ["사전 검토 대기", "Awaiting preflight"],
-    RUNNER_OFFLINE: ["Runner 연결 대기", "Waiting for runner"],
-    PREFLIGHT: ["사전 검토 중", "Preflight"],
-    AWAITING_APPROVAL: ["승인 대기", "Awaiting approval"],
+    STARTING: ["시작 중", "Starting"],
+    QUEUED: ["대기 중", "Queued"],
+    RUNNER_OFFLINE: ["대기 중", "Queued"],
+    PREFLIGHT: ["시작 중", "Starting"],
+    AWAITING_APPROVAL: ["대기 중", "Queued"],
     RUNNING: ["실행 중", "Running"],
     GENERATING_REPORTS: ["결과 작성 중", "Generating results"],
     COMPLETED: ["완료", "Completed"],
@@ -80,19 +81,19 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
       <h2 id="my-research-heading">My Research</h2>
       {!session && (
         <p className="my-research-empty">
-          {ko ? "아직 실행한 연구가 없습니다." : "No research runs yet."}
+          {ko ? "아직 실행한 연구가 없습니다." : "No research yet."}
         </p>
       )}
       {loading && (
         <p className="control-loading" role="status">
           <LoaderCircle className="spin" size={18} />
-          {ko ? "내 비공개 연구를 불러오는 중입니다." : "Loading private research."}
+          {ko ? "비공개 연구를 불러오는 중입니다." : "Loading private research."}
         </p>
       )}
       {session && error && <p className="control-error" role="alert">{error}</p>}
       {session && loaded && runs.length === 0 && (
         <p className="my-research-empty">
-          {ko ? "아직 실행한 연구가 없습니다." : "No research runs yet."}
+          {ko ? "아직 실행한 연구가 없습니다." : "No research yet."}
         </p>
       )}
       {session && runs.length > 0 && (
