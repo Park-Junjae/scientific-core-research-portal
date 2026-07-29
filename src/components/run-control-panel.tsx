@@ -138,6 +138,9 @@ export function RunControlPanel() {
   const [lastStateChange, setLastStateChange] = useState<Date | null>(null);
   const [pollCycle, setPollCycle] = useState(0);
   const eventSequenceRef = useRef(0);
+  const eventsInitializedRef = useRef(false);
+  const eventsRunIdRef = useRef("");
+  const refreshInFlightRef = useRef(false);
   const statusRef = useRef<RunControlStatus | "">("");
   const backoffUntilRef = useRef(0);
 
@@ -154,7 +157,15 @@ export function RunControlPanel() {
   }, [runId]);
 
   const refresh = useCallback(async (id: string, includeEvents = false) => {
+    if (eventsRunIdRef.current !== id) {
+      eventsRunIdRef.current = id;
+      eventsInitializedRef.current = false;
+      eventSequenceRef.current = 0;
+      statusRef.current = "";
+    }
+    if (refreshInFlightRef.current) return;
     if (Date.now() < backoffUntilRef.current) return;
+    refreshInFlightRef.current = true;
     try {
       const nextRun = await getControlledRun(id);
       const previousStatus = statusRef.current;
@@ -165,13 +176,19 @@ export function RunControlPanel() {
         setLastStateChange(new Date(nextRun.updated_at));
       }
       setRun(nextRun);
-      if (includeEvents) {
-        const initialEvents = await getControlledRunEvents(id, 0);
-        setEvents(initialEvents);
-        eventSequenceRef.current = initialEvents.reduce(
-          (maximum, event) => Math.max(maximum, event.sequence),
-          nextSequence,
-        );
+      if (includeEvents && !eventsInitializedRef.current) {
+        eventsInitializedRef.current = true;
+        try {
+          const initialEvents = await getControlledRunEvents(id, 0);
+          setEvents(initialEvents);
+          eventSequenceRef.current = initialEvents.reduce(
+            (maximum, event) => Math.max(maximum, event.sequence),
+            nextSequence,
+          );
+        } catch (reason) {
+          eventsInitializedRef.current = false;
+          throw reason;
+        }
       } else if (nextSequence > eventSequenceRef.current) {
         const delta = await getControlledRunEvents(
           id,
@@ -201,6 +218,7 @@ export function RunControlPanel() {
       }
       setError(statusError(reason, ko));
     } finally {
+      refreshInFlightRef.current = false;
       setPollCycle((value) => value + 1);
     }
   }, [ko]);
