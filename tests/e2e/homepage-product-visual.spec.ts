@@ -44,7 +44,10 @@ async function fillComposer(page: Page, breakthrough = false) {
   return composer;
 }
 
-async function openRun(page: Page, status: "PREFLIGHT" | "AWAITING_APPROVAL" | "RUNNING" | "COMPLETED") {
+async function openRun(
+  page: Page,
+  status: "STARTING" | "EXECUTION_DISABLED" | "RUNNING" | "COMPLETED",
+) {
   await installPrivateWorkspaceRoutes(page, status);
   await seedSubmittedSummary(page);
   await page.goto(`/run-control/?run_id=${fixtureRunId}&lang=en`);
@@ -60,10 +63,10 @@ test("desktop 01 disconnected homepage", async ({ page }) => {
 
 test("desktop 02 connected empty My Research", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await installPrivateWorkspaceRoutes(page, "AWAITING_APPROVAL", { list: "empty" });
+  await installPrivateWorkspaceRoutes(page, "STARTING", { list: "empty" });
   await page.goto("/?lang=en");
   const research = page.locator(".my-research-section");
-  await expect(research.getByText("No research runs yet.", { exact: true })).toBeVisible();
+  await expect(research.getByText("No research yet.", { exact: true })).toBeVisible();
   await research.scrollIntoViewIfNeeded();
   await capture(page, "desktop-02-connected-empty");
 });
@@ -82,29 +85,32 @@ test("desktop 04 Breakthrough filled composer", async ({ page }) => {
   await capture(page, "desktop-04-breakthrough-filled");
 });
 
-test("desktop 05 zero-provider preflight result", async ({ page }) => {
+test("desktop 05 direct research starting", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await openRun(page, "AWAITING_APPROVAL");
-  const contract = page.locator(".compiled-contract");
-  await expect(contract.getByRole("heading", { name: "Compiled research plan" })).toBeVisible();
-  await contract.scrollIntoViewIfNeeded();
-  await capture(page, "desktop-05-preflight-result");
+  await openRun(page, "STARTING");
+  const launch = page.locator(".launch-progress");
+  await expect(launch.getByRole("heading", { name: "Starting" })).toBeVisible();
+  await launch.scrollIntoViewIfNeeded();
+  await capture(page, "desktop-05-direct-start");
 });
 
-test("desktop 06 awaiting self-approval", async ({ page }) => {
+test("desktop 06 execution temporarily disabled", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await openRun(page, "AWAITING_APPROVAL");
-  const approval = page.locator(".approval-panel");
-  await expect(approval.getByRole("heading", { name: "Approve my execution" })).toBeVisible();
-  await approval.scrollIntoViewIfNeeded();
-  await capture(page, "desktop-06-awaiting-approval");
+  await openRun(page, "EXECUTION_DISABLED");
+  const launch = page.locator(".execution-disabled-state");
+  await expect(
+    launch.getByRole("heading", { name: "Execution disabled" }),
+  ).toBeVisible();
+  await expect(launch.locator(".spin")).toHaveCount(0);
+  await launch.scrollIntoViewIfNeeded();
+  await capture(page, "desktop-06-execution-disabled");
 });
 
 test("desktop 07 running research", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openRun(page, "RUNNING");
   const progress = page.locator(".execution-progress");
-  await expect(progress.getByRole("heading", { name: "Research stage progress" })).toBeVisible();
+  await expect(progress.getByRole("heading", { name: "Research progress" })).toBeVisible();
   await progress.scrollIntoViewIfNeeded();
   await capture(page, "desktop-07-running");
 });
@@ -132,12 +138,17 @@ test("mobile 02 Breakthrough selector", async ({ page }) => {
   await capture(page, "mobile-02-breakthrough-selector");
 });
 
-test("mobile 03 self-approval", async ({ page }) => {
+test("mobile 03 direct research status", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await openRun(page, "AWAITING_APPROVAL");
-  const approval = page.locator(".approval-panel");
-  await approval.scrollIntoViewIfNeeded();
-  await capture(page, "mobile-03-approval");
+  await openRun(page, "STARTING");
+  const launch = page.locator(".launch-progress");
+  await expect(launch).toBeVisible();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(
+    page.locator(".mobile-header").getByText("AI Cho-Scientist", { exact: true }),
+  ).toBeVisible();
+  await page.waitForTimeout(150);
+  await capture(page, "mobile-03-direct-start");
 });
 
 test("mobile 04 My Research", async ({ page }) => {

@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
 });
 
-test("GET /api/session is automatic and has no preflight-triggering Content-Type", async ({ page }) => {
+test("GET /api/session is automatic and has no unnecessary Content-Type", async ({ page }) => {
   let sessionRequests = 0;
   await page.route("https://control.example/**", (route) => {
     const request = route.request();
@@ -156,5 +156,5 @@ test("connected state shows the email and no account action button", async ({ pa
   await expect(account.getByText("approved@example.com", { exact: true })).toBeVisible();
   await expect(account.getByRole("button")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "My Research" })).toBeVisible();
-  await expect(page.getByText("No research runs yet.", { exact: true })).toBeVisible();
+  await expect(page.getByText("No research yet.", { exact: true })).toBeVisible();
 });

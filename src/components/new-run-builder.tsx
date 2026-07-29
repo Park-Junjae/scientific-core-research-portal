@@ -19,7 +19,6 @@ import {
   type RunRequestDraft,
 } from "@/lib/run-request";
 import {
-  BREAKTHROUGH_RUNTIME_REF,
   buildControlledRunPayload,
   createControlledRun,
   runControlApiBase,
@@ -40,12 +39,6 @@ function downloadRequest(body: unknown) {
 function lines(value: string) {
   return value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
 }
-
-const modes: Array<[RunRequestDraft["run_type"], string]> = [
-  ["", "Choose automatically"],
-  ["FOCUSED_DECISION_RUN", "Focused decision"],
-  ["DISCOVERY_PORTFOLIO_RUN", "Discovery portfolio"],
-];
 
 interface ResearchComposerProps {
   session?: RunControlSession | null;
@@ -87,7 +80,7 @@ export function ResearchComposer({
     if (!ready || busy || submissionGuard.current || !runControlApiBase) return;
     submissionGuard.current = true;
     setBusy(true);
-    setMessage(ko ? "사전 검토 요청 중…" : "Submitting preflight…");
+    setMessage(ko ? "연구를 시작하고 있습니다…" : "Starting research…");
     if (!activeSession) {
       setMessage(ko
         ? "Google로 계속하여 계정을 연결하세요."
@@ -113,7 +106,11 @@ export function ResearchComposer({
           researchQuestion,
           objectives,
           constraints,
-          requestedMode: (value.run_type || "AUTO") as PortalSelectableRunMode,
+          requestedMode: (
+            breakthrough
+              ? "DISCOVERY_PORTFOLIO_RUN"
+              : "AUTO"
+          ) as PortalSelectableRunMode,
           creativityProfile: value.creativity_profile,
           includeLiteratureScope: value.literature_scope_enabled,
           reportLanguage,
@@ -127,16 +124,17 @@ export function ResearchComposer({
           research_question: researchQuestion,
           objectives,
           constraints,
-          selected_mode: breakthrough ? "DISCOVERY_PORTFOLIO_RUN" : (value.run_type || "AUTO"),
+          selected_mode: breakthrough
+            ? "DISCOVERY_PORTFOLIO_RUN"
+            : "AUTO",
           creativity_profile: value.creativity_profile,
           literature_scope: value.literature_scope_enabled,
           report_language: reportLanguage,
-          runtime_ref: breakthrough ? BREAKTHROUGH_RUNTIME_REF : "Assigned by Backend preflight",
         }),
       );
       setMessage(ko
-        ? "요청을 접수했습니다. 사전 검토를 시작합니다."
-        : "Request submitted. Starting preflight.");
+        ? "연구를 시작하고 있습니다."
+        : "Starting research.");
       router.push(withBasePath(`/run-control/?run_id=${encodeURIComponent(run.run_id)}&lang=${locale}&created=1`));
     } catch (reason) {
       setMessage(reason instanceof Error ? reason.message : "Unable to prepare the run.");
@@ -234,12 +232,6 @@ export function ResearchComposer({
               <span>Include literature review and complete source ledger</span>
             </label>
             <label>
-              <span>Detailed run mode</span>
-              <select value={value.run_type} disabled={breakthrough} onChange={(event) => update("run_type", event.target.value as RunRequestDraft["run_type"])}>
-                {modes.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-              </select>
-            </label>
-            <label>
               <span>References and additional constraints</span>
               <textarea rows={4} value={value.reference_material_or_constraints} onChange={(event) => update("reference_material_or_constraints", event.target.value)} />
             </label>
@@ -279,12 +271,12 @@ export function ResearchComposer({
           >
             {busy ? <LoaderCircle className="spin" size={18} /> : <ArrowRight size={18} />}
             {busy
-              ? (ko ? "사전 검토 요청 중…" : "Submitting preflight…")
-              : "Start preflight"}
+              ? (ko ? "연구를 시작하고 있습니다…" : "Starting research…")
+              : (ko ? "연구 시작" : "Start research")}
           </button>
           {!activeSession && (
             <small className="run-request-hint">
-              {ko ? "Google로 계속하여 사전 검토를 활성화하세요." : "Continue with Google to enable preflight."}
+              {ko ? "Google로 계속하여 연구를 시작하세요." : "Continue with Google to start research."}
             </small>
           )}
         </div>

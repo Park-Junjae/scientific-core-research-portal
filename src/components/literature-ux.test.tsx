@@ -83,7 +83,7 @@ describe("reader contracts", () => {
     expect(screen.queryByRole("heading", { name: "Request preview" })).not.toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /standard/i })).toBeChecked();
     expect(screen.getByRole("radio", { name: /breakthrough discovery/i })).not.toBeChecked();
-    expect(screen.getByRole("button", { name: "Start preflight" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Start research" })).toBeDisabled();
     if (!runControlApiBase) {
       expect(screen.getByText("Research execution is being prepared.")).toBeInTheDocument();
     }
@@ -92,7 +92,7 @@ describe("reader contracts", () => {
       target: { value: "Why does product purity collapse at this locus?" },
     });
 
-    expect(screen.getByRole("button", { name: "Start preflight" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Start research" })).toBeDisabled();
     expect(screen.getByText("Evidence-first research")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("radio", { name: /breakthrough discovery/i }));

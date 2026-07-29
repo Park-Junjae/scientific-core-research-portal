@@ -29,6 +29,7 @@ function filesUnder(directory) {
 }
 
 function readText(file) {
+  if (!existsSync(file)) return null;
   if (!textExtensions.has(extname(file).toLowerCase()) || statSync(file).size > 8_000_000) return null;
   try { return readFileSync(file, "utf8"); } catch { return null; }
 }
