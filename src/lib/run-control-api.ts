@@ -138,6 +138,9 @@ export interface ArtifactAvailability {
 
 export interface RunControlRecord {
   run_id: string;
+  display_title: string;
+  research_question: string;
+  creativity_profile: "STANDARD" | "BREAKTHROUGH_DISCOVERY";
   creator: string;
   created_at: string;
   updated_at: string;
@@ -192,7 +195,8 @@ export interface RunControlEvent {
 
 export interface CreatorRunListItem {
   run_id: string;
-  research_question: string;
+  display_title?: string;
+  research_question?: string;
   created_at: string;
   updated_at: string;
   status: RunControlStatus;
@@ -432,11 +436,15 @@ export function getMyRuns(limit = 20, offset = 0) {
 export function createControlledRun(
   payload: Record<string, unknown>,
   csrfToken: string,
+  requestLocator?: string,
 ) {
   return request<RunControlRecord>("/api/runs", {
     method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      ...payload,
+      ...(requestLocator ? { request_locator: requestLocator } : {}),
+    }),
   });
 }
 

@@ -7,7 +7,8 @@ import {
   LoaderCircle,
   Upload,
 } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { AccessConnectionPanel } from "@/components/access-connection-panel";
 import { useLocale } from "@/lib/locale";
 import { withBasePath } from "@/lib/paths";
@@ -56,18 +57,22 @@ export function ResearchComposer({
   onConnected,
 }: ResearchComposerProps = {}) {
   const { locale } = useLocale();
+  const router = useRouter();
   const ko = locale === "ko";
   const [value, setValue] = useState<RunRequestDraft>(initialRunRequest);
   const [localSession, setLocalSession] = useState<RunControlSession | null>(null);
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const submissionGuard = useRef(false);
+  const requestLocator = useRef("");
   const activeSession = session === undefined ? localSession : session;
   const request = useMemo(() => buildRunRequest(value, locale), [locale, value]);
   const ready = Boolean(value.raw_research_request.trim());
   const breakthrough = value.creativity_profile === "BREAKTHROUGH_DISCOVERY";
 
   const update = <K extends keyof RunRequestDraft>(key: K, next: RunRequestDraft[K]) => {
+    if (!busy) requestLocator.current = "";
     setSaved(false);
     setMessage("");
     setValue((current) => ({ ...current, [key]: next }));
@@ -79,15 +84,19 @@ export function ResearchComposer({
   }, [onConnected]);
 
   async function prepareRun() {
-    if (!ready || busy || !runControlApiBase) return;
+    if (!ready || busy || submissionGuard.current || !runControlApiBase) return;
+    submissionGuard.current = true;
+    setBusy(true);
+    setMessage(ko ? "사전 검토 요청 중…" : "Submitting preflight…");
     if (!activeSession) {
       setMessage(ko
         ? "Google로 계속하여 계정을 연결하세요."
         : "Continue with Google to connect your account.");
+      submissionGuard.current = false;
+      setBusy(false);
       return;
     }
-    setBusy(true);
-    setMessage("");
+    requestLocator.current ||= `portal-${crypto.randomUUID()}`;
     const researchQuestion = value.research_question.trim()
       || value.raw_research_request.trim();
     const objectives = lines(value.research_goal || value.success_criteria);
@@ -110,6 +119,7 @@ export function ResearchComposer({
           reportLanguage,
         }),
         activeSession.csrf_token,
+        requestLocator.current,
       );
       window.sessionStorage.setItem(
         `scientific-core-run-draft:${run.run_id}`,
@@ -125,12 +135,12 @@ export function ResearchComposer({
         }),
       );
       setMessage(ko
-        ? "비공개 사전 검토를 만들었습니다. 컴파일된 연구 계획을 여는 중입니다."
-        : "Private preflight created. Opening the compiled research plan.");
-      window.location.assign(withBasePath(`/run-control/?run_id=${encodeURIComponent(run.run_id)}&lang=${locale}`));
+        ? "요청을 접수했습니다. 사전 검토를 시작합니다."
+        : "Request submitted. Starting preflight.");
+      router.push(withBasePath(`/run-control/?run_id=${encodeURIComponent(run.run_id)}&lang=${locale}&created=1`));
     } catch (reason) {
       setMessage(reason instanceof Error ? reason.message : "Unable to prepare the run.");
-    } finally {
+      submissionGuard.current = false;
       setBusy(false);
     }
   }
@@ -261,9 +271,16 @@ export function ResearchComposer({
         </details>
 
         <div className="run-request-actions">
-          <button className="primary-button review-plan-button" type="submit" disabled={!ready || busy || !runControlApiBase || !activeSession}>
+          <button
+            aria-busy={busy}
+            className="primary-button review-plan-button"
+            type="submit"
+            disabled={!ready || busy || !runControlApiBase || !activeSession}
+          >
             {busy ? <LoaderCircle className="spin" size={18} /> : <ArrowRight size={18} />}
-            Start preflight
+            {busy
+              ? (ko ? "사전 검토 요청 중…" : "Submitting preflight…")
+              : "Start preflight"}
           </button>
           {!activeSession && (
             <small className="run-request-hint">
@@ -272,7 +289,15 @@ export function ResearchComposer({
           )}
         </div>
         {!runControlApiBase && <div className="intake-message" role="status"><p>{ko ? "연구 실행 기능은 준비 중입니다." : "Research execution is being prepared."}</p></div>}
-        {message && <div className="intake-message" role="alert"><p>{message}</p></div>}
+        {message && (
+          <div
+            aria-live="polite"
+            className="intake-message"
+            role={busy ? "status" : "alert"}
+          >
+            <p>{message}</p>
+          </div>
+        )}
       </form>
     </section>
   );

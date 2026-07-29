@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useLocale } from "@/lib/locale";
 import { withBasePath } from "@/lib/paths";
+import { compactResearchTitle } from "@/lib/research-title";
 import {
   getMyRuns,
   runControlApiBase,
@@ -105,8 +106,13 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
                   <span>{run.current_stage.replaceAll("_", " ")}</span>
                 </p>
                 <h3>
-                  <Link href={withBasePath(`/run-control/?run_id=${encodeURIComponent(run.run_id)}`)}>
-                    {run.research_question || run.run_id}
+                  <Link
+                    className="my-research-title"
+                    href={withBasePath(`/run-control/?run_id=${encodeURIComponent(run.run_id)}&lang=${locale}`)}
+                  >
+                    {run.display_title?.trim()
+                      || compactResearchTitle(run.research_question)
+                      || run.run_id}
                   </Link>
                 </h3>
                 <p>

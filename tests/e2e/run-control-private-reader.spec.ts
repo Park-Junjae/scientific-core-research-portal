@@ -83,6 +83,9 @@ test("authenticated creator sees an artifact-first completed bundle", async ({ p
         creator: "approved-user",
         created_at: "2026-07-23T00:00:00Z",
         updated_at: "2026-07-23T00:05:00Z",
+        display_title: "합성 비공개 연구 결과",
+        research_question: "합성 fixture의 산출물 우선 비공개 결과를 검증한다.",
+        creativity_profile: "STANDARD",
         status: "COMPLETED",
         request_sha256: "d".repeat(64),
         budget_profile: "synthetic",
@@ -151,7 +154,7 @@ test("authenticated creator sees an artifact-first completed bundle", async ({ p
   });
 
   await page.goto(`/run-control/?run_id=${runId}&lang=ko`);
-  await expect(page.getByRole("heading", { name: "연구 계획과 실행 상태" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "합성 비공개 연구 결과" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "연구 결과 파일" })).toBeVisible();
   await expect(page.getByText("내 비공개 결과")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Synthetic final report" })).toBeVisible();

@@ -22,6 +22,7 @@ import { AccessConnectionPanel } from "@/components/access-connection-panel";
 import { PrivateRunReader } from "@/components/private-run-reader";
 import { useLocale } from "@/lib/locale";
 import { withBasePath } from "@/lib/paths";
+import { compactResearchTitle } from "@/lib/research-title";
 import {
   approveControlledRun,
   cancelControlledRun,
@@ -105,6 +106,11 @@ export function RunControlPanel() {
     () => new URLSearchParams(window.location.search).get("run_id") ?? "",
     () => "",
   );
+  const createdMarker = useSyncExternalStore(
+    () => () => undefined,
+    () => new URLSearchParams(window.location.search).get("created") ?? "",
+    () => "",
+  );
   const [session, setSession] = useState<RunControlSession | null>(null);
   const [run, setRun] = useState<RunControlRecord | null>(null);
   const [events, setEvents] = useState<RunControlEvent[]>([]);
@@ -120,6 +126,7 @@ export function RunControlPanel() {
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [createdNotice, setCreatedNotice] = useState(false);
   const stageRef = useRef("");
   const backoffUntilRef = useRef(0);
 
@@ -164,6 +171,15 @@ export function RunControlPanel() {
     setError("");
     if (runId) await refresh(runId, true);
   }, [refresh, runId]);
+
+  useEffect(() => {
+    if (!runId || createdMarker !== "1") return;
+    const key = `scientific-core-created-notice:${runId}`;
+    if (window.sessionStorage.getItem(key)) return;
+    window.sessionStorage.setItem(key, "shown");
+    const frame = window.requestAnimationFrame(() => setCreatedNotice(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, [createdMarker, runId]);
 
   useEffect(() => {
     let active = true;
@@ -222,6 +238,14 @@ export function RunControlPanel() {
   const currentSession = session;
 
   const contract = run.compiled_contract;
+  const fullResearchGoal = run.research_question || submitted?.research_question || "";
+  const projectTitle = run.display_title?.trim()
+    || compactResearchTitle(fullResearchGoal)
+    || run.run_id;
+  const creativityProfile = run.creativity_profile
+    || contract?.creativity_profile
+    || submitted?.creativity_profile
+    || "STANDARD";
   const budget = contract?.budget;
   const canApprove = run.status === "AWAITING_APPROVAL";
   const canCancel = [
@@ -270,6 +294,16 @@ export function RunControlPanel() {
 
   return (
     <div className="run-control-layout">
+      {createdNotice && (
+        <div className="created-run-notice" role="status" aria-live="polite">
+          <Check size={18} />
+          <span>
+            {ko
+              ? "요청을 접수했습니다. 사전 검토를 시작합니다."
+              : "Request submitted. Starting preflight."}
+          </span>
+        </div>
+      )}
       <div className="workflow-steps" aria-label={ko ? "연구 실행 단계" : "Research workflow"}>
         <span>1. {ko ? "요청" : "Request"}</span>
         <strong>2. {ko ? "사전 검토" : "Preflight review"}</strong>
@@ -279,8 +313,11 @@ export function RunControlPanel() {
       <header className="run-control-header">
         <div>
           <p className="section-label">{ko ? "인증된 비공개 실행" : "Authenticated private run"}</p>
-          <h1>{ko ? "연구 계획과 실행 상태" : "Research plan and execution"}</h1>
+          <h1>{projectTitle}</h1>
           <p className="page-lede">{run.safe_message}</p>
+          <Link className="run-control-return" href={withBasePath(`/?lang=${locale}#my-research-heading`)}>
+            ← My Research
+          </Link>
         </div>
         <div className={`runner-state ${run.runner_state === "ONLINE" ? "online" : "offline"}`}>
           <Server size={17} />
@@ -299,6 +336,21 @@ export function RunControlPanel() {
         <div><span>{ko ? "대기 만료" : "Queue expiry"}</span><strong>{queueExpiry ? new Date(queueExpiry).toLocaleString(locale) : "—"}</strong></div>
       </section>
 
+      {fullResearchGoal && (
+        <section className="research-goal-section" aria-labelledby="research-goal-heading">
+          <p className="section-label">{ko ? "전체 연구 목표" : "Full Research goal"}</p>
+          <h2 id="research-goal-heading">Research goal</h2>
+          {fullResearchGoal.length > 480 ? (
+            <details open>
+              <summary>{ko ? "전체 요청 펼치기/접기" : "Expand or collapse the full request"}</summary>
+              <p>{fullResearchGoal}</p>
+            </details>
+          ) : (
+            <p>{fullResearchGoal}</p>
+          )}
+        </section>
+      )}
+
       {submitted && (
         <section className="submitted-request-summary">
           <div className="section-heading">
@@ -306,7 +358,7 @@ export function RunControlPanel() {
               <p className="section-label">{ko ? "제출한 비공개 요청" : "Submitted private request"}</p>
               <h2>{ko ? "연구 범위 확인" : "Research scope review"}</h2>
             </div>
-            <span>{submitted.creativity_profile === "BREAKTHROUGH_DISCOVERY" ? "Breakthrough Discovery" : "Standard"}</span>
+            <span>{creativityProfile === "BREAKTHROUGH_DISCOVERY" ? "Breakthrough Discovery" : "Standard"}</span>
           </div>
           <dl className="contract-grid">
             <div className="wide"><dt>{ko ? "정규화된 연구 질문" : "Normalized research question"}</dt><dd>{submitted.research_question}</dd></div>
