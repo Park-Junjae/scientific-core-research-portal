@@ -1,7 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
   fixtureRunId,
+  fixtureDisplayTitle,
   installPrivateWorkspaceRoutes,
+  legacyLongResearchQuestion,
   seedSubmittedSummary,
 } from "./fixtures/private-workspace";
 
@@ -23,7 +25,10 @@ test("homepage Standard request preserves the lean production payload", async ({
   const composer = await connectAndFill(page);
 
   await composer.getByRole("button", { name: "Start preflight" }).click();
-  await expect(page).toHaveURL(new RegExp(`/run-control/\\?run_id=${fixtureRunId}`));
+  await expect(page).toHaveURL(
+    new RegExp(`/run-control/\\?run_id=${fixtureRunId}&lang=en&created=1`),
+  );
+  await expect(page.getByText("Request submitted. Starting preflight.")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Compiled research plan" })).toBeVisible();
 
   expect(api.submittedBody).toMatchObject({
@@ -78,7 +83,9 @@ test("creator can self-approve, refresh, re-enter, and cancel the same private r
   await page.goto(`/run-control/?run_id=${fixtureRunId}&lang=en`);
 
   await expect(page.getByRole("heading", { name: "Research scope review" })).toBeVisible();
-  await expect(page.getByText(question)).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Research goal" }).getByText(question),
+  ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Approve my execution" })).toBeVisible();
   await page.getByRole("checkbox", { name: /reviewed the compiled plan/ }).check();
   await page.getByRole("button", { name: "Approve my execution" }).click();
@@ -103,11 +110,72 @@ test("My Research renders only the authenticated creator projection", async ({ p
   await page.goto("/?lang=en");
 
   const research = page.locator(".my-research-section");
-  await expect(research.getByRole("link", { name: question })).toBeVisible();
+  await expect(research.getByRole("link", { name: fixtureDisplayTitle })).toBeVisible();
   await expect(research.getByText("Breakthrough Discovery")).toBeVisible();
   await expect(research.getByText("42%").first()).toBeVisible();
   await expect(page.locator("body")).not.toContainText("another creator's private question");
   expect(api.runnerApiCalls).toBe(0);
+});
+
+test("My Research compacts a legacy 4,000-character prompt and never renders the raw body", async ({ page }) => {
+  await installPrivateWorkspaceRoutes(page, "RUNNING", { list: "legacy-long" });
+  await page.goto("/?lang=en");
+
+  const research = page.locator(".my-research-section");
+  const title = research.getByRole("link", {
+    name: "RNA-mediated mitochondrial DNA/RNA base editing.",
+  });
+  await expect(title).toBeVisible();
+  await expect(title).toHaveCSS("-webkit-line-clamp", "2");
+  await expect(research).not.toContainText(
+    "Private detailed instruction that must never appear in My Research.",
+  );
+  await expect(page.locator("body")).not.toContainText(legacyLongResearchQuestion);
+});
+
+test("rapid double submission sends exactly one POST and exposes the pending state", async ({ page }) => {
+  const api = await installPrivateWorkspaceRoutes(page, "AWAITING_APPROVAL", {
+    postDelayMs: 350,
+  });
+  const composer = await connectAndFill(page);
+  const button = composer.getByRole("button", { name: "Start preflight" });
+  await button.evaluate((element) => {
+    const form = element.closest("form");
+    form?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    form?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+  });
+
+  await expect(
+    composer.getByRole("button", { name: "Submitting preflight…" }),
+  ).toBeDisabled();
+  await expect(composer.locator(".intake-message")).toContainText("Submitting preflight…");
+  await expect(page).toHaveURL(new RegExp(`/run-control/\\?run_id=${fixtureRunId}`));
+  expect(api.postCount).toBe(1);
+});
+
+test("network failure restores the composer without automatic resubmission", async ({ page }) => {
+  const api = await installPrivateWorkspaceRoutes(page, "AWAITING_APPROVAL", {
+    failFirstPost: true,
+  });
+  const composer = await connectAndFill(page);
+  await composer.getByRole("button", { name: "Start preflight" }).click();
+
+  await expect(composer.getByRole("button", { name: "Start preflight" })).toBeEnabled();
+  await expect(composer.getByRole("alert")).toContainText(
+    "Unable to reach the Run Control API",
+  );
+  expect(api.postCount).toBe(1);
+  await expect(page).toHaveURL(/\/\?lang=en$/);
+});
+
+test("Run detail uses a compact heading and keeps the full goal in its own section", async ({ page }) => {
+  await installPrivateWorkspaceRoutes(page, "PREFLIGHT");
+  await page.goto(`/run-control/?run_id=${fixtureRunId}&lang=en`);
+
+  await expect(page.getByRole("heading", { name: fixtureDisplayTitle })).toBeVisible();
+  const goal = page.getByRole("region", { name: "Research goal" });
+  await expect(goal).toContainText(question);
+  await expect(page.getByRole("link", { name: "← My Research" })).toBeVisible();
 });
 
 test("completed run is artifact-first and reads the canonical report privately", async ({ page }) => {

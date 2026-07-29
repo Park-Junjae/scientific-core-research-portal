@@ -41,6 +41,7 @@ describe("run control browser client", () => {
     await createControlledRun(
       { research_question: "Synthetic question", budget_profile: "standard" },
       "csrf-only",
+      "portal-request-locator-0001",
     );
 
     const init = fetchMock.mock.calls[0][1] as RequestInit;
@@ -50,6 +51,7 @@ describe("run control browser client", () => {
     expect(init.body).toBe(JSON.stringify({
       research_question: "Synthetic question",
       budget_profile: "standard",
+      request_locator: "portal-request-locator-0001",
     }));
   });
 

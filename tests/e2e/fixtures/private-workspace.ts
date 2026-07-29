@@ -2,6 +2,14 @@ import type { Page, Route } from "@playwright/test";
 
 export const fixtureRunId = "run-fixture-homepage-0001";
 export const fixtureRuntimeRef = "743336b3419bf735caeaaec434074ed512eb0c22";
+export const fixtureResearchQuestion = "Which controllable state preserves product purity without sacrificing activity?";
+export const fixtureDisplayTitle = "Controllable state for product purity and activity";
+export const legacyLongResearchQuestion = [
+  "RNA-mediated mitochondrial DNA/RNA base editing.",
+  ...Array.from({ length: 120 }, (_, index) => (
+    `${index + 1}. Private detailed instruction that must never appear in My Research.`
+  )),
+].join("\n");
 
 export type FixtureRunStatus =
   | "QUEUED"
@@ -197,6 +205,9 @@ export function makeRun(
       };
   return {
     run_id: fixtureRunId,
+    display_title: fixtureDisplayTitle,
+    research_question: fixtureResearchQuestion,
+    creativity_profile: profile,
     creator: "creator-fixture",
     created_at: "2026-07-28T00:00:00Z",
     updated_at: "2026-07-28T01:30:00Z",
@@ -252,7 +263,7 @@ function listItem(
   const run = makeRun(status, profile);
   return {
     run_id: run.run_id,
-    research_question: "Which controllable state preserves product purity without sacrificing activity?",
+    display_title: fixtureDisplayTitle,
     created_at: run.created_at,
     updated_at: run.updated_at,
     status: run.status,
@@ -298,13 +309,20 @@ export async function seedSubmittedSummary(page: Page) {
 export async function installPrivateWorkspaceRoutes(
   page: Page,
   initialStatus: FixtureRunStatus = "AWAITING_APPROVAL",
-  options: { list?: "empty" | "current"; captureDownloads?: boolean } = {},
+  options: {
+    list?: "empty" | "current" | "legacy-long";
+    captureDownloads?: boolean;
+    failFirstPost?: boolean;
+    postDelayMs?: number;
+  } = {},
 ) {
   let status = initialStatus;
   let submittedBody: Record<string, unknown> | null = null;
   let profile: "STANDARD" | "BREAKTHROUGH_DISCOVERY" = "BREAKTHROUGH_DISCOVERY";
   let runnerApiCalls = 0;
   let artifactDownloads = 0;
+  let postCount = 0;
+  let postFailed = false;
 
   await page.route("https://control.example/**", async (route) => {
     const request = route.request();
@@ -314,14 +332,32 @@ export async function installPrivateWorkspaceRoutes(
     if (url.pathname.includes("/actions/runners")) runnerApiCalls += 1;
     if (url.pathname === "/api/session") return fulfillJson(route, session);
     if (url.pathname === "/api/runs" && method === "GET") {
+      const listed = listItem(status, profile);
+      const runs = options.list === "current"
+        ? [listed]
+        : options.list === "legacy-long"
+          ? [{
+              ...listed,
+              display_title: undefined,
+              research_question: legacyLongResearchQuestion,
+            }]
+          : [];
       return fulfillJson(route, {
-        runs: options.list === "current" ? [listItem(status, profile)] : [],
+        runs,
         limit: 20,
         offset: 0,
         next_offset: null,
       });
     }
     if (url.pathname === "/api/runs" && method === "POST") {
+      postCount += 1;
+      if (options.postDelayMs) {
+        await new Promise((resolve) => setTimeout(resolve, options.postDelayMs));
+      }
+      if (options.failFirstPost && !postFailed) {
+        postFailed = true;
+        return route.abort("connectionfailed");
+      }
       submittedBody = request.postDataJSON() as Record<string, unknown>;
       profile = submittedBody.creativity_profile === "BREAKTHROUGH_DISCOVERY"
         ? "BREAKTHROUGH_DISCOVERY"
@@ -398,5 +434,6 @@ export async function installPrivateWorkspaceRoutes(
     get submittedBody() { return submittedBody; },
     get runnerApiCalls() { return runnerApiCalls; },
     get artifactDownloads() { return artifactDownloads; },
+    get postCount() { return postCount; },
   };
 }

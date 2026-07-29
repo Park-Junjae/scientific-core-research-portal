@@ -335,6 +335,16 @@ p, li, dd, td, th, a, button, label { word-break: keep-all; overflow-wrap: break
 .my-research-list article { display: grid; grid-template-columns: minmax(0,1.7fr) minmax(420px,1fr); gap: 30px; align-items: center; border-bottom: 1px solid var(--line); padding: 20px 0; }
 .my-research-list h3 { margin: 5px 0; font-size: 18px; }
 .my-research-list h3 a { color: var(--ink); text-decoration: none; }
+.my-research-title {
+  display: -webkit-box;
+  overflow: hidden;
+  max-width: 100%;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+}
 .my-research-list h3 a:hover { color: var(--accent-dark); text-decoration: underline; }
 .my-research-list article > div > p:last-child { margin: 0; color: var(--ink-faint); font-size: 12px; }
 .my-research-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
@@ -2711,6 +2721,47 @@ body { font-family: var(--font-ui), sans-serif; }
   background: var(--surface-muted);
 }
 .preflight-progress-bar span { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.created-run-notice {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--accent-softer);
+  padding: 13px 16px;
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+.run-control-return {
+  display: inline-flex;
+  margin-top: 10px;
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.run-control-return:hover { text-decoration: underline; }
+.research-goal-section {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  padding: 24px;
+}
+.research-goal-section h2 { margin: 4px 0 14px; font-size: 22px; }
+.research-goal-section summary {
+  cursor: pointer;
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+.research-goal-section p {
+  overflow-wrap: anywhere;
+  margin: 12px 0 0;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
 .contract-stage-order ol {
   display: flex;
   flex-wrap: wrap;

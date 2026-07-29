@@ -9,6 +9,7 @@ import {
 
 const screenshotRoot = join("UPDATED_SCREENSHOTS", "homepage-first");
 const question = "Which controllable state preserves product purity without sacrificing activity?";
+const displayTitle = "Controllable state for product purity and activity";
 
 mkdirSync(screenshotRoot, { recursive: true });
 test.describe.configure({ mode: "serial" });
@@ -47,7 +48,7 @@ async function openRun(page: Page, status: "PREFLIGHT" | "AWAITING_APPROVAL" | "
   await installPrivateWorkspaceRoutes(page, status);
   await seedSubmittedSummary(page);
   await page.goto(`/run-control/?run_id=${fixtureRunId}&lang=en`);
-  await expect(page.getByRole("heading", { name: "Research plan and execution" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: displayTitle })).toBeVisible();
 }
 
 test("desktop 01 disconnected homepage", async ({ page }) => {
@@ -144,7 +145,7 @@ test("mobile 04 My Research", async ({ page }) => {
   await installPrivateWorkspaceRoutes(page, "RUNNING", { list: "current" });
   await page.goto("/?lang=en");
   const research = page.locator(".my-research-section");
-  await expect(research.getByRole("link", { name: question })).toBeVisible();
+  await expect(research.getByRole("link", { name: displayTitle })).toBeVisible();
   await research.scrollIntoViewIfNeeded();
   await capture(page, "mobile-04-my-research");
 });
