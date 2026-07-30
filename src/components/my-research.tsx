@@ -5,6 +5,7 @@ import {
   Clock3,
   Library,
   LoaderCircle,
+  LogIn,
   MoreHorizontal,
   PackageCheck,
   RotateCcw,
@@ -23,6 +24,7 @@ import {
   restoreControlledRun,
   runControlApiBase,
   type CreatorRunListItem,
+  RunControlApiError,
   type RunControlSession,
 } from "@/lib/run-control-api";
 
@@ -33,6 +35,17 @@ const deletableStatuses = new Set([
   "CANCELLED",
   "FAILED",
   "COMPLETED",
+]);
+const activeStatuses = new Set([
+  "STARTING",
+  "QUEUED",
+  "RUNNING",
+  "GENERATING_REPORTS",
+]);
+const finishedStatuses = new Set([
+  "COMPLETED",
+  "FAILED",
+  "CANCELLED",
 ]);
 
 function profileLabel(run: CreatorRunListItem) {
@@ -56,10 +69,8 @@ function statusLabel(status: CreatorRunListItem["status"], ko: boolean) {
   return ko ? value[0] : value[1];
 }
 
-function deletionKey() {
-  const suffix = globalThis.crypto?.randomUUID?.()
-    ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  return `portal-delete:${suffix}`;
+function deletionKey(runId: string) {
+  return "portal-delete:" + runId;
 }
 
 export function MyResearch({ session }: { session: RunControlSession | null }) {
@@ -77,7 +88,7 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
   const [deletion, setDeletion] = useState<{
     run: CreatorRunListItem;
     confirmation: string;
-    idempotencyKey: string;
+    requiresRecentAuthentication: boolean;
   } | null>(null);
   const loaded = Boolean(session && result?.email === session.email);
   const loading = Boolean(session && !loaded);
@@ -116,9 +127,9 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
     if (!loaded || !result) return [];
     if (view === "archived") return result.archived;
     if (view === "completed") {
-      return result.active.filter((run) => run.status === "COMPLETED");
+      return result.active.filter((run) => finishedStatuses.has(run.status));
     }
-    return result.active.filter((run) => run.status !== "COMPLETED");
+    return result.active.filter((run) => activeStatuses.has(run.status));
   }, [loaded, result, view]);
   const error = loaded ? result?.error ?? "" : "";
 
@@ -166,14 +177,16 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
     if (!session || !deletion) return;
     const accepted = deletion.confirmation === "DELETE"
       || deletion.confirmation === deletion.run.run_id;
-    if (!accepted) return;
+    const recentAuthenticationRequired = deletion.requiresRecentAuthentication
+      && session.recent_authentication !== true;
+    if (!accepted || recentAuthenticationRequired) return;
     setBusyRunId(deletion.run.run_id);
     setActionError("");
     try {
       const response = await deleteControlledRun(
         deletion.run.run_id,
         session.csrf_token,
-        deletion.idempotencyKey,
+        deletionKey(deletion.run.run_id),
         deletion.run.archive_category === "system_validation"
           ? "system_validation_cleanup"
           : "creator_requested_cleanup",
@@ -196,7 +209,18 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
       setDeletion(null);
       await refreshAfterMutation();
     } catch (reason) {
-      setActionError(reason instanceof Error ? reason.message : "Unable to delete this Run.");
+      if (
+        reason instanceof RunControlApiError
+        && reason.status === 401
+        && /recent authentication required/i.test(reason.message)
+      ) {
+        setDeletion((current) => current?.run.run_id === deletion.run.run_id
+          ? { ...current, requiresRecentAuthentication: true }
+          : current);
+        setActionError("");
+      } else {
+        setActionError(reason instanceof Error ? reason.message : "Unable to delete this Run.");
+      }
     } finally {
       setBusyRunId("");
     }
@@ -295,7 +319,7 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
                         {ko ? "보관" : "Archive"}
                       </button>
                     )}
-                    {view === "archived" && run.archived_at && (
+                    {view === "archived" && run.archive_category === "creator_archived" && (
                       <button
                         type="button"
                         disabled={busyRunId === run.run_id}
@@ -318,7 +342,7 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
                       onClick={() => setDeletion({
                         run,
                         confirmation: "",
-                        idempotencyKey: deletionKey(),
+                        requiresRecentAuthentication: false,
                       })}
                     >
                       <Trash2 size={15} aria-hidden="true" />
@@ -382,6 +406,33 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
                 confirmation: event.target.value,
               })}
             />
+            {deletion.requiresRecentAuthentication && session?.recent_authentication !== true && (
+              <div className="run-delete-reauth" role="alert">
+                <p>
+                  {ko
+                    ? "영구 삭제 전에 Google로 다시 인증해야 합니다. Run ID와 확인 입력은 유지됩니다."
+                    : "Reauthenticate with Google before permanent deletion. The Run ID and confirmation are preserved."}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => window.open(
+                    runControlApiBase + "/api/session",
+                    "_blank",
+                    "noopener,noreferrer",
+                  )}
+                >
+                  <LogIn size={16} aria-hidden="true" />
+                  {ko ? "Google로 다시 인증" : "Reauthenticate with Google"}
+                </button>
+              </div>
+            )}
+            {deletion.requiresRecentAuthentication && session?.recent_authentication === true && (
+              <p className="run-delete-reauth-confirmed" role="status">
+                {ko
+                  ? "최근 인증이 확인되었습니다. 영구 삭제를 다시 선택하세요."
+                  : "Recent authentication confirmed. Select Delete permanently again."}
+              </p>
+            )}
             <div className="run-delete-actions">
               <button type="button" onClick={() => setDeletion(null)}>
                 {ko ? "취소" : "Cancel"}
@@ -391,6 +442,8 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
                 className="danger"
                 disabled={
                   busyRunId === deletion.run.run_id
+                  || (deletion.requiresRecentAuthentication
+                    && session?.recent_authentication !== true)
                   || !(
                     deletion.confirmation === "DELETE"
                     || deletion.confirmation === deletion.run.run_id

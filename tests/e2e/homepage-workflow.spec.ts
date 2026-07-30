@@ -115,6 +115,7 @@ test("provider gate disabled is shown after local validation without approval UX
   await expect(page.getByText(/preflight/i)).toHaveCount(0);
   expect(api.runnerApiCalls).toBe(0);
   await page.goto("/?lang=en");
+  await page.getByRole("tab", { name: "Archived" }).click();
   await expect(
     page.locator(".my-research-section").getByText(
       "Execution disabled",
