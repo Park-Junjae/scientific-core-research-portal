@@ -3004,30 +3004,6 @@ body { font-family: var(--font-ui), sans-serif; }
   color: var(--ink);
   font: inherit;
 }
-.run-delete-reauth {
-  margin-top: 16px;
-  border: 1px solid #d9b36c;
-  background: #fffaf0;
-  padding: 13px;
-}
-.run-delete-reauth p { margin: 0 0 10px; color: var(--ink); }
-.run-delete-reauth button {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  border: 1px solid var(--line-strong);
-  background: var(--surface);
-  padding: 8px 11px;
-  color: var(--ink);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-.run-delete-reauth-confirmed {
-  margin: 14px 0 0;
-  color: var(--accent-dark) !important;
-  font-weight: 700;
-}
 .run-delete-actions {
   display: flex;
   justify-content: flex-end;

@@ -1,10 +1,7 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  RunControlApiError,
-  type CreatorRunListItem,
-} from "@/lib/run-control-api";
+import type { CreatorRunListItem } from "@/lib/run-control-api";
 import { MyResearch } from "./my-research";
 
 const apiMocks = vi.hoisted(() => ({
@@ -17,16 +14,6 @@ const apiMocks = vi.hoisted(() => ({
 vi.mock("@/lib/run-control-api", () => ({
   ...apiMocks,
   runControlApiBase: "https://control.example",
-  RunControlApiError: class extends Error {
-    constructor(
-      message: string,
-      readonly status: number,
-      readonly kind = "HTTP",
-      readonly retryAfterMs = 0,
-    ) {
-      super(message);
-    }
-  },
 }));
 vi.mock("@/lib/locale", () => ({
   useLocale: () => ({ locale: "en" }),
@@ -74,7 +61,6 @@ const session = {
   authenticated: true as const,
   email: "creator@example.com",
   csrf_token: "csrf",
-  recent_authentication: true,
 };
 
 describe("My Research lifecycle controls", () => {
@@ -152,6 +138,7 @@ describe("My Research lifecycle controls", () => {
 
     const dialog = screen.getByRole("dialog");
     expect(within(dialog).getByText(/Reports and all private files/)).toBeInTheDocument();
+    expect(within(dialog).queryByText(/reauthenticate/i)).not.toBeInTheDocument();
     const confirmButton = within(dialog).getByRole("button", { name: "Delete permanently" });
     expect(confirmButton).toBeDisabled();
     await user.type(within(dialog).getByLabelText(/Type DELETE/), "DELETE");
@@ -272,71 +259,5 @@ describe("My Research lifecycle controls", () => {
     expect(screen.getAllByRole("button", { name: "Restore" })).toHaveLength(1);
   });
 
-  it("preserves deletion intent while requiring a fresh authenticated session", async () => {
-    activeRuns = [run()];
-    const user = userEvent.setup();
-    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
-    const staleSession = { ...session, recent_authentication: false };
-    apiMocks.deleteControlledRun
-      .mockRejectedValueOnce(new RunControlApiError(
-        "Recent authentication required",
-        401,
-        "BACKEND_UNAUTHENTICATED",
-      ))
-      .mockImplementationOnce(async (runId: string) => {
-        activeRuns = activeRuns.filter((candidate) => candidate.run_id !== runId);
-        return { status: "DELETED", run_id: runId };
-      });
 
-    const view = render(<MyResearch session={staleSession} />);
-    await user.click(screen.getByRole("tab", { name: "Completed" }));
-    expect(await screen.findByText("Lifecycle Run")).toBeInTheDocument();
-    await user.click(screen.getByLabelText("Lifecycle Run actions"));
-    await user.click(screen.getByRole("button", { name: "Delete permanently" }));
-    const confirmation = screen.getByLabelText(/Type DELETE/);
-    await user.type(confirmation, "DELETE");
-    await user.click(within(screen.getByRole("dialog")).getByRole(
-      "button",
-      { name: "Delete permanently" },
-    ));
-
-    const reauthenticate = await screen.findByRole(
-      "button",
-      { name: "Reauthenticate with Google" },
-    );
-    expect(confirmation).toHaveValue("DELETE");
-    expect(screen.getByText("run-lifecycle-001")).toBeInTheDocument();
-    expect(within(screen.getByRole("dialog")).getByRole(
-      "button",
-      { name: "Delete permanently" },
-    )).toBeDisabled();
-    await user.click(reauthenticate);
-    expect(openSpy).toHaveBeenCalledWith(
-      "https://control.example/api/session",
-      "_blank",
-      "noopener,noreferrer",
-    );
-
-    view.rerender(<MyResearch session={{
-      ...session,
-      csrf_token: "fresh-csrf",
-      recent_authentication: true,
-    }} />);
-    expect(await screen.findByText(/Recent authentication confirmed/)).toBeInTheDocument();
-    const retry = within(screen.getByRole("dialog")).getByRole(
-      "button",
-      { name: "Delete permanently" },
-    );
-    expect(retry).toBeEnabled();
-    await user.click(retry);
-
-    await waitFor(() => expect(screen.queryByText("Lifecycle Run")).not.toBeInTheDocument());
-    expect(apiMocks.deleteControlledRun).toHaveBeenLastCalledWith(
-      "run-lifecycle-001",
-      "fresh-csrf",
-      "portal-delete:run-lifecycle-001",
-      "creator_requested_cleanup",
-    );
-    openSpy.mockRestore();
-  });
 });

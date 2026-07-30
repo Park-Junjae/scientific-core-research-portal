@@ -38,7 +38,6 @@ export interface RunControlSession {
   authenticated: true;
   email: string;
   csrf_token: string;
-  recent_authentication?: boolean;
 }
 
 export interface CompiledRunContract {

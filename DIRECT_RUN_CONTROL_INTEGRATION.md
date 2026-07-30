@@ -49,13 +49,10 @@ artifact endpoints.
 10. Permanent deletion is offered only for terminal Runs. The confirmation
     dialog explains that reports and private files are removed and requires
     `DELETE` or the exact Run ID. The API request still carries the exact Run
-    ID confirmation, recent-authentication protection, CSRF, and the stable
-    Run-bound idempotency key `portal-delete:{runId}`. The same job resumes
-    after component remount, refresh, response loss, or Backend restart;
-    pending object cleanup is never presented as complete. If recent
-    authentication is required, the open dialog preserves the Run ID,
-    confirmation, and key, offers one reauthentication action, and retries
-    only after a fresh session plus an explicit second delete action.
+    ID confirmation, CSRF, and the stable Run-bound idempotency key
+    `portal-delete:{runId}`. The same job resumes after component remount,
+    refresh, response loss, or Backend restart; pending object cleanup is never
+    presented as complete.
 
 ## Deployment Gate
 
