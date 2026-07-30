@@ -39,6 +39,14 @@ artifact endpoints.
 7. Cancellation remains explicit.
 8. A completed run opens its private Summary, Ideas, Literature, Knowledge
    Background, Run Specification, and PDF without public publication.
+9. My Research separates Active, Completed, and Archived views. A creator may
+   archive or restore a Run without changing its execution state. System
+   validation records are presented in Archived automatically.
+10. Permanent deletion is offered only for terminal Runs. The confirmation
+    dialog explains that reports and private files are removed and requires
+    `DELETE` or the exact Run ID. The API request still carries the exact Run
+    ID confirmation, recent-authentication protection, CSRF, and a stable
+    idempotency key. Pending object cleanup is never presented as complete.
 
 ## Deployment Gate
 

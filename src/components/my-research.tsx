@@ -1,22 +1,39 @@
 "use client";
 
 import {
+  Archive,
   Clock3,
   Library,
   LoaderCircle,
+  MoreHorizontal,
   PackageCheck,
+  RotateCcw,
+  Trash2,
+  X,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale } from "@/lib/locale";
 import { withBasePath } from "@/lib/paths";
 import { compactResearchTitle } from "@/lib/research-title";
 import {
+  archiveControlledRun,
+  deleteControlledRun,
   getMyRuns,
+  restoreControlledRun,
   runControlApiBase,
   type CreatorRunListItem,
   type RunControlSession,
 } from "@/lib/run-control-api";
+
+type ResearchView = "active" | "completed" | "archived";
+
+const deletableStatuses = new Set([
+  "EXECUTION_DISABLED",
+  "CANCELLED",
+  "FAILED",
+  "COMPLETED",
+]);
 
 function profileLabel(run: CreatorRunListItem) {
   return run.creativity_profile === "BREAKTHROUGH_DISCOVERY"
@@ -39,43 +56,178 @@ function statusLabel(status: CreatorRunListItem["status"], ko: boolean) {
   return ko ? value[0] : value[1];
 }
 
+function deletionKey() {
+  const suffix = globalThis.crypto?.randomUUID?.()
+    ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  return `portal-delete:${suffix}`;
+}
+
 export function MyResearch({ session }: { session: RunControlSession | null }) {
   const { locale } = useLocale();
   const ko = locale === "ko";
+  const [view, setView] = useState<ResearchView>("active");
   const [result, setResult] = useState<{
     email: string;
-    runs: CreatorRunListItem[];
+    active: CreatorRunListItem[];
+    archived: CreatorRunListItem[];
     error: string;
   } | null>(null);
+  const [busyRunId, setBusyRunId] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [deletion, setDeletion] = useState<{
+    run: CreatorRunListItem;
+    confirmation: string;
+    idempotencyKey: string;
+  } | null>(null);
   const loaded = Boolean(session && result?.email === session.email);
-  const runs = loaded ? result?.runs ?? [] : [];
-  const error = loaded ? result?.error ?? "" : "";
   const loading = Boolean(session && !loaded);
+
+  const loadRuns = useCallback(async (activeSession: RunControlSession) => {
+    const [current, archived] = await Promise.all([
+      getMyRuns(50, 0, false),
+      getMyRuns(50, 0, true),
+    ]);
+    setResult({
+      email: activeSession.email,
+      active: current.runs,
+      archived: archived.runs,
+      error: "",
+    });
+  }, []);
 
   useEffect(() => {
     let active = true;
     if (!session) return () => { active = false; };
-    void getMyRuns(20, 0)
-      .then((response) => {
-        if (!active) return;
-        setResult({ email: session.email, runs: response.runs, error: "" });
-      })
+    void Promise.resolve()
+      .then(() => loadRuns(session))
       .catch((reason) => {
-        if (!active) return;
-        setResult({
-          email: session.email,
-          runs: [],
-          error: reason instanceof Error ? reason.message : "Unable to load private research.",
-        });
+      if (!active) return;
+      setResult({
+        email: session.email,
+        active: [],
+        archived: [],
+        error: reason instanceof Error ? reason.message : "Unable to load private research.",
       });
+    });
     return () => { active = false; };
-  }, [session]);
+  }, [loadRuns, session]);
+
+  const runs = useMemo(() => {
+    if (!loaded || !result) return [];
+    if (view === "archived") return result.archived;
+    if (view === "completed") {
+      return result.active.filter((run) => run.status === "COMPLETED");
+    }
+    return result.active.filter((run) => run.status !== "COMPLETED");
+  }, [loaded, result, view]);
+  const error = loaded ? result?.error ?? "" : "";
+
+  const refreshAfterMutation = useCallback(async () => {
+    if (session) await loadRuns(session);
+  }, [loadRuns, session]);
+
+  const archiveRun = async (run: CreatorRunListItem) => {
+    if (!session) return;
+    setBusyRunId(run.run_id);
+    setActionError("");
+    setResult((current) => current
+      ? { ...current, active: current.active.filter((item) => item.run_id !== run.run_id) }
+      : current);
+    try {
+      await archiveControlledRun(run.run_id, session.csrf_token);
+      await refreshAfterMutation();
+    } catch (reason) {
+      setActionError(reason instanceof Error ? reason.message : "Unable to archive this Run.");
+      await refreshAfterMutation().catch(() => undefined);
+    } finally {
+      setBusyRunId("");
+    }
+  };
+
+  const restoreRun = async (run: CreatorRunListItem) => {
+    if (!session) return;
+    setBusyRunId(run.run_id);
+    setActionError("");
+    setResult((current) => current
+      ? { ...current, archived: current.archived.filter((item) => item.run_id !== run.run_id) }
+      : current);
+    try {
+      await restoreControlledRun(run.run_id, session.csrf_token);
+      await refreshAfterMutation();
+    } catch (reason) {
+      setActionError(reason instanceof Error ? reason.message : "Unable to restore this Run.");
+      await refreshAfterMutation().catch(() => undefined);
+    } finally {
+      setBusyRunId("");
+    }
+  };
+
+  const permanentlyDelete = async () => {
+    if (!session || !deletion) return;
+    const accepted = deletion.confirmation === "DELETE"
+      || deletion.confirmation === deletion.run.run_id;
+    if (!accepted) return;
+    setBusyRunId(deletion.run.run_id);
+    setActionError("");
+    try {
+      const response = await deleteControlledRun(
+        deletion.run.run_id,
+        session.csrf_token,
+        deletion.idempotencyKey,
+        deletion.run.archive_category === "system_validation"
+          ? "system_validation_cleanup"
+          : "creator_requested_cleanup",
+      );
+      if (response.status === "PENDING_OBJECT_DELETE") {
+        setActionError(
+          ko
+            ? "비공개 파일 삭제 확인이 진행 중입니다. 완료로 표시하지 않았습니다."
+            : "Private file deletion is still being verified. The Run was not marked deleted.",
+        );
+        return;
+      }
+      setResult((current) => current
+        ? {
+            ...current,
+            active: current.active.filter((item) => item.run_id !== deletion.run.run_id),
+            archived: current.archived.filter((item) => item.run_id !== deletion.run.run_id),
+          }
+        : current);
+      setDeletion(null);
+      await refreshAfterMutation();
+    } catch (reason) {
+      setActionError(reason instanceof Error ? reason.message : "Unable to delete this Run.");
+    } finally {
+      setBusyRunId("");
+    }
+  };
 
   if (!runControlApiBase) return null;
 
   return (
     <section className="my-research-section" aria-labelledby="my-research-heading">
-      <h2 id="my-research-heading">My Research</h2>
+      <div className="my-research-heading-row">
+        <h2 id="my-research-heading">My Research</h2>
+        {session && (
+          <div className="my-research-tabs" role="tablist" aria-label="Research views">
+            {(["active", "completed", "archived"] as const).map((item) => (
+              <button
+                key={item}
+                type="button"
+                role="tab"
+                aria-selected={view === item}
+                onClick={() => setView(item)}
+              >
+                {item === "active"
+                  ? (ko ? "진행 중" : "Active")
+                  : item === "completed"
+                    ? (ko ? "완료" : "Completed")
+                    : (ko ? "보관됨" : "Archived")}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
       {!session && (
         <p className="my-research-empty">
           {ko ? "아직 실행한 연구가 없습니다." : "No research yet."}
@@ -87,10 +239,16 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
           {ko ? "비공개 연구를 불러오는 중입니다." : "Loading private research."}
         </p>
       )}
-      {session && error && <p className="control-error" role="alert">{error}</p>}
+      {session && (error || actionError) && (
+        <p className="control-error" role="alert">{actionError || error}</p>
+      )}
       {session && loaded && runs.length === 0 && (
         <p className="my-research-empty">
-          {ko ? "아직 실행한 연구가 없습니다." : "No research yet."}
+          {view === "archived"
+            ? (ko ? "보관된 연구가 없습니다." : "No archived research.")
+            : view === "completed"
+              ? (ko ? "완료된 연구가 없습니다." : "No completed research.")
+              : (ko ? "아직 실행한 연구가 없습니다." : "No research yet.")}
         </p>
       )}
       {session && runs.length > 0 && (
@@ -102,6 +260,9 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
                   <span>{statusLabel(run.status, ko)}</span>
                   <span>{profileLabel(run)}</span>
                   <span>{run.current_stage.replaceAll("_", " ")}</span>
+                  {run.archive_category === "system_validation" && (
+                    <span>{ko ? "시스템 검증" : "System validation"}</span>
+                  )}
                 </p>
                 <h3>
                   <Link
@@ -118,22 +279,131 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
                   {` · ${Math.round(run.progress_percentage)}%`}
                 </p>
               </div>
-              <dl>
-                <div>
-                  <dt><Clock3 size={14} />{ko ? "진행률" : "Progress"}</dt>
-                  <dd>{Math.round(run.progress_percentage)}%</dd>
-                </div>
-                <div>
-                  <dt><Library size={14} />{ko ? "분석 문헌" : "Literature"}</dt>
-                  <dd>{run.literature_analyzed_count}</dd>
-                </div>
-                <div>
-                  <dt><PackageCheck size={14} />{ko ? "결과 파일" : "Artifacts"}</dt>
-                  <dd>{run.artifact_availability.available ? run.artifact_availability.count : "—"}</dd>
-                </div>
-              </dl>
+              <div className="my-research-card-side">
+                <details className="run-action-menu">
+                  <summary aria-label={`${run.display_title || run.run_id} actions`}>
+                    <MoreHorizontal size={19} aria-hidden="true" />
+                  </summary>
+                  <div>
+                    {view !== "archived" && (
+                      <button
+                        type="button"
+                        disabled={busyRunId === run.run_id}
+                        onClick={() => void archiveRun(run)}
+                      >
+                        <Archive size={15} aria-hidden="true" />
+                        {ko ? "보관" : "Archive"}
+                      </button>
+                    )}
+                    {view === "archived" && run.archived_at && (
+                      <button
+                        type="button"
+                        disabled={busyRunId === run.run_id}
+                        onClick={() => void restoreRun(run)}
+                      >
+                        <RotateCcw size={15} aria-hidden="true" />
+                        {ko ? "복원" : "Restore"}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="danger"
+                      disabled={
+                        busyRunId === run.run_id
+                        || !deletableStatuses.has(run.status)
+                      }
+                      title={!deletableStatuses.has(run.status)
+                        ? (ko ? "종료된 연구만 삭제할 수 있습니다." : "Only terminal Runs can be deleted.")
+                        : undefined}
+                      onClick={() => setDeletion({
+                        run,
+                        confirmation: "",
+                        idempotencyKey: deletionKey(),
+                      })}
+                    >
+                      <Trash2 size={15} aria-hidden="true" />
+                      {ko ? "영구 삭제" : "Delete permanently"}
+                    </button>
+                  </div>
+                </details>
+                <dl>
+                  <div>
+                    <dt><Clock3 size={14} />{ko ? "진행률" : "Progress"}</dt>
+                    <dd>{Math.round(run.progress_percentage)}%</dd>
+                  </div>
+                  <div>
+                    <dt><Library size={14} />{ko ? "분석 문헌" : "Literature"}</dt>
+                    <dd>{run.literature_analyzed_count}</dd>
+                  </div>
+                  <div>
+                    <dt><PackageCheck size={14} />{ko ? "결과 파일" : "Artifacts"}</dt>
+                    <dd>{run.artifact_availability.available ? run.artifact_availability.count : "—"}</dd>
+                  </div>
+                </dl>
+              </div>
             </article>
           ))}
+        </div>
+      )}
+      {deletion && (
+        <div className="run-delete-backdrop" role="presentation">
+          <section
+            className="run-delete-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="run-delete-title"
+          >
+            <button
+              type="button"
+              className="run-delete-close"
+              aria-label={ko ? "닫기" : "Close"}
+              onClick={() => setDeletion(null)}
+            >
+              <X size={18} />
+            </button>
+            <h3 id="run-delete-title">{ko ? "연구를 영구 삭제할까요?" : "Permanently delete this Run?"}</h3>
+            <p>
+              {ko
+                ? "보고서와 모든 비공개 파일이 함께 삭제되며 복구할 수 없습니다."
+                : "Reports and all private files will be removed and cannot be recovered."}
+            </p>
+            <p className="run-delete-id"><code>{deletion.run.run_id}</code></p>
+            <label htmlFor="run-delete-confirmation">
+              {ko
+                ? "DELETE 또는 정확한 Run ID를 입력하세요."
+                : "Type DELETE or the exact Run ID to continue."}
+            </label>
+            <input
+              id="run-delete-confirmation"
+              autoComplete="off"
+              value={deletion.confirmation}
+              onChange={(event) => setDeletion({
+                ...deletion,
+                confirmation: event.target.value,
+              })}
+            />
+            <div className="run-delete-actions">
+              <button type="button" onClick={() => setDeletion(null)}>
+                {ko ? "취소" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                className="danger"
+                disabled={
+                  busyRunId === deletion.run.run_id
+                  || !(
+                    deletion.confirmation === "DELETE"
+                    || deletion.confirmation === deletion.run.run_id
+                  )
+                }
+                onClick={() => void permanentlyDelete()}
+              >
+                {busyRunId === deletion.run.run_id
+                  ? (ko ? "삭제 확인 중…" : "Verifying deletion…")
+                  : (ko ? "영구 삭제" : "Delete permanently")}
+              </button>
+            </div>
+          </section>
         </div>
       )}
     </section>
