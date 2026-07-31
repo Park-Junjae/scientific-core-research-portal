@@ -2096,6 +2096,25 @@ h1, h2 { letter-spacing: -0.015em; }
 }
 .setting-row { padding: 20px 24px; border-bottom: 1px solid var(--line); border-top: 0; }
 .setting-row:last-child { border-bottom: 0; }
+.setting-row > div { display: grid; gap: 2px; }
+.setting-row small { color: var(--ink-faint); font-size: 13px; line-height: 1.5; }
+.settings-group-heading {
+  margin: 0;
+  border-bottom: 1px solid var(--line-strong);
+  background: var(--surface-muted);
+  padding: 12px 24px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.settings-panel .save-status { padding: 16px 24px 18px; }
+@media (max-width: 620px) {
+  .settings-group-heading { padding-inline: 16px; }
+  .setting-row { padding-inline: 16px; }
+  .settings-panel .save-status { padding-inline: 16px; }
+}
 
 /* Reading-page container widths keep centered on large screens */
 .report-reading-page,
@@ -3086,4 +3105,41 @@ body { font-family: var(--font-ui), sans-serif; }
     right: clamp(18px, 4vw, 44px);
     left: auto;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Reading density
+   PreferencesProvider writes data-density on <html>. Until now nothing read it,
+   so the control did nothing. Compact tightens the reading surfaces only — it
+   does not shrink type below the sizes the typography contract sets, and it
+   leaves controls at their full hit area.
+--------------------------------------------------------------------------- */
+:root[data-density="compact"] {
+  --text-reading: 16px;
+}
+:root[data-density="compact"] .page-container,
+:root[data-density="compact"] .run-page {
+  padding-top: 22px;
+  padding-bottom: 52px;
+}
+:root[data-density="compact"] .markdown-article p,
+:root[data-density="compact"] .markdown-article li {
+  line-height: 1.55;
+}
+:root[data-density="compact"] .markdown-article > * + * {
+  margin-top: 12px;
+}
+:root[data-density="compact"] .my-research-list article {
+  padding: 13px 0;
+}
+:root[data-density="compact"] .intake-form {
+  gap: 15px;
+}
+:root[data-density="compact"] .advanced-fields > div {
+  gap: 14px;
+}
+:root[data-density="compact"] .source-list article,
+:root[data-density="compact"] .editorial-idea-row {
+  padding-top: 12px;
+  padding-bottom: 12px;
 }

@@ -2,6 +2,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { CreatorRunListItem } from "@/lib/run-control-api";
+import { PreferencesProvider } from "@/lib/preferences";
 import { MyResearch } from "./my-research";
 
 const apiMocks = vi.hoisted(() => ({
@@ -106,7 +107,7 @@ describe("My Research lifecycle controls", () => {
       return item;
     });
 
-    render(<MyResearch session={session} />);
+    render(<PreferencesProvider><MyResearch session={session} /></PreferencesProvider>);
     expect(await screen.findByText("Lifecycle Run")).toBeInTheDocument();
     await user.click(screen.getByLabelText("Lifecycle Run actions"));
     await user.click(screen.getByRole("button", { name: "Archive" }));
@@ -130,7 +131,7 @@ describe("My Research lifecycle controls", () => {
       return { status: "DELETED", run_id: runId };
     });
 
-    render(<MyResearch session={session} />);
+    render(<PreferencesProvider><MyResearch session={session} /></PreferencesProvider>);
     await user.click(screen.getByRole("tab", { name: "Completed" }));
     expect(await screen.findByText("Lifecycle Run")).toBeInTheDocument();
     await user.click(screen.getByLabelText("Lifecycle Run actions"));
@@ -167,7 +168,7 @@ describe("My Research lifecycle controls", () => {
         return { status: "DELETED", run_id: runId };
       });
 
-    const firstMount = render(<MyResearch session={session} />);
+    const firstMount = render(<PreferencesProvider><MyResearch session={session} /></PreferencesProvider>);
     await user.click(screen.getByRole("tab", { name: "Completed" }));
     expect(await screen.findByText("Lifecycle Run")).toBeInTheDocument();
     await user.click(screen.getByLabelText("Lifecycle Run actions"));
@@ -180,7 +181,7 @@ describe("My Research lifecycle controls", () => {
     expect(await screen.findByText(/still being verified/)).toBeInTheDocument();
     firstMount.unmount();
 
-    render(<MyResearch session={session} />);
+    render(<PreferencesProvider><MyResearch session={session} /></PreferencesProvider>);
     await user.click(screen.getByRole("tab", { name: "Completed" }));
     expect(await screen.findByText("Lifecycle Run")).toBeInTheDocument();
     await user.click(screen.getByLabelText("Lifecycle Run actions"));
@@ -238,7 +239,7 @@ describe("My Research lifecycle controls", () => {
       }),
     ];
 
-    render(<MyResearch session={session} />);
+    render(<PreferencesProvider><MyResearch session={session} /></PreferencesProvider>);
     expect(await screen.findByText("Starting Run")).toBeInTheDocument();
     expect(screen.getByText("Queued Run")).toBeInTheDocument();
     expect(screen.getByText("Running Run")).toBeInTheDocument();

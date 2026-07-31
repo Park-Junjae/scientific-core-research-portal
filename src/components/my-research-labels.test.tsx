@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { CreatorRunListItem } from "@/lib/run-control-api";
+import { PreferencesProvider } from "@/lib/preferences";
 import { MyResearch } from "./my-research";
 
 const apiMocks = vi.hoisted(() => ({
@@ -71,7 +72,7 @@ function mount(item: CreatorRunListItem) {
       next_offset: null,
     }),
   );
-  return render(<MyResearch session={session} />);
+  return render(<PreferencesProvider><MyResearch session={session} /></PreferencesProvider>);
 }
 
 beforeEach(() => {

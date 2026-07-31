@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { LocaleProvider } from "@/lib/locale";
+import { PreferencesProvider } from "@/lib/preferences";
 import { runControlApiBase } from "@/lib/run-control-api";
 import { testReports, testRun, testSources } from "@/test/fixtures";
 import { KnowledgeReader } from "./knowledge-reader";
@@ -12,14 +13,14 @@ import { SourceDetail } from "./source-detail";
 
 describe("literature reading UX", () => {
   it("shows declared key papers and a deep-linkable source", () => {
-    render(<LocaleProvider><LiteratureExplorer run={testRun} /></LocaleProvider>);
+    render(<LocaleProvider><PreferencesProvider><LiteratureExplorer run={testRun} /></PreferencesProvider></LocaleProvider>);
     expect(screen.getByRole("heading", { name: "Key papers" })).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: "A cited paper" })[0]).toHaveAttribute("href", "/runs/r/literature/source-1");
     expect(screen.getAllByRole("link", { name: /DOI/ })[0]).toHaveAttribute("href", "https://doi.org/10.0000/test");
   });
 
   it("shows run-corpus accounting filters as plain text", () => {
-    render(<LocaleProvider><LiteratureExplorer run={testRun} /></LocaleProvider>);
+    render(<LocaleProvider><PreferencesProvider><LiteratureExplorer run={testRun} /></PreferencesProvider></LocaleProvider>);
     expect(screen.getByRole("button", { name: "All 1" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cited in final reports 1" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Load-bearing 1" })).toBeInTheDocument();
@@ -28,7 +29,7 @@ describe("literature reading UX", () => {
   });
 
   it("retains the complete detailed literature funnel", () => {
-    const { container } = render(<LocaleProvider><LiteratureExplorer run={testRun} /></LocaleProvider>);
+    const { container } = render(<LocaleProvider><PreferencesProvider><LiteratureExplorer run={testRun} /></PreferencesProvider></LocaleProvider>);
     const funnel = container.querySelector<HTMLElement>(".literature-funnel-grid")!;
     expect(within(funnel).getByText("Discovered").nextSibling).toHaveTextContent("30");
     expect(within(funnel).getByText("Full text").nextSibling).toHaveTextContent("8");
@@ -39,7 +40,7 @@ describe("literature reading UX", () => {
   });
 
   it("resolves a numbered report citation and restores focus after Escape", async () => {
-    render(<LocaleProvider><MarkdownArticle markdown={"## Evidence\n\nMechanism [1]."} runSlug="r" reportId="idea-en" sources={testSources} /></LocaleProvider>);
+    render(<LocaleProvider><PreferencesProvider><MarkdownArticle markdown={"## Evidence\n\nMechanism [1]."} runSlug="r" reportId="idea-en" sources={testSources} /></PreferencesProvider></LocaleProvider>);
     const trigger = screen.getByRole("button", { name: "Preview source: 1" });
     fireEvent.click(trigger);
     expect(screen.getByRole("dialog", { name: "Citation preview" })).toBeInTheDocument();
@@ -50,14 +51,14 @@ describe("literature reading UX", () => {
   });
 
   it("orders source evidence before relationships and access links", () => {
-    const { container } = render(<LocaleProvider><SourceDetail run={testRun} source={testSources[0]} /></LocaleProvider>);
+    const { container } = render(<LocaleProvider><PreferencesProvider><SourceDetail run={testRun} source={testSources[0]} /></PreferencesProvider></LocaleProvider>);
     const headings = Array.from(container.querySelectorAll("section > h2")).map((node) => node.textContent);
     expect(headings).toEqual(["Why it matters", "What this source shows", "What it does not show", "Related ideas", "Related reports and sections", "Access and source links"]);
     expect(screen.getByText(/evidence/)).toBeInTheDocument();
   });
 
   it("provides Read, Key papers, and References views in Knowledge", () => {
-    render(<LocaleProvider><KnowledgeReader run={testRun} markdownByReport={{ "knowledge-en": "## Background\n\nText [1]." }} /></LocaleProvider>);
+    render(<LocaleProvider><PreferencesProvider><KnowledgeReader run={testRun} markdownByReport={{ "knowledge-en": "## Background\n\nText [1]." }} /></PreferencesProvider></LocaleProvider>);
     expect(screen.getByRole("button", { name: "Read" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Key papers" }));
     expect(screen.getByRole("heading", { name: "Key papers" })).toBeInTheDocument();
@@ -68,13 +69,13 @@ describe("literature reading UX", () => {
 
 describe("reader contracts", () => {
   it("renders a report title once and starts with report metadata", () => {
-    render(<LocaleProvider><ReportReader runSlug="r" selectedId="idea-en" reports={testReports} sources={testSources} markdownByReport={{ "idea-en": "## Abstract\n\nBody [1]." }} /></LocaleProvider>);
+    render(<LocaleProvider><PreferencesProvider><ReportReader runSlug="r" selectedId="idea-en" reports={testReports} sources={testSources} markdownByReport={{ "idea-en": "## Abstract\n\nBody [1]." }} /></PreferencesProvider></LocaleProvider>);
     expect(screen.getAllByRole("heading", { name: "Complete idea report" })).toHaveLength(1);
     expect(screen.getByText(/IDEA REPORT/)).toBeInTheDocument();
   });
 
   it("starts the composer with one required natural-language field and no synthetic preview", () => {
-    const { container } = render(<LocaleProvider><NewRunBuilder /></LocaleProvider>);
+    const { container } = render(<LocaleProvider><PreferencesProvider><NewRunBuilder /></PreferencesProvider></LocaleProvider>);
     expect(container.querySelector("pre, code")).toBeNull();
     expect(screen.queryByText(/^# /)).not.toBeInTheDocument();
     expect(screen.queryByText("FOCUSED_DECISION_RUN")).not.toBeInTheDocument();

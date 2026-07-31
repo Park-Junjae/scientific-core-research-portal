@@ -12,8 +12,9 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "@/lib/locale";
+import { usePreferences } from "@/lib/preferences";
 import { withBasePath } from "@/lib/paths";
 import { compactResearchTitle } from "@/lib/research-title";
 import {
@@ -113,7 +114,19 @@ function deletionKey(runId: string) {
 export function MyResearch({ session }: { session: RunControlSession | null }) {
   const { locale } = useLocale();
   const ko = locale === "ko";
+  const { preferences, loaded: preferencesLoaded } = usePreferences();
   const [view, setView] = useState<ResearchView>("active");
+  const viewSeeded = useRef(false);
+  const viewChosen = useRef(false);
+
+  /* Open on the saved tab. Preferences resolve after the first paint, so a
+     reader can switch tabs before they land; seeding must never take that back. */
+  useEffect(() => {
+    if (viewSeeded.current || !preferencesLoaded) return;
+    viewSeeded.current = true;
+    if (viewChosen.current) return;
+    setView(preferences.defaultResearchView);
+  }, [preferencesLoaded, preferences.defaultResearchView]);
   const [result, setResult] = useState<{
     email: string;
     active: CreatorRunListItem[];
@@ -263,7 +276,7 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
                 type="button"
                 role="tab"
                 aria-selected={view === item}
-                onClick={() => setView(item)}
+                onClick={() => { viewChosen.current = true; setView(item); }}
               >
                 {item === "active"
                   ? (ko ? "진행 중" : "Active")

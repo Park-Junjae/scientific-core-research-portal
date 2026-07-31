@@ -8,9 +8,10 @@ import {
   Upload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AccessConnectionPanel } from "@/components/access-connection-panel";
 import { useLocale } from "@/lib/locale";
+import { usePreferences } from "@/lib/preferences";
 import { withBasePath } from "@/lib/paths";
 import {
   buildRunRequest,
@@ -52,7 +53,10 @@ export function ResearchComposer({
   const { locale } = useLocale();
   const router = useRouter();
   const ko = locale === "ko";
+  const { preferences, loaded: preferencesLoaded } = usePreferences();
   const [value, setValue] = useState<RunRequestDraft>(initialRunRequest);
+  const seeded = useRef(false);
+  const touched = useRef(false);
   const [localSession, setLocalSession] = useState<RunControlSession | null>(null);
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -65,6 +69,7 @@ export function ResearchComposer({
   const breakthrough = value.creativity_profile === "BREAKTHROUGH_DISCOVERY";
 
   const update = <K extends keyof RunRequestDraft>(key: K, next: RunRequestDraft[K]) => {
+    touched.current = true;
     if (!busy) requestLocator.current = "";
     setSaved(false);
     setMessage("");
@@ -146,6 +151,18 @@ export function ResearchComposer({
       setBusy(false);
     }
   }
+
+  useEffect(() => {
+    if (seeded.current || !preferencesLoaded) return;
+    seeded.current = true;
+    if (touched.current) return;
+    setValue((current) => ({
+      ...current,
+      creativity_profile: preferences.defaultMode,
+      output_language: preferences.defaultReportLanguage,
+      literature_scope_enabled: preferences.defaultLiteratureScope,
+    }));
+  }, [preferencesLoaded, preferences]);
 
   const textArea = (
     key: keyof Pick<RunRequestDraft,
