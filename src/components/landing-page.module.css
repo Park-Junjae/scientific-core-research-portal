@@ -88,6 +88,9 @@
 .cta:hover { background: var(--accent-dark); }
 
 .secondary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   color: var(--ink-soft);
   font-size: 14px;
   text-decoration: underline;

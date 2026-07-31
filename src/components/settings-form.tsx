@@ -8,6 +8,24 @@ import { usePreferences, type Preferences } from "@/lib/preferences";
    consumer is worse than a missing one, so nothing is listed here without the
    code that reads it. */
 
+export function SettingsHeading() {
+  const { locale } = useLocale();
+  const ko = locale === "ko";
+  return (
+    <div className="page-heading-row">
+      <div>
+        <p className="eyebrow">{ko ? "이 기기의 설정" : "Local preferences"}</p>
+        <h1>{ko ? "설정" : "Settings"}</h1>
+        <p className="page-lede">
+          {ko
+            ? "이 워크스페이스가 이 기기에서 어떻게 보이고 동작할지 정합니다."
+            : "Choose how this research workspace appears and behaves on this device."}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function SettingsForm() {
   const { locale, setLocale } = useLocale();
   const ko = locale === "ko";
