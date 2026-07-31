@@ -6,8 +6,7 @@ import { usePreferences, type Preferences } from "@/lib/preferences";
 
 /* Every control on this page changes something observable. A preference with no
    consumer is worse than a missing one, so nothing is listed here without the
-   code that reads it. The theme control was removed for that reason — see
-   SETTINGS.md. */
+   code that reads it. */
 
 export function SettingsForm() {
   const { locale, setLocale } = useLocale();
@@ -61,6 +60,20 @@ export function SettingsForm() {
         >
           <option value="Comfortable">{ko ? "보통" : "Comfortable"}</option>
           <option value="Compact">{ko ? "촘촘하게" : "Compact"}</option>
+        </select>,
+      )}
+
+      {row(
+        ko ? "화면 테마" : "Theme",
+        ko ? "시스템을 고르면 기기 설정을 따릅니다." : "System follows the device setting.",
+        <select
+          aria-label={ko ? "화면 테마" : "Theme"}
+          value={value.theme}
+          onChange={(event) => update("theme", event.target.value as Preferences["theme"])}
+        >
+          <option value="System">{ko ? "시스템" : "System"}</option>
+          <option value="Light">{ko ? "밝게" : "Light"}</option>
+          <option value="Dark">{ko ? "어둡게" : "Dark"}</option>
         </select>,
       )}
 

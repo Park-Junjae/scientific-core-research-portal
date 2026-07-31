@@ -79,7 +79,7 @@
   border-radius: 3px;
   background: var(--accent);
   padding: 0 20px;
-  color: #ffffff;
+  color: var(--on-accent);
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;
@@ -226,7 +226,7 @@
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .barrier { background: rgba(255, 255, 255, 0.9); }
+  .barrier { background: color-mix(in srgb, var(--ground) 82%, transparent); }
 }
 
 /* Hatching reads as a sealed boundary rather than another card. */
@@ -284,8 +284,8 @@
   white-space: nowrap;
 }
 
-.accessDenied { border-color: rgba(151, 88, 24, 0.42); color: #8a5410; }
-.accessAllowed { border-color: rgba(20, 88, 154, 0.4); color: var(--accent-dark); }
+.accessDenied { border-color: color-mix(in srgb, var(--warn) 45%, transparent); color: var(--warn); }
+.accessAllowed { border-color: color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent-dark); }
 
 /* ---- modes -------------------------------------------------------------- */
 
@@ -399,4 +399,48 @@
     border-color: var(--ink);
   }
   .barrier::before { display: none; }
+}
+
+/* ---- dark ---------------------------------------------------------------
+   The ink tokens come from the application stylesheet and flip with the theme;
+   the ground, rules and glass are local to this file, so they flip here. The
+   barrier stays the one translucent surface — it just tints dark instead of
+   light, and the hatching lightens so the boundary still reads.
+------------------------------------------------------------------------- */
+:global(:root[data-theme="dark"]) .root {
+  --ground: #0e151d;
+  --rule: #263341;
+  --rule-strong: #3a4a5c;
+}
+
+:global(:root[data-theme="dark"]) .barrier {
+  background: rgba(38, 51, 65, 0.55);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 10px 30px -22px rgba(0, 0, 0, 0.8);
+}
+
+:global(:root[data-theme="dark"]) .barrier::before {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(88, 168, 240, 0.12) 0 6px,
+    transparent 6px 13px
+  );
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"]):not([data-theme="dark"])) .root {
+    --ground: #0e151d;
+    --rule: #263341;
+    --rule-strong: #3a4a5c;
+  }
+  :global(:root:not([data-theme="light"]):not([data-theme="dark"])) .barrier {
+    background: rgba(38, 51, 65, 0.55);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 10px 30px -22px rgba(0, 0, 0, 0.8);
+  }
+  :global(:root:not([data-theme="light"]):not([data-theme="dark"])) .barrier::before {
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(88, 168, 240, 0.12) 0 6px,
+      transparent 6px 13px
+    );
+  }
 }

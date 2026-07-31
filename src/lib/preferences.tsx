@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 export type Preferences = {
   density: "Comfortable" | "Compact";
   pdf: "Inline viewer" | "New tab";
+  theme: "System" | "Light" | "Dark";
   recent: number;
   /* Composer defaults. Applied to a new run request while the form is still
      untouched, so they seed a run rather than override what was typed. */
@@ -18,6 +19,7 @@ export type Preferences = {
 export const defaultPreferences: Preferences = {
   density: "Comfortable",
   pdf: "Inline viewer",
+  theme: "System",
   recent: 5,
   defaultMode: "STANDARD",
   defaultReportLanguage: "",
@@ -43,6 +45,7 @@ function normalizePreferences(value: unknown): Preferences {
   return {
     density: candidate.density === "Compact" ? "Compact" : "Comfortable",
     pdf: candidate.pdf === "New tab" ? "New tab" : "Inline viewer",
+    theme: candidate.theme === "Light" || candidate.theme === "Dark" ? candidate.theme : "System",
     recent: Math.min(10, Math.max(3, Number(candidate.recent) || 5)),
     defaultMode:
       candidate.defaultMode === "BREAKTHROUGH_DISCOVERY" ? "BREAKTHROUGH_DISCOVERY" : "STANDARD",
@@ -79,7 +82,11 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.density = preferences.density.toLowerCase();
-  }, [preferences.density]);
+    /* Absent means "System", which lets the prefers-color-scheme rule apply.
+       An explicit choice must be written out so it can win over the OS. */
+    if (preferences.theme === "System") delete root.dataset.theme;
+    else root.dataset.theme = preferences.theme.toLowerCase();
+  }, [preferences.density, preferences.theme]);
 
   const value = useMemo<PreferencesContextValue>(() => ({
     preferences,
