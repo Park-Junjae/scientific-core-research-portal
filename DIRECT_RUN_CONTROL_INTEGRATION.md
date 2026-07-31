@@ -39,6 +39,20 @@ artifact endpoints.
 7. Cancellation remains explicit.
 8. A completed run opens its private Summary, Ideas, Literature, Knowledge
    Background, Run Specification, and PDF without public publication.
+9. My Research separates exact lifecycle views: Active contains `STARTING`,
+   `QUEUED`, `RUNNING`, and `GENERATING_REPORTS`; Completed contains
+   `COMPLETED`, `FAILED`, and `CANCELLED`; Archived contains explicit
+   creator archives plus `EXECUTION_DISABLED` and
+   `CANCELLED_LEGACY_PREFLIGHT` system-validation records. Restore is offered
+   only for an explicit creator archive and never changes terminal execution
+   state.
+10. Permanent deletion is offered only for terminal Runs. The confirmation
+    dialog explains that reports and private files are removed and requires
+    `DELETE` or the exact Run ID. The API request still carries the exact Run
+    ID confirmation, CSRF, and the stable Run-bound idempotency key
+    `portal-delete:{runId}`. The same job resumes after component remount,
+    refresh, response loss, or Backend restart; pending object cleanup is never
+    presented as complete.
 
 ## Deployment Gate
 

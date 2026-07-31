@@ -169,6 +169,8 @@ export interface RunControlRecord {
   runner_state: "ONLINE" | "OFFLINE" | "UNKNOWN";
   cancellation_state: "NOT_REQUESTED" | "REQUESTED" | "CANCELLED";
   artifact_availability: ArtifactAvailability;
+  archived_at?: string | null;
+  archived_by?: string | null;
 }
 
 export interface RunControlEvent {
@@ -211,6 +213,9 @@ export interface CreatorRunListItem {
   literature_counts: LiteratureCounts;
   provider_cost_usd: number;
   artifact_availability: ArtifactAvailability;
+  archived_at: string | null;
+  archived_by: string | null;
+  archive_category: "creator_archived" | "system_validation" | null;
 }
 
 export interface CreatorRunListResponse {
@@ -431,9 +436,9 @@ export function getRunControlSession() {
   return request<RunControlSession>("/api/session");
 }
 
-export function getMyRuns(limit = 20, offset = 0) {
+export function getMyRuns(limit = 20, offset = 0, archived = false) {
   return request<CreatorRunListResponse>(
-    `/api/runs?limit=${encodeURIComponent(limit)}&offset=${encodeURIComponent(offset)}`,
+    `/api/runs?limit=${encodeURIComponent(limit)}&offset=${encodeURIComponent(offset)}&archived=${archived}`,
   );
 }
 
@@ -470,6 +475,49 @@ export function cancelControlledRun(runId: string, csrfToken: string) {
   return request<RunControlRecord>(
     `/api/runs/${encodeURIComponent(runId)}/cancel`,
     { method: "POST", headers: { "X-CSRF-Token": csrfToken } },
+  );
+}
+
+export function archiveControlledRun(runId: string, csrfToken: string) {
+  return request<RunControlRecord>(
+    `/api/runs/${encodeURIComponent(runId)}/archive`,
+    { method: "POST", headers: { "X-CSRF-Token": csrfToken } },
+  );
+}
+
+export function restoreControlledRun(runId: string, csrfToken: string) {
+  return request<RunControlRecord>(
+    `/api/runs/${encodeURIComponent(runId)}/restore`,
+    { method: "POST", headers: { "X-CSRF-Token": csrfToken } },
+  );
+}
+
+export interface RunDeletionResponse {
+  status: "DELETED" | "PENDING_OBJECT_DELETE";
+  run_id: string;
+  deletion_timestamp?: string;
+  remaining_object_count?: number;
+}
+
+export function deleteControlledRun(
+  runId: string,
+  csrfToken: string,
+  idempotencyKey: string,
+  deletionReason = "creator_requested_cleanup",
+) {
+  return request<RunDeletionResponse>(
+    `/api/runs/${encodeURIComponent(runId)}`,
+    {
+      method: "DELETE",
+      headers: {
+        "X-CSRF-Token": csrfToken,
+        "Idempotency-Key": idempotencyKey,
+      },
+      body: JSON.stringify({
+        confirmation_token: runId,
+        deletion_reason: deletionReason,
+      }),
+    },
   );
 }
 

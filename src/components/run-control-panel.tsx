@@ -131,6 +131,7 @@ export function RunControlPanel() {
   const [events, setEvents] = useState<RunControlEvent[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [notFound, setNotFound] = useState(false);
   const [createdNotice, setCreatedNotice] = useState(false);
   const [lastSuccessfulCheck, setLastSuccessfulCheck] = useState<Date | null>(
     null,
@@ -176,6 +177,7 @@ export function RunControlPanel() {
         setLastStateChange(new Date(nextRun.updated_at));
       }
       setRun(nextRun);
+      setNotFound(false);
       if (includeEvents && !eventsInitializedRef.current) {
         eventsInitializedRef.current = true;
         try {
@@ -202,6 +204,12 @@ export function RunControlPanel() {
       setLastSuccessfulCheck(new Date());
       setError("");
     } catch (reason) {
+      if (reason instanceof RunControlApiError && reason.status === 404) {
+        setRun(null);
+        setNotFound(true);
+        setError("");
+        return;
+      }
       if (reason instanceof RunControlApiError && reason.kind === "RATE_LIMITED") {
         backoffUntilRef.current = Date.now() + Math.max(
           reason.retryAfterMs,
@@ -309,6 +317,23 @@ export function RunControlPanel() {
         <AccessConnectionPanel onSessionChange={connected} />
         {error && <p className="control-error" role="alert">{error}</p>}
       </>
+    );
+  }
+  if (notFound) {
+    return (
+      <section className="control-notice" role="status">
+        <div>
+          <h2>{ko ? "연구를 찾을 수 없습니다." : "Research not found."}</h2>
+          <p>
+            {ko
+              ? "삭제되었거나 이 계정에서 접근할 수 없는 비공개 연구입니다."
+              : "This private Run was deleted or is not available to this account."}
+          </p>
+          <Link href={withBasePath(`/?lang=${locale}#my-research-heading`)}>
+            {ko ? "My Research로 돌아가기" : "Return to My Research"}
+          </Link>
+        </div>
+      </section>
     );
   }
   if (!run) {

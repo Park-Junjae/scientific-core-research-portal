@@ -35,7 +35,10 @@
         "roles": [
           "artifact_manifest"
         ]
-      }
+      },
+      "archived_at": null,
+      "archived_by": null,
+      "archive_category": null
     }
   ],
   "limit": 20,
