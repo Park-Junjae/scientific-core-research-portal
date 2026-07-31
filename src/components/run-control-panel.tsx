@@ -19,6 +19,7 @@ import {
 import { AccessConnectionPanel } from "@/components/access-connection-panel";
 import { PrivateRunReader } from "@/components/private-run-reader";
 import { useLocale } from "@/lib/locale";
+import { stageLabel } from "@/lib/stage-labels";
 import { withBasePath } from "@/lib/paths";
 import { compactResearchTitle } from "@/lib/research-title";
 import {
@@ -507,7 +508,7 @@ export function RunControlPanel() {
                   {complete && !active
                     ? <Check size={15} />
                     : <CircleDot size={15} />}
-                  <span>{aliases[0].replaceAll("_", " ")}</span>
+                  <span>{stageLabel(aliases[0], locale) ?? ""}</span>
                 </li>
               );
             })}

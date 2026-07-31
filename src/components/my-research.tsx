@@ -15,6 +15,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "@/lib/locale";
 import { usePreferences } from "@/lib/preferences";
+import { stageLabel } from "@/lib/stage-labels";
+import type { Locale } from "@/lib/types";
 import { useModalDialog } from "@/lib/modal-dialog";
 import { withBasePath } from "@/lib/paths";
 import { compactResearchTitle } from "@/lib/research-title";
@@ -55,42 +57,16 @@ function profileLabel(run: CreatorRunListItem, ko: boolean) {
   return ko ? "표준 연구" : "Standard";
 }
 
-/* Stage names the Backend is allowed to publish. Anything unlisted is dropped
-   rather than shown as a raw identifier. */
-const STAGE_LABELS: Record<string, [string, string]> = {
-  runner_accepted: ["실행 시작", "Execution started"],
-  source_preflight: ["사전 점검", "Preflight"],
-  scientific_framing: ["문제 재구성", "Reframing the problem"],
-  mechanistic_decomposition: ["기전 분해", "Decomposing the mechanism"],
-  blind_multi_lens_ideation: ["다중 렌즈 발상", "Multi-lens ideation"],
-  idea_generation: ["아이디어 생성", "Generating ideas"],
-  presearch_idea_freeze: ["아이디어 동결", "Idea freeze"],
-  literature_retrieval: ["문헌 검색", "Retrieving literature"],
-  novelty_and_precedent_audit: ["신규성 대조", "Novelty audit"],
-  mechanism_family_grouping: ["기전 계열 분류", "Grouping mechanisms"],
-  family_grouping: ["계열 분류", "Grouping"],
-  proposal_development: ["제안 구체화", "Developing proposals"],
-  scientific_development: ["연구 구체화", "Scientific development"],
-  skeptical_review: ["회의적 검토", "Skeptical review"],
-  revision: ["제안 개정", "Revising proposals"],
-  dual_axis_portfolio: ["이중축 포트폴리오", "Dual-axis portfolio"],
-  comparison: ["비교", "Comparison"],
-  synthesis: ["종합", "Synthesis"],
-  report_generation: ["보고서 작성", "Generating reports"],
-  publication_packaging: ["결과 정리", "Packaging results"],
-};
-
 /* The Backend falls back to the lowercased status when a run has no events yet,
    so an unstarted run reports its status as its stage. Showing that alongside
    the status badge printed the same fact twice, once untranslated. */
-function stageLabel(
+function runStageLabel(
   stage: string,
   status: CreatorRunListItem["status"],
-  ko: boolean,
+  locale: Locale,
 ): string | null {
   if (!stage || stage.toLowerCase() === status.toLowerCase()) return null;
-  const label = STAGE_LABELS[stage];
-  return label ? (ko ? label[0] : label[1]) : null;
+  return stageLabel(stage, locale);
 }
 
 function statusLabel(status: CreatorRunListItem["status"], ko: boolean) {
@@ -323,8 +299,8 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
                 <p className="my-research-meta">
                   <span>{statusLabel(run.status, ko)}</span>
                   <span>{profileLabel(run, ko)}</span>
-                  {stageLabel(run.current_stage, run.status, ko) && (
-                    <span>{stageLabel(run.current_stage, run.status, ko)}</span>
+                  {runStageLabel(run.current_stage, run.status, locale) && (
+                    <span>{runStageLabel(run.current_stage, run.status, locale)}</span>
                   )}
                   {run.archive_category === "system_validation" && (
                     <span>{ko ? "시스템 검증" : "System validation"}</span>
