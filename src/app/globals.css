@@ -1776,13 +1776,21 @@ h1, h2 { letter-spacing: -0.015em; }
   padding: 14px 16px;
   color: var(--ink-soft);
 }
-.intake-form input,
-.intake-form textarea,
-.intake-form select,
 .settings-panel input,
 .settings-panel select {
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: 12px 14px;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+/* The composer follows the landing's flat treatment: hairline field, 3px
+   radius, no lift. Settings keeps the softer card styling above. */
+.intake-form input,
+.intake-form textarea,
+.intake-form select {
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
   background: var(--surface);
   padding: 12px 14px;
   transition: border-color 140ms ease, box-shadow 140ms ease;
@@ -1807,19 +1815,21 @@ h1, h2 { letter-spacing: -0.015em; }
 .primary-request-field > span { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
 .primary-request-field textarea {
   min-height: 250px;
-  border-radius: var(--radius-lg);
+  border-radius: 3px;
   padding: 20px;
   font-size: 17px;
   line-height: 1.6;
-  box-shadow: var(--shadow-xs);
+  box-shadow: none;
 }
 .intake-form label > span { font-weight: 600; }
 .advanced-fields {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  padding: 0 18px;
-  box-shadow: var(--shadow-xs);
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
 }
 .advanced-fields > summary { padding: 16px 0; }
 .advanced-fields > div { padding: 4px 0 22px; }
@@ -2538,11 +2548,12 @@ body { font-family: var(--font-ui), sans-serif; }
 .research-composer-shell {
   display: grid;
   gap: 22px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  padding: clamp(22px, 3vw, 36px);
-  box-shadow: var(--shadow-md);
+  border: 0;
+  border-top: 2px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  padding: 24px 0 0;
+  box-shadow: none;
 }
 .composer-heading {
   display: flex;
@@ -2577,34 +2588,47 @@ body { font-family: var(--font-ui), sans-serif; }
 .prominent .creativity-options {
   grid-template-columns: 1fr;
   height: 100%;
+  border: 0;
+  align-content: start;
+  gap: 22px;
 }
 .prominent .creativity-options > label {
   align-content: start;
-  padding: 17px 18px;
+  border-top: 2px solid var(--line-strong);
+  padding: 13px 0 0;
 }
 .prominent .creativity-options > label + label {
-  border-top: 1px solid var(--line-strong);
   border-left: 0;
 }
 .prominent .creativity-options > label.breakthrough {
-  background: color-mix(in srgb, var(--accent-softer) 62%, var(--surface));
+  background: transparent;
 }
 .prominent .creativity-options > label.selected {
-  box-shadow: inset 4px 0 0 var(--accent);
+  border-top-color: var(--accent);
+  background: transparent;
+  box-shadow: none;
+}
+.prominent .creativity-options > label.selected strong {
+  color: var(--accent-dark);
 }
 .prominent .creativity-options strong {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 15px;
 }
 .prominent .creativity-options ul {
   display: grid;
-  gap: 3px;
-  margin: 4px 0 0;
-  padding-left: 17px;
+  gap: 0;
+  margin: 9px 0 0;
+  padding-left: 0;
   color: var(--ink-soft);
-  font-size: 11px;
-  line-height: 1.45;
+  font-size: 13px;
+  line-height: 1.55;
+  list-style: none;
+}
+.prominent .creativity-options li {
+  border-top: 1px solid var(--line);
+  padding: 7px 0;
 }
 .homepage-composer .request-direct-fields {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(180px, 0.58fr);
@@ -2654,7 +2678,23 @@ body { font-family: var(--font-ui), sans-serif; }
 }
 .selected-profile-summary > p:last-child { color: var(--ink-soft); font-size: 13px; line-height: 1.55; }
 .homepage-composer .access-connection { max-width: none; }
-.review-plan-button { min-width: 220px; justify-content: center; }
+.intake-form .secondary-button {
+  border-radius: 3px;
+}
+.review-plan-button {
+  min-width: 220px;
+  justify-content: center;
+  border: 1px solid var(--accent-dark);
+  border-radius: 3px;
+  background: var(--accent);
+  box-shadow: none;
+}
+.review-plan-button:hover {
+  background: var(--accent-dark);
+  box-shadow: none;
+  transform: none;
+  filter: none;
+}
 .connected-account-state {
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr);
@@ -2826,18 +2866,6 @@ body { font-family: var(--font-ui), sans-serif; }
   font-size: 13px;
   line-height: 1.55;
 }
-.prominent .creativity-options > label { padding: 20px; }
-.prominent .creativity-options strong {
-  display: block;
-  overflow-wrap: anywhere;
-  letter-spacing: .015em;
-}
-.prominent .creativity-options ul {
-  gap: 5px;
-  margin-top: 8px;
-  font-size: 12px;
-  line-height: 1.5;
-}
 .homepage-composer .advanced-fields > div { gap: 20px; }
 .homepage-composer .advanced-fields .request-direct-fields {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(180px, .62fr);
@@ -2898,6 +2926,7 @@ body { font-family: var(--font-ui), sans-serif; }
 .my-research-tabs { display: flex; flex-wrap: wrap; gap: 4px; }
 .my-research-tabs button {
   border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
   background: transparent;
   padding: 7px 10px;
   color: var(--ink-soft);
@@ -2907,8 +2936,9 @@ body { font-family: var(--font-ui), sans-serif; }
   cursor: pointer;
 }
 .my-research-tabs button[aria-selected="true"] {
-  border-color: var(--line-strong);
-  background: var(--surface-muted);
+  border-color: transparent;
+  border-bottom-color: var(--accent);
+  background: transparent;
   color: var(--ink);
 }
 .my-research-card-side {
