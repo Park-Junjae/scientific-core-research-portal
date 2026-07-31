@@ -3035,3 +3035,25 @@ body { font-family: var(--font-ui), sans-serif; }
   .run-delete-dialog { padding: 22px; }
   .run-delete-actions { align-items: stretch; flex-direction: column-reverse; }
 }
+
+/* ---------------------------------------------------------------------------
+   Landing shell
+   The landing page at "/" is an introduction rather than a workspace view, so
+   it runs full-bleed without the application sidebar. These are the only rules
+   the landing needs from this stylesheet; everything it draws lives in
+   landing-page.module.css. The locale control is fixed relative to the sidebar,
+   so it moves to the opposite corner once the sidebar is gone.
+--------------------------------------------------------------------------- */
+.app-shell:has(.landing-root) .desktop-sidebar { display: none; }
+.app-shell:has(.landing-root) .main-content { margin-left: 0; }
+
+/* Above 820px the sidebar normally anchors the locale switch, so on the landing
+   it moves to the opposite corner. At or below 820px the mobile header already
+   owns that corner and positions the switch itself — leave it alone. */
+@media (min-width: 821px) {
+  .app-shell:has(.landing-root) .global-locale-control {
+    top: clamp(18px, 3vw, 30px);
+    right: clamp(18px, 4vw, 44px);
+    left: auto;
+  }
+}
