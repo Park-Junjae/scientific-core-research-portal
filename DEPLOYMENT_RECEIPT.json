@@ -2,9 +2,9 @@
   "schema_version": "ScientificCorePortalDeploymentReceiptV1",
   "deployment_id": "github-pages-public-synthetic-20260721",
   "deployment_status": "LIVE_VERIFIED",
-  "repository": "best916116-crypto/scientific-core-research-portal",
-  "repository_url": "https://github.com/best916116-crypto/scientific-core-research-portal",
-  "pages_url": "https://best916116-crypto.github.io/scientific-core-research-portal/",
+  "repository": "Park-Junjae/scientific-core-research-portal",
+  "repository_url": "https://github.com/Park-Junjae/scientific-core-research-portal",
+  "pages_url": "https://park-junjae.github.io/scientific-core-research-portal/",
   "visibility": "PUBLIC_SANITIZED",
   "approved_run_ids": [
     "demo_xrrna_prime_assembly_001",

@@ -4,6 +4,10 @@ An operational, creator-scoped research workspace for AI Cho-Scientist. The home
 
 [AI Cho-Scientist](https://app.aichoscientist.com/)
 
+<p align="center">
+  <img src="docs/assets/research-portal.png" alt="AI Cho-Scientist public research portal" width="1200">
+</p>
+
 ## Current mode
 
 Production publishes zero historical demonstration runs, artifacts, search records, or routes. Historical synthetic content is isolated under `tests/fixtures/` and can only be enabled by the explicit fixture-only test build.
@@ -11,6 +15,12 @@ Production publishes zero historical demonstration runs, artifacts, search recor
 Private run requests and results remain in the run-control API. No private scientific report, raw provider output, prompt, registry, request body, or laboratory data is serialized into the static deployment.
 
 ## Local use
+
+Prerequisites:
+
+- Python 3.11 or newer;
+- Node.js with `pnpm`;
+- a browser for the static preview and end-to-end tests.
 
 ```bash
 pnpm install --frozen-lockfile
@@ -61,3 +71,13 @@ Publication is allowlist-only, rejects unsafe paths and secret patterns, generat
 The scientific runtime is outside this repository and remains unchanged. Source-run locations are supplied to the publication CLI at execution time and are never serialized into published content.
 
 The current deployment receipt is recorded in [`DEPLOYMENT_RECEIPT.json`](DEPLOYMENT_RECEIPT.json).
+
+## License
+
+- Source code is released under the [MIT License](LICENSE).
+- Original synthetic demonstrations, project-created reports, interface copy, and project-created figures are released under [CC BY 4.0](LICENSE-CONTENT.md).
+- Third-party material retains its original license; see [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+## Feedback and contact
+
+Questions, corrections, and feature requests are welcome through [GitHub Issues](https://github.com/Park-Junjae/scientific-core-research-portal/issues) or at [best916116@gmail.com](mailto:best916116@gmail.com).
