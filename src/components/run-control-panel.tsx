@@ -19,6 +19,7 @@ import {
 import { AccessConnectionPanel } from "@/components/access-connection-panel";
 import { PrivateRunReader } from "@/components/private-run-reader";
 import { useLocale } from "@/lib/locale";
+import { stageLabel } from "@/lib/stage-labels";
 import { withBasePath } from "@/lib/paths";
 import { compactResearchTitle } from "@/lib/research-title";
 import {
@@ -302,7 +303,7 @@ export function RunControlPanel() {
       <section className="control-notice" role="status">
         <Server size={22} />
         <div>
-          <h2>{ko ? "연구 실행 기능을 준비하고 있습니다." : "Research execution is being prepared."}</h2>
+          <h1>{ko ? "연구 실행 기능을 준비하고 있습니다." : "Research execution is being prepared."}</h1>
           <p>{ko ? "운영 Backend 연결이 완료될 때까지 연구를 시작할 수 없습니다." : "Research cannot start until the production Backend is connected."}</p>
         </div>
       </section>
@@ -323,7 +324,7 @@ export function RunControlPanel() {
     return (
       <section className="control-notice" role="status">
         <div>
-          <h2>{ko ? "연구를 찾을 수 없습니다." : "Research not found."}</h2>
+          <h1>{ko ? "연구를 찾을 수 없습니다." : "Research not found."}</h1>
           <p>
             {ko
               ? "삭제되었거나 이 계정에서 접근할 수 없는 비공개 연구입니다."
@@ -443,7 +444,7 @@ export function RunControlPanel() {
           className="research-goal-section"
           aria-labelledby="research-goal-heading"
         >
-          <h2 id="research-goal-heading">Research goal</h2>
+          <h2 id="research-goal-heading">{ko ? "연구 목표" : "Research goal"}</h2>
           <p>{fullResearchGoal}</p>
         </section>
       )}
@@ -507,7 +508,7 @@ export function RunControlPanel() {
                   {complete && !active
                     ? <Check size={15} />
                     : <CircleDot size={15} />}
-                  <span>{aliases[0].replaceAll("_", " ")}</span>
+                  <span>{stageLabel(aliases[0], locale) ?? ""}</span>
                 </li>
               );
             })}
@@ -530,10 +531,10 @@ export function RunControlPanel() {
       <details className="technical-details run-diagnostics">
         <summary>{ko ? "진단 정보" : "Diagnostics"}</summary>
         <dl className="contract-grid">
-          <div><dt>Run ID</dt><dd>{run.run_id}</dd></div>
+          <div><dt>{ko ? "실행 ID" : "Run ID"}</dt><dd>{run.run_id}</dd></div>
           <div><dt>{ko ? "현재 단계" : "Current stage"}</dt><dd>{run.current_stage.replaceAll("_", " ")}</dd></div>
           <div><dt>{ko ? "예산 프로필" : "Budget profile"}</dt><dd>{run.budget_profile}</dd></div>
-          <div><dt>Runtime</dt><dd>{run.runtime_ref}</dd></div>
+          <div><dt>{ko ? "런타임" : "Runtime"}</dt><dd>{run.runtime_ref}</dd></div>
           <div><dt>{ko ? "취소 상태" : "Cancellation"}</dt><dd>{run.cancellation_state}</dd></div>
           <div><dt>{ko ? "이벤트" : "Events"}</dt><dd>{events.length}</dd></div>
         </dl>

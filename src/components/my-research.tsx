@@ -12,8 +12,12 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "@/lib/locale";
+import { usePreferences } from "@/lib/preferences";
+import { stageLabel } from "@/lib/stage-labels";
+import type { Locale } from "@/lib/types";
+import { useModalDialog } from "@/lib/modal-dialog";
 import { withBasePath } from "@/lib/paths";
 import { compactResearchTitle } from "@/lib/research-title";
 import {
@@ -46,10 +50,23 @@ const finishedStatuses = new Set([
   "CANCELLED",
 ]);
 
-function profileLabel(run: CreatorRunListItem) {
-  return run.creativity_profile === "BREAKTHROUGH_DISCOVERY"
-    ? "Breakthrough Discovery"
-    : "Standard";
+function profileLabel(run: CreatorRunListItem, ko: boolean) {
+  if (run.creativity_profile === "BREAKTHROUGH_DISCOVERY") {
+    return ko ? "돌파구 탐색" : "Breakthrough Discovery";
+  }
+  return ko ? "표준 연구" : "Standard";
+}
+
+/* The Backend falls back to the lowercased status when a run has no events yet,
+   so an unstarted run reports its status as its stage. Showing that alongside
+   the status badge printed the same fact twice, once untranslated. */
+function runStageLabel(
+  stage: string,
+  status: CreatorRunListItem["status"],
+  locale: Locale,
+): string | null {
+  if (!stage || stage.toLowerCase() === status.toLowerCase()) return null;
+  return stageLabel(stage, locale);
 }
 
 function statusLabel(status: CreatorRunListItem["status"], ko: boolean) {
@@ -74,7 +91,19 @@ function deletionKey(runId: string) {
 export function MyResearch({ session }: { session: RunControlSession | null }) {
   const { locale } = useLocale();
   const ko = locale === "ko";
+  const { preferences, loaded: preferencesLoaded } = usePreferences();
   const [view, setView] = useState<ResearchView>("active");
+  const viewSeeded = useRef(false);
+  const viewChosen = useRef(false);
+
+  /* Open on the saved tab. Preferences resolve after the first paint, so a
+     reader can switch tabs before they land; seeding must never take that back. */
+  useEffect(() => {
+    if (viewSeeded.current || !preferencesLoaded) return;
+    viewSeeded.current = true;
+    if (viewChosen.current) return;
+    setView(preferences.defaultResearchView);
+  }, [preferencesLoaded, preferences.defaultResearchView]);
   const [result, setResult] = useState<{
     email: string;
     active: CreatorRunListItem[];
@@ -87,6 +116,9 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
     run: CreatorRunListItem;
     confirmation: string;
   } | null>(null);
+  const closeDeletion = useCallback(() => setDeletion(null), []);
+  const { ref: deleteDialogRef, onKeyDown: onDeleteDialogKeyDown } =
+    useModalDialog<HTMLElement>(Boolean(deletion), closeDeletion);
   const loaded = Boolean(session && result?.email === session.email);
   const loading = Boolean(session && !loaded);
 
@@ -215,7 +247,7 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
   return (
     <section className="my-research-section" aria-labelledby="my-research-heading">
       <div className="my-research-heading-row">
-        <h2 id="my-research-heading">My Research</h2>
+        <h2 id="my-research-heading">{ko ? "내 연구" : "My Research"}</h2>
         {session && (
           <div className="my-research-tabs" role="tablist" aria-label="Research views">
             {(["active", "completed", "archived"] as const).map((item) => (
@@ -224,7 +256,7 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
                 type="button"
                 role="tab"
                 aria-selected={view === item}
-                onClick={() => setView(item)}
+                onClick={() => { viewChosen.current = true; setView(item); }}
               >
                 {item === "active"
                   ? (ko ? "진행 중" : "Active")
@@ -266,8 +298,10 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
               <div>
                 <p className="my-research-meta">
                   <span>{statusLabel(run.status, ko)}</span>
-                  <span>{profileLabel(run)}</span>
-                  <span>{run.current_stage.replaceAll("_", " ")}</span>
+                  <span>{profileLabel(run, ko)}</span>
+                  {runStageLabel(run.current_stage, run.status, locale) && (
+                    <span>{runStageLabel(run.current_stage, run.status, locale)}</span>
+                  )}
                   {run.archive_category === "system_validation" && (
                     <span>{ko ? "시스템 검증" : "System validation"}</span>
                   )}
@@ -359,6 +393,10 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="run-delete-title"
+            aria-describedby="run-delete-warning"
+            tabIndex={-1}
+            ref={deleteDialogRef}
+            onKeyDown={onDeleteDialogKeyDown}
           >
             <button
               type="button"
@@ -369,7 +407,7 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
               <X size={18} />
             </button>
             <h3 id="run-delete-title">{ko ? "연구를 영구 삭제할까요?" : "Permanently delete this Run?"}</h3>
-            <p>
+            <p id="run-delete-warning">
               {ko
                 ? "보고서와 모든 비공개 파일이 함께 삭제되며 복구할 수 없습니다."
                 : "Reports and all private files will be removed and cannot be recovered."}

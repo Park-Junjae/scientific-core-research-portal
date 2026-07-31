@@ -8,9 +8,10 @@ import {
   Upload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AccessConnectionPanel } from "@/components/access-connection-panel";
 import { useLocale } from "@/lib/locale";
+import { usePreferences } from "@/lib/preferences";
 import { withBasePath } from "@/lib/paths";
 import {
   buildRunRequest,
@@ -52,7 +53,10 @@ export function ResearchComposer({
   const { locale } = useLocale();
   const router = useRouter();
   const ko = locale === "ko";
+  const { preferences, loaded: preferencesLoaded } = usePreferences();
   const [value, setValue] = useState<RunRequestDraft>(initialRunRequest);
+  const seeded = useRef(false);
+  const touched = useRef(false);
   const [localSession, setLocalSession] = useState<RunControlSession | null>(null);
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -65,6 +69,7 @@ export function ResearchComposer({
   const breakthrough = value.creativity_profile === "BREAKTHROUGH_DISCOVERY";
 
   const update = <K extends keyof RunRequestDraft>(key: K, next: RunRequestDraft[K]) => {
+    touched.current = true;
     if (!busy) requestLocator.current = "";
     setSaved(false);
     setMessage("");
@@ -137,11 +142,27 @@ export function ResearchComposer({
         : "Starting research.");
       router.push(withBasePath(`/run-control/?run_id=${encodeURIComponent(run.run_id)}&lang=${locale}&created=1`));
     } catch (reason) {
-      setMessage(reason instanceof Error ? reason.message : "Unable to prepare the run.");
+      setMessage(
+        reason instanceof Error
+          ? reason.message
+          : (ko ? "연구를 준비하지 못했습니다." : "Unable to prepare the run."),
+      );
       submissionGuard.current = false;
       setBusy(false);
     }
   }
+
+  useEffect(() => {
+    if (seeded.current || !preferencesLoaded) return;
+    seeded.current = true;
+    if (touched.current) return;
+    setValue((current) => ({
+      ...current,
+      creativity_profile: preferences.defaultMode,
+      output_language: preferences.defaultReportLanguage,
+      literature_scope_enabled: preferences.defaultLiteratureScope,
+    }));
+  }, [preferencesLoaded, preferences]);
 
   const textArea = (
     key: keyof Pick<RunRequestDraft,
@@ -162,9 +183,9 @@ export function ResearchComposer({
       <form className="intake-form homepage-composer" onSubmit={(event) => { event.preventDefault(); void prepareRun(); }}>
         <div className="composer-core-grid">
           <label className="primary-request-field">
-            <span>Research goal<b aria-hidden="true"> *</b></span>
+            <span>{ko ? "연구 목표" : "Research goal"}<b aria-hidden="true"> *</b></span>
             <textarea
-              aria-label="Research goal"
+              aria-label={ko ? "연구 목표" : "Research goal"}
               required
               rows={8}
               value={value.raw_research_request}
@@ -181,27 +202,27 @@ export function ResearchComposer({
           </label>
 
           <fieldset className="creativity-selector prominent">
-            <legend>Research mode</legend>
+            <legend>{ko ? "연구 모드" : "Research mode"}</legend>
             <div className="creativity-options">
               <label className={breakthrough ? "" : "selected"}>
                 <input type="radio" name="creativity-profile" value="STANDARD" checked={!breakthrough} onChange={() => update("creativity_profile", "STANDARD")} />
                 <span>
-                  <strong>STANDARD</strong>
+                  <strong>{ko ? "표준 연구" : "STANDARD"}</strong>
                   <ul>
-                    <li>Evidence-first research</li>
-                    <li>Focused analysis</li>
-                    <li>Testable conclusions</li>
+                    <li>{ko ? "근거를 먼저 확인하는 방식" : "Evidence-first research"}</li>
+                    <li>{ko ? "초점을 좁힌 분석" : "Focused analysis"}</li>
+                    <li>{ko ? "검증 가능한 결론" : "Testable conclusions"}</li>
                   </ul>
                 </span>
               </label>
               <label className={breakthrough ? "selected breakthrough" : "breakthrough"}>
                 <input type="radio" name="creativity-profile" value="BREAKTHROUGH_DISCOVERY" checked={breakthrough} onChange={() => update("creativity_profile", "BREAKTHROUGH_DISCOVERY")} />
                 <span>
-                  <strong>BREAKTHROUGH DISCOVERY</strong>
+                  <strong>{ko ? "돌파구 탐색" : "BREAKTHROUGH DISCOVERY"}</strong>
                   <ul>
-                    <li>Broad ideation before literature search</li>
-                    <li>Cross-domain mechanism search</li>
-                    <li>Novelty and feasibility assessed separately</li>
+                    <li>{ko ? "문헌 검색 이전의 광범위한 발상" : "Broad ideation before literature search"}</li>
+                    <li>{ko ? "도메인을 넘나드는 기전 탐색" : "Cross-domain mechanism search"}</li>
+                    <li>{ko ? "신규성과 실현 가능성을 따로 평가" : "Novelty and feasibility assessed separately"}</li>
                   </ul>
                 </span>
               </label>
@@ -212,38 +233,38 @@ export function ResearchComposer({
         {runControlApiBase && <AccessConnectionPanel onSessionChange={connected} compact />}
 
         <details className="advanced-fields">
-          <summary>Options</summary>
+          <summary>{ko ? "세부 설정" : "Options"}</summary>
           <div>
             <div className="request-direct-fields">
-              {textArea("research_goal", "Objectives")}
-              {textArea("experimental_constraints", "Constraints")}
+              {textArea("research_goal", ko ? "목표" : "Objectives")}
+              {textArea("experimental_constraints", ko ? "제약 조건" : "Constraints")}
               <label>
-                <span>Report language</span>
+                <span>{ko ? "보고서 언어" : "Report language"}</span>
                 <select value={value.output_language} onChange={(event) => update("output_language", event.target.value as RunRequestDraft["output_language"])}>
-                  <option value="">Current portal language</option>
+                  <option value="">{ko ? "현재 화면 언어" : "Current portal language"}</option>
                   <option value="ko">한국어</option>
                   <option value="en">English</option>
-                  <option value="bilingual">Korean + English</option>
+                  <option value="bilingual">{ko ? "한국어 + English" : "Korean + English"}</option>
                 </select>
               </label>
             </div>
             <label className="literature-scope-toggle">
               <input type="checkbox" checked={value.literature_scope_enabled} onChange={(event) => update("literature_scope_enabled", event.target.checked)} />
-              <span>Include literature review and complete source ledger</span>
+              <span>{ko ? "문헌 검토와 전체 출처 원장을 포함합니다" : "Include literature review and complete source ledger"}</span>
             </label>
             <label>
-              <span>References and additional constraints</span>
+              <span>{ko ? "참고 자료 및 추가 제약" : "References and additional constraints"}</span>
               <textarea rows={4} value={value.reference_material_or_constraints} onChange={(event) => update("reference_material_or_constraints", event.target.value)} />
             </label>
-            {textArea("research_question", "Structured research question", 4)}
-            {textArea("current_bottleneck", "Current bottleneck")}
-            {textArea("success_criteria", "Success criteria")}
-            {textArea("failure_criteria", "Failure criteria")}
-            {textArea("non_goals", "Non-goals")}
-            {textArea("custom_requested_outputs", "Additional outputs")}
-            {textArea("notes", "Notes")}
+            {textArea("research_question", ko ? "정형화된 연구 질문" : "Structured research question", 4)}
+            {textArea("current_bottleneck", ko ? "현재 병목" : "Current bottleneck")}
+            {textArea("success_criteria", ko ? "성공 기준" : "Success criteria")}
+            {textArea("failure_criteria", ko ? "실패 기준" : "Failure criteria")}
+            {textArea("non_goals", ko ? "다루지 않을 범위" : "Non-goals")}
+            {textArea("custom_requested_outputs", ko ? "추가 산출물" : "Additional outputs")}
+            {textArea("notes", ko ? "메모" : "Notes")}
             <label className="request-import">
-              <span><Upload size={16} />Import JSON</span>
+              <span><Upload size={16} />{ko ? "JSON 불러오기" : "Import JSON"}</span>
               <input type="file" accept=".json,application/json" onChange={async (event) => {
                 const file = event.target.files?.[0];
                 if (!file) return;
@@ -257,7 +278,7 @@ export function ResearchComposer({
             </label>
             <button className="secondary-button" type="button" disabled={!ready} onClick={() => { downloadRequest(request); setSaved(true); }}>
               {saved ? <Check size={18} /> : <Download size={18} />}
-              {saved ? "JSON exported" : "Export JSON"}
+              {saved ? (ko ? "JSON 내보냄" : "JSON exported") : (ko ? "JSON 내보내기" : "Export JSON")}
             </button>
           </div>
         </details>

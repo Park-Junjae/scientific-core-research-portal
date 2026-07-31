@@ -1,0 +1,449 @@
+/* Landing surface.
+   Scoped as a CSS Module so none of it reaches the application stylesheet and
+   none of that stylesheet's overrides reach it.
+
+   The page is built as an instrument readout rather than a marketing page:
+   flat ground, hairline rules, monospace for anything that is a real
+   identifier in the system, and prose set at reading density.
+
+   Glass appears exactly once — the barrier at presearch_idea_freeze. It is the
+   only place where a translucent pane means something: it is the membrane the
+   run cannot see through, separating ideation from literature access. */
+
+.root {
+  --ground: #fcfdfe;
+  --rule: #dde3ea;
+  --rule-strong: #c3ccd6;
+  --mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  position: relative;
+  isolation: isolate;
+  background: var(--ground);
+  color: var(--ink);
+}
+
+.shell {
+  width: 100%;
+  max-width: 1020px;
+  margin-inline: auto;
+  padding: clamp(48px, 7vw, 92px) clamp(20px, 5vw, 48px) clamp(64px, 8vw, 104px);
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: -0.01em;
+}
+
+/* ---- hero --------------------------------------------------------------- */
+
+.hero {
+  display: grid;
+  gap: 20px;
+  justify-items: start;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: clamp(38px, 5vw, 58px);
+}
+
+.title {
+  max-width: 20ch;
+  margin: 0;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.022em;
+}
+
+.lede {
+  max-width: 58ch;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: clamp(15px, 1.4vw, 17px);
+  line-height: 1.68;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  margin-top: 6px;
+}
+
+.cta {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--accent-dark);
+  border-radius: 3px;
+  background: var(--accent);
+  padding: 0 20px;
+  color: var(--on-accent);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cta:hover { background: var(--accent-dark); }
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: var(--ink-soft);
+  font-size: 14px;
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 4px;
+}
+
+.secondary:hover { color: var(--ink); text-decoration-color: currentColor; }
+
+/* Factual run parameters, not claims. */
+.specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 4px 0 0;
+  padding: 0;
+  color: var(--ink-faint);
+  list-style: none;
+}
+
+.specs li { font-family: var(--mono); font-size: 12px; }
+
+/* ---- pipeline spine ----------------------------------------------------- */
+
+.spine {
+  margin-top: clamp(44px, 6vw, 72px);
+}
+
+.spineHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px 24px;
+  margin-bottom: 26px;
+}
+
+.spineHead h2 {
+  margin: 0;
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.014em;
+}
+
+.spineHead p {
+  max-width: 46ch;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.phase {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0 12px;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.phase::after {
+  flex: 1;
+  border-top: 1px solid var(--rule);
+  content: "";
+}
+
+.stages {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stage {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 250px) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 4px 18px;
+  border-bottom: 1px solid var(--rule);
+  padding: 11px 2px;
+}
+
+.stage:last-child { border-bottom: 0; }
+
+.stageIndex {
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stageId {
+  color: var(--accent-dark);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+
+.stageLabel {
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.stageNote {
+  grid-column: 3;
+  margin: 2px 0 0;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+/* ---- the barrier -------------------------------------------------------- */
+
+.barrier {
+  position: relative;
+  display: grid;
+  gap: 9px;
+  margin: 14px 0;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.55);
+  padding: clamp(18px, 2.6vw, 26px) clamp(18px, 2.6vw, 28px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 10px 30px -22px rgba(23, 42, 66, 0.5);
+}
+
+/* The one meaningful use of glass on this page: the run cannot see through it. */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .barrier {
+    -webkit-backdrop-filter: blur(10px) saturate(130%);
+    backdrop-filter: blur(10px) saturate(130%);
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .barrier { background: color-mix(in srgb, var(--ground) 82%, transparent); }
+}
+
+/* Hatching reads as a sealed boundary rather than another card. */
+.barrier::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: 4px;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(30, 116, 192, 0.07) 0 6px,
+    transparent 6px 13px
+  );
+  content: "";
+}
+
+.barrierTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.barrierId {
+  color: var(--accent-dark);
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+
+.barrierLabel {
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.barrierNote {
+  max-width: 74ch;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.access {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  padding: 3px 8px;
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.accessDenied { border-color: color-mix(in srgb, var(--warn) 45%, transparent); color: var(--warn); }
+.accessAllowed { border-color: color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent-dark); }
+
+/* ---- modes -------------------------------------------------------------- */
+
+.modes {
+  margin-top: clamp(52px, 7vw, 86px);
+  border-top: 1px solid var(--rule);
+  padding-top: clamp(28px, 4vw, 42px);
+}
+
+.modes h2 {
+  margin: 0 0 4px;
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.014em;
+}
+
+.modes > p {
+  max-width: 58ch;
+  margin: 0 0 26px;
+  color: var(--ink-soft);
+  font-size: 14.5px;
+  line-height: 1.62;
+}
+
+.modeGrid {
+  display: grid;
+  gap: 0 40px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mode {
+  border-top: 2px solid var(--ink);
+  padding-top: 14px;
+}
+
+.mode + .mode { border-top-color: var(--accent); }
+
+.modeName {
+  margin: 0 0 3px;
+  font-size: 16.5px;
+  font-weight: 700;
+}
+
+.modeEnum {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 11.5px;
+}
+
+.mode ul {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mode li {
+  border-top: 1px solid var(--rule);
+  padding: 9px 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* ---- close -------------------------------------------------------------- */
+
+.close {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 22px;
+  margin-top: clamp(48px, 6vw, 76px);
+  border-top: 1px solid var(--rule);
+  padding-top: 26px;
+}
+
+.close p {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+/* ---- responsive --------------------------------------------------------- */
+
+@media (max-width: 860px) {
+  .stage {
+    grid-template-columns: 26px minmax(0, 1fr);
+    gap: 2px 12px;
+  }
+  .stageId { grid-column: 2; order: 2; font-size: 11.5px; }
+  .stageLabel { grid-column: 2; order: 1; }
+  .stageNote { grid-column: 2; order: 3; }
+  .modeGrid { grid-template-columns: minmax(0, 1fr); gap: 34px; }
+}
+
+@media (max-width: 560px) {
+  .title { max-width: 100%; }
+  .cta { width: 100%; justify-content: center; }
+}
+
+@media (prefers-contrast: more) {
+  .barrier {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: #ffffff;
+    border-color: var(--ink);
+  }
+  .barrier::before { display: none; }
+}
+
+/* ---- dark ---------------------------------------------------------------
+   The ink tokens come from the application stylesheet and flip with the theme;
+   the ground, rules and glass are local to this file, so they flip here. The
+   barrier stays the one translucent surface — it just tints dark instead of
+   light, and the hatching lightens so the boundary still reads.
+------------------------------------------------------------------------- */
+:global(:root[data-theme="dark"]) .root {
+  --ground: #0e151d;
+  --rule: #263341;
+  --rule-strong: #3a4a5c;
+}
+
+:global(:root[data-theme="dark"]) .barrier {
+  background: rgba(38, 51, 65, 0.55);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 10px 30px -22px rgba(0, 0, 0, 0.8);
+}
+
+:global(:root[data-theme="dark"]) .barrier::before {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(88, 168, 240, 0.12) 0 6px,
+    transparent 6px 13px
+  );
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"]):not([data-theme="dark"])) .root {
+    --ground: #0e151d;
+    --rule: #263341;
+    --rule-strong: #3a4a5c;
+  }
+  :global(:root:not([data-theme="light"]):not([data-theme="dark"])) .barrier {
+    background: rgba(38, 51, 65, 0.55);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 10px 30px -22px rgba(0, 0, 0, 0.8);
+  }
+  :global(:root:not([data-theme="light"]):not([data-theme="dark"])) .barrier::before {
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(88, 168, 240, 0.12) 0 6px,
+      transparent 6px 13px
+    );
+  }
+}
