@@ -12,10 +12,11 @@ import {
   Settings,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { localized, useLocale } from "@/lib/locale";
 import { withBasePath } from "@/lib/paths";
 import { usePreferences } from "@/lib/preferences";
+import { useModalDialog } from "@/lib/modal-dialog";
 import type { LocalizedText, RunStatus } from "@/lib/types";
 
 export type RecentRunLink = {
@@ -155,6 +156,9 @@ export function SiteNavigation({ recentRuns }: { recentRuns: RecentRunLink[] }) 
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const { preferences } = usePreferences();
+  const closeDrawer = useCallback(() => setOpen(false), []);
+  const { ref: drawerRef, onKeyDown: onDrawerKeyDown } =
+    useModalDialog<HTMLDivElement>(open, closeDrawer);
   const { locale } = useLocale();
   const visibleRecentRuns = recentRuns.slice(0, preferences.recent);
   return (
@@ -189,6 +193,9 @@ export function SiteNavigation({ recentRuns }: { recentRuns: RecentRunLink[] }) 
           role="dialog"
           aria-modal="true"
           aria-label={locale === "ko" ? "탐색" : "Navigation"}
+          tabIndex={-1}
+          ref={drawerRef}
+          onKeyDown={onDrawerKeyDown}
         >
           <button
             className="drawer-dismiss"

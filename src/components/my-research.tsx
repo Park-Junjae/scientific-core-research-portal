@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "@/lib/locale";
 import { usePreferences } from "@/lib/preferences";
+import { useModalDialog } from "@/lib/modal-dialog";
 import { withBasePath } from "@/lib/paths";
 import { compactResearchTitle } from "@/lib/research-title";
 import {
@@ -139,6 +140,9 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
     run: CreatorRunListItem;
     confirmation: string;
   } | null>(null);
+  const closeDeletion = useCallback(() => setDeletion(null), []);
+  const { ref: deleteDialogRef, onKeyDown: onDeleteDialogKeyDown } =
+    useModalDialog<HTMLElement>(Boolean(deletion), closeDeletion);
   const loaded = Boolean(session && result?.email === session.email);
   const loading = Boolean(session && !loaded);
 
@@ -413,6 +417,10 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="run-delete-title"
+            aria-describedby="run-delete-warning"
+            tabIndex={-1}
+            ref={deleteDialogRef}
+            onKeyDown={onDeleteDialogKeyDown}
           >
             <button
               type="button"
@@ -423,7 +431,7 @@ export function MyResearch({ session }: { session: RunControlSession | null }) {
               <X size={18} />
             </button>
             <h3 id="run-delete-title">{ko ? "연구를 영구 삭제할까요?" : "Permanently delete this Run?"}</h3>
-            <p>
+            <p id="run-delete-warning">
               {ko
                 ? "보고서와 모든 비공개 파일이 함께 삭제되며 복구할 수 없습니다."
                 : "Reports and all private files will be removed and cannot be recovered."}
