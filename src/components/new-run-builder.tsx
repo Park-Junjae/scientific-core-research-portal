@@ -104,7 +104,10 @@ export function ResearchComposer({
       value.failure_criteria,
       value.non_goals,
     ].filter(Boolean).join("\n"));
-    const reportLanguage = value.output_language || locale;
+    // Run Control refuses a provider-backed Breakthrough run whose report is not
+    // bilingual, and it refuses it after dispatch. The control below is fixed to
+    // bilingual for this profile, so this only restates what the operator was shown.
+    const reportLanguage = breakthrough ? "bilingual" : (value.output_language || locale);
     try {
       const run = await createControlledRun(
         buildControlledRunPayload({
@@ -240,12 +243,23 @@ export function ResearchComposer({
               {textArea("experimental_constraints", ko ? "제약 조건" : "Constraints")}
               <label>
                 <span>{ko ? "보고서 언어" : "Report language"}</span>
-                <select value={value.output_language} onChange={(event) => update("output_language", event.target.value as RunRequestDraft["output_language"])}>
+                <select
+                  value={breakthrough ? "bilingual" : value.output_language}
+                  disabled={breakthrough}
+                  onChange={(event) => update("output_language", event.target.value as RunRequestDraft["output_language"])}
+                >
                   <option value="">{ko ? "현재 화면 언어" : "Current portal language"}</option>
                   <option value="ko">한국어</option>
                   <option value="en">English</option>
                   <option value="bilingual">{ko ? "한국어 + English" : "Korean + English"}</option>
                 </select>
+                {breakthrough ? (
+                  <small>
+                    {ko
+                      ? "Breakthrough Discovery 보고서는 항상 한국어와 English 두 언어로 작성됩니다."
+                      : "Breakthrough Discovery reports are always written in both Korean and English."}
+                  </small>
+                ) : null}
               </label>
             </div>
             <label className="literature-scope-toggle">
